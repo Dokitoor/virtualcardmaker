@@ -1,0 +1,1617 @@
+/* ==========================================================================
+   OLUSEYI OGUNDIPE — VIRTUAL BUSINESS CARD
+   Editorial • Minimal • Modern • Confident • Creative
+   Nairobi Conference 2026 Edition
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   01. DESIGN TOKENS & VARIABLES
+   -------------------------------------------------------------------------- */
+:root {
+  /* Editorial Palette: Warm Ivory & Near-Black */
+  --bg-page: #F3EFE8;
+  --bg-page-subtle: #EBE5DB;
+  --bg-card: #FAF7F2;
+  --bg-card-alt: #F4EFE7;
+  --bg-card-elevated: #FFFFFF;
+
+  /* Typography Colors */
+  --text-main: #141312;
+  --text-muted: #645F58;
+  --text-subtle: #8F8980;
+  --text-inverse: #FAF7F2;
+
+  /* Editorial Accent: Warm Burnt Terracotta */
+  --accent-primary: #C84B24;
+  --accent-primary-hover: #AF3C17;
+  --accent-soft: rgba(200, 75, 36, 0.08);
+  --accent-border: rgba(200, 75, 36, 0.25);
+
+  /* Subtle Teal Nuance (Echoing Suit Texture) */
+  --accent-teal: #10757F;
+  --accent-teal-soft: rgba(16, 117, 127, 0.1);
+
+  /* Hairlines & Grid Lines */
+  --border-hairline: rgba(20, 19, 18, 0.12);
+  --border-fine: rgba(20, 19, 18, 0.20);
+  --border-strong: rgba(20, 19, 18, 0.85);
+
+  /* Typography Stack */
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Space Mono', monospace;
+  --font-editorial: 'Newsreader', Georgia, serif;
+
+  /* Card Sizing */
+  --card-width: 420px;
+  --card-min-height: 670px;
+  --card-radius: 24px;
+
+  /* Shadows: Tactile Architectural Shadows */
+  --shadow-card: 0 24px 50px -15px rgba(24, 21, 18, 0.18),
+                 0 8px 18px -6px rgba(24, 21, 18, 0.08),
+                 0 0 0 1px rgba(20, 19, 18, 0.08);
+  --shadow-elevated: 0 12px 28px -6px rgba(24, 21, 18, 0.12);
+
+  /* Animation Timings */
+  --flip-duration: 0.65s;
+  --flip-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* --------------------------------------------------------------------------
+   02. BASE & RESET
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 24px 16px;
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   03. AMBIENT BACKGROUND & ARCHITECTURAL GRID
+   -------------------------------------------------------------------------- */
+.page-background {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.architectural-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(20, 19, 18, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 19, 18, 0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
+  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
+}
+
+.subtle-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.25;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.12) 1px, transparent 0);
+  background-size: 8px 8px;
+}
+
+/* --------------------------------------------------------------------------
+   04. VIEWPORT STAGE & TOP BAR
+   -------------------------------------------------------------------------- */
+.viewport-stage {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: var(--card-width);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin: auto;
+}
+
+/* Top Navigation Bar */
+.top-nav-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background-color: rgba(255, 255, 255, 0.65);
+  border: 1px solid var(--border-hairline);
+  border-radius: 100px;
+  backdrop-filter: blur(8px);
+}
+
+.pulse-indicator {
+  width: 7px;
+  height: 7px;
+  background-color: var(--accent-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(200, 75, 36, 0.5);
+  animation: pulse 2.2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(200, 75, 36, 0.6); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(200, 75, 36, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(200, 75, 36, 0); }
+}
+
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-main);
+}
+
+.nav-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: rgba(255, 255, 255, 0.65);
+  border: 1px solid var(--border-hairline);
+  border-radius: 100px;
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.nav-icon-btn:hover {
+  background-color: #FFFFFF;
+  border-color: var(--text-main);
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   05. 3D CARD SCENE & CONTAINER
+   -------------------------------------------------------------------------- */
+.card-scene {
+  width: 100%;
+  perspective: 1400px;
+}
+
+.card-container {
+  width: 100%;
+  min-height: var(--card-min-height);
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform var(--flip-duration) var(--flip-ease);
+  cursor: default;
+}
+
+.card-container.is-flipped {
+  transform: rotateY(180deg);
+}
+
+/* Card Faces Common Styles */
+.card-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  min-height: 100%;
+  background-color: var(--bg-card);
+  border-radius: var(--card-radius);
+  border: 1px solid var(--border-hairline);
+  box-shadow: var(--shadow-card);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  padding: 24px 22px 20px 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  /* Tactile Subtle Noise Effect */
+  background-image: radial-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 0);
+  background-size: 6px 6px;
+}
+
+/* Back Face Specifics */
+.card-back {
+  transform: rotateY(180deg);
+  background-color: #FAF8F4;
+}
+
+/* Card Top Bar Metadata */
+.card-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-hairline);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text-subtle);
+  user-select: none;
+}
+
+.spec-crosshairs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.crosshair {
+  color: var(--accent-primary);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.brand-submark {
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   06. FRONT FACE: EDITORIAL PORTRAIT & TYPOGRAPHY
+   -------------------------------------------------------------------------- */
+.portrait-stage {
+  position: relative;
+  margin: 14px 0 16px 0;
+  width: 100%;
+}
+
+/* Architectural Framing (Non-Circular, Asymmetric Edge) */
+.portrait-frame {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background-color: #E7E3DC;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(20, 19, 18, 0.08);
+}
+
+.portrait-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  filter: contrast(1.02) brightness(1.01);
+}
+
+.card-container:hover .portrait-img {
+  transform: scale(1.03);
+}
+
+.portrait-corner-rule {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 18px;
+  height: 18px;
+  border-top: 2px solid rgba(255, 255, 255, 0.8);
+  border-right: 2px solid rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+}
+
+.portrait-badge {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(20, 19, 18, 0.8);
+  color: #FFFFFF;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  backdrop-filter: blur(8px);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10B981; /* emerald active dot */
+}
+
+.portrait-caption-tag {
+  position: absolute;
+  top: -8px;
+  right: 14px;
+  background-color: var(--bg-card);
+  padding: 0 6px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-subtle);
+  border: 1px solid var(--border-hairline);
+  border-radius: 4px;
+}
+
+.portrait-caption-tag .pipe {
+  color: var(--accent-primary);
+  margin: 0 2px;
+}
+
+/* Identity Typography */
+.identity-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.person-name {
+  font-family: var(--font-display);
+  font-size: 29px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--text-main);
+  text-transform: uppercase;
+}
+
+.name-accent {
+  color: var(--accent-primary);
+}
+
+.role-title {
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.role-separator {
+  color: var(--accent-primary);
+  font-weight: 700;
+  margin: 0 4px;
+}
+
+.positioning-statement {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* Capability Pills (Editorial Tags) */
+.capabilities-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.capability-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  background-color: rgba(20, 19, 18, 0.04);
+  border: 1px solid var(--border-hairline);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.04em;
+}
+
+.cap-num {
+  color: var(--accent-primary);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+/* Front Footer */
+.face-footer {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-hairline);
+}
+
+.flip-trigger-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 16px;
+  background-color: var(--text-main);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.flip-trigger-btn:hover {
+  background-color: #262422;
+  transform: translateY(-1px);
+}
+
+.flip-arrow-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.18);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease;
+}
+
+.flip-trigger-btn:hover .flip-arrow-circle {
+  transform: translateX(3px);
+  background-color: var(--accent-primary);
+}
+
+/* --------------------------------------------------------------------------
+   07. BACK FACE: LET'S CONNECT & FUNCTIONAL DETAILS
+   -------------------------------------------------------------------------- */
+.connect-headline-wrap {
+  margin: 10px 0 12px 0;
+}
+
+.connect-kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--accent-primary);
+  margin-bottom: 2px;
+}
+
+.connect-heading {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+  line-height: 1.1;
+}
+
+/* Contact Details List */
+.contact-details-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 11px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-hairline);
+  border-radius: 10px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.contact-item:hover {
+  border-color: var(--border-fine);
+  background-color: #FCFBF9;
+}
+
+.contact-item-left {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.contact-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--text-subtle);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.contact-link {
+  color: var(--text-main);
+  text-decoration: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.15s ease;
+}
+
+.contact-link:hover {
+  color: var(--accent-primary);
+}
+
+.contact-link.highlight-portfolio {
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+.contact-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 8px;
+}
+
+.copy-action-btn,
+.direct-action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--border-hairline);
+  background-color: var(--bg-card);
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.copy-action-btn:hover,
+.direct-action-btn:hover {
+  background-color: var(--text-main);
+  color: #FFFFFF;
+  border-color: var(--text-main);
+}
+
+.whatsapp-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.whatsapp-pill-btn:hover {
+  background-color: #059669;
+  color: #FFFFFF;
+}
+
+/* --------------------------------------------------------------------------
+   08. PROMINENT QR CODE BLOCK
+   -------------------------------------------------------------------------- */
+.qr-showcase-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 14px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-hairline);
+  border-radius: 14px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.qr-header {
+  margin-bottom: 8px;
+}
+
+.qr-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-main);
+}
+
+.qr-image-wrapper {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  padding: 8px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-hairline);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.qr-image-wrapper:hover {
+  transform: scale(1.04);
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.12);
+  border-color: var(--accent-primary);
+}
+
+.qr-svg-graphic {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.qr-scan-badge {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--text-main);
+  color: #FFFFFF;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 100px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.qr-supporting-line {
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Back Footer Actions */
+.back-footer-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-hairline);
+}
+
+.save-contact-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  background-color: var(--accent-primary);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(200, 75, 36, 0.28);
+}
+
+.save-contact-btn:hover {
+  background-color: var(--accent-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(200, 75, 36, 0.38);
+}
+
+.flip-back-btn {
+  background-color: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--border-hairline);
+  padding: 9px 14px;
+}
+
+.flip-back-btn:hover {
+  background-color: #FFFFFF;
+  border-color: var(--text-main);
+  color: var(--text-main);
+}
+
+.flip-arrow-left {
+  background-color: rgba(20, 19, 18, 0.08);
+}
+
+.flip-back-btn:hover .flip-arrow-left {
+  background-color: var(--text-main);
+  color: #FFFFFF;
+  transform: translateX(-3px);
+}
+
+/* --------------------------------------------------------------------------
+   09. BOTTOM PERSISTENT DOCK & SEGMENTED SWITCHER
+   -------------------------------------------------------------------------- */
+.bottom-control-dock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  user-select: none;
+}
+
+.segmented-control {
+  display: inline-flex;
+  padding: 4px;
+  background-color: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--border-hairline);
+  border-radius: 100px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  backdrop-filter: blur(10px);
+}
+
+.segment-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.segment-btn .dot-status {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+}
+
+.segment-btn.active {
+  background-color: var(--text-main);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.segment-btn.active .dot-status {
+  background-color: var(--accent-primary);
+}
+
+.quick-instructions {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-subtle);
+  letter-spacing: 0.03em;
+}
+
+.kbd-hint kbd {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--border-hairline);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* --------------------------------------------------------------------------
+   10. FULLSCREEN MODAL FOR QR SCANNING
+   -------------------------------------------------------------------------- */
+.qr-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.qr-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.qr-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(20, 19, 18, 0.65);
+  backdrop-filter: blur(6px);
+}
+
+.qr-modal-dialog {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 360px;
+  background-color: #FAF7F2;
+  border-radius: 20px;
+  border: 1px solid var(--border-fine);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+  padding: 28px 24px;
+  text-align: center;
+  transform: scale(0.95) translateY(10px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.qr-modal.is-open .qr-modal-dialog {
+  transform: scale(1) translateY(0);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border-hairline);
+  background: #FFFFFF;
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.modal-close-btn:hover {
+  background-color: var(--text-main);
+  color: #FFFFFF;
+}
+
+.modal-kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--accent-primary);
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  margin: 4px 0 2px 0;
+  letter-spacing: -0.01em;
+}
+
+.modal-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.modal-qr-wrapper {
+  margin: 20px auto;
+  width: 220px;
+  height: 220px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-hairline);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.modal-qr-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.modal-quote {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.modal-author {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent-primary);
+}
+
+/* --------------------------------------------------------------------------
+   11. TOAST NOTIFICATION
+   -------------------------------------------------------------------------- */
+.toast-notification {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(50px);
+  background-color: var(--text-main);
+  color: #FFFFFF;
+  padding: 10px 18px;
+  border-radius: 100px;
+  font-size: 12.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2000;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-notification.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast-icon {
+  color: #10B981;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   12. RESPONSIVE DESIGN (MOBILE-FIRST POLISH)
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  body {
+    padding: 16px 12px;
+  }
+
+  :root {
+    --card-min-height: 650px;
+  }
+
+  .card-face {
+    padding: 20px 18px 18px 18px;
+  }
+
+  .person-name {
+    font-size: 26px;
+  }
+
+  .role-title {
+    font-size: 12.5px;
+  }
+
+  .positioning-statement {
+    font-size: 12px;
+  }
+
+  .portrait-frame {
+    height: 230px;
+  }
+
+  .connect-heading {
+    font-size: 23px;
+  }
+
+  .qr-image-wrapper {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+@media (max-height: 750px) and (min-width: 481px) {
+  /* Compact laptop displays */
+  :root {
+    --card-min-height: 630px;
+  }
+  .portrait-frame {
+    height: 220px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   13. APPLE WALLET PASS & IPHONE SHARE HUB STYLES
+   -------------------------------------------------------------------------- */
+
+/* Apple Wallet Trigger Button */
+.apple-wallet-trigger-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  background-color: #1C1C1E;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.apple-wallet-trigger-btn:hover {
+  background-color: #2C2C2E;
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+/* Apple Wallet Pass Modal */
+.apple-wallet-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.apple-wallet-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.wallet-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(10, 10, 12, 0.75);
+  backdrop-filter: blur(8px);
+}
+
+.wallet-modal-dialog {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 380px;
+  background-color: #121214;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
+  padding: 24px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: scale(0.94) translateY(12px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #FFFFFF;
+}
+
+.apple-wallet-modal.is-open .wallet-modal-dialog {
+  transform: scale(1) translateY(0);
+}
+
+.wallet-badge-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #D4AF37; /* Wallet Gold */
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+/* 3D Flippable Wallet Pass Card */
+.wallet-pass-container {
+  width: 100%;
+  min-height: 440px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.2, 0.8, 0.2, 1);
+  margin-bottom: 16px;
+}
+
+.wallet-pass-container.is-pass-flipped {
+  transform: rotateY(180deg);
+}
+
+.wallet-pass-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, #1C1C1E 0%, #2C2C2E 100%);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  padding: 16px 18px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.wallet-pass-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(145deg, #222224 0%, #171719 100%);
+}
+
+/* Pass Top Bar */
+.pass-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pass-logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pass-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.pass-org-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.pass-org-name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #FFFFFF;
+}
+
+.pass-type-tag {
+  font-size: 9px;
+  color: #8E8E93;
+  letter-spacing: 0.04em;
+}
+
+.pass-event-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 8px;
+  background-color: rgba(212, 175, 55, 0.15);
+  color: #D4AF37;
+  border-radius: 100px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+/* Primary Pass Fields */
+.pass-primary-fields {
+  margin-top: 12px;
+}
+
+.pass-field-label {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  font-weight: 700;
+  color: #8E8E93;
+  letter-spacing: 0.1em;
+  display: block;
+}
+
+.pass-field-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.pass-field-value.primary-val {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+}
+
+/* Aux Grid */
+.pass-aux-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* Perforation Tear Line */
+.pass-perforation-line {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 12px -18px;
+}
+
+.pass-perforation-line .dashed-line {
+  width: 100%;
+  height: 1px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.18);
+}
+
+.pass-perforation-line .notch {
+  width: 14px;
+  height: 14px;
+  background-color: #121214;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.notch-left {
+  left: -7px;
+}
+
+.notch-right {
+  right: -7px;
+}
+
+/* Barcode Section */
+.pass-barcode-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.pass-qr-wrapper {
+  width: 100px;
+  height: 100px;
+  padding: 6px;
+  background-color: #FFFFFF;
+  border-radius: 8px;
+}
+
+.pass-qr-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.pass-serial {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  color: #8E8E93;
+  letter-spacing: 0.08em;
+}
+
+/* Pass Info Flip (i) Button */
+.pass-info-flip-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+  font-family: serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pass-info-flip-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* Pass Back Styles */
+.pass-back-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pass-back-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #FFFFFF;
+}
+
+.pass-back-close-btn {
+  background: transparent;
+  border: none;
+  color: #0A84FF;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pass-back-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 14px 0;
+  text-align: left;
+}
+
+.pass-back-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: #8E8E93;
+  letter-spacing: 0.08em;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.pass-back-text {
+  font-size: 12px;
+  color: #E5E5EA;
+  line-height: 1.4;
+}
+
+.pass-back-actions {
+  margin-top: auto;
+}
+
+.pass-action-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background-color: #0A84FF;
+  color: #FFFFFF;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+/* Wallet Pass Actions Download Button */
+.wallet-modal-actions {
+  width: 100%;
+}
+
+.download-pkpass-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: #D4AF37; /* Apple Wallet Gold */
+  color: #000000;
+  border: none;
+  border-radius: 12px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.download-pkpass-btn:hover {
+  background-color: #E5BE48;
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   14. IPHONE NATIVE SHARE DRAWER MODAL
+   -------------------------------------------------------------------------- */
+.iphone-share-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.iphone-share-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.iphone-share-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.iphone-share-sheet {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 440px;
+  background-color: #FAF7F2;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  padding: 12px 20px 24px 20px;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.iphone-share-modal.is-open .iphone-share-sheet {
+  transform: translateY(0);
+}
+
+.share-sheet-handle {
+  width: 36px;
+  height: 5px;
+  background-color: rgba(20, 19, 18, 0.2);
+  border-radius: 100px;
+  margin: 0 auto 14px auto;
+}
+
+.share-sheet-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-hairline);
+  margin-bottom: 16px;
+}
+
+.share-sheet-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.share-sheet-info {
+  flex: 1;
+}
+
+.share-sheet-name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.share-sheet-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.share-sheet-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-hairline);
+  background: #FFFFFF;
+  color: var(--text-main);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.share-options-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px 10px;
+  margin-bottom: 16px;
+}
+
+.share-option-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.share-option-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease;
+}
+
+.share-option-btn:hover .share-option-icon {
+  transform: scale(1.06);
+}
+
+.icon-airdrop { background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%); }
+.icon-contacts { background: linear-gradient(135deg, #34C759 0%, #30B0C7 100%); }
+.icon-wallet { background: linear-gradient(135deg, #1C1C1E 0%, #D4AF37 100%); }
+.icon-messages { background: linear-gradient(135deg, #34C759 0%, #248A3D 100%); }
+.icon-whatsapp { background: #25D366; }
+.icon-qr { background: linear-gradient(135deg, #FF9500 0%, #FF2D55 100%); }
+
+.share-option-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-main);
+  text-align: center;
+}
+
+.share-sheet-footer {
+  padding-top: 10px;
+  border-top: 1px solid var(--border-hairline);
+}
+
+.copy-link-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-fine);
+  border-radius: 12px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.copy-link-btn:hover {
+  background-color: var(--bg-card-alt);
+}
