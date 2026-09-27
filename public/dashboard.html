@@ -180,6 +180,69 @@
     <span class="toast-message" id="toast-message">Changes saved!</span>
   </div>
 
+  <!-- Auth Modal (Create Account or Sign In to Publish Card) -->
+  <div class="dash-modal-overlay" id="auth-modal" style="display: none;">
+    <div class="dash-modal-content">
+      <button class="dash-modal-close" id="auth-modal-close" aria-label="Close modal">&times;</button>
+      
+      <div class="modal-header">
+        <h3 class="modal-title">Publish Your 3D Digital Card</h3>
+        <p class="modal-sub">Create a free account or sign in to publish your card and claim your custom share link.</p>
+      </div>
+
+      <div class="modal-tabs">
+        <button class="modal-tab-btn active" id="modal-tab-register" type="button">Create Free Account</button>
+        <button class="modal-tab-btn" id="modal-tab-login" type="button">Sign In</button>
+      </div>
+
+      <div id="modal-auth-alert" class="modal-alert" style="display: none;"></div>
+
+      <!-- Register Form -->
+      <form id="modal-register-form" class="modal-form">
+        <div class="form-group">
+          <label for="modal-reg-email" class="form-label">Email Address</label>
+          <input type="email" id="modal-reg-email" class="form-input" placeholder="you@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="modal-reg-username" class="form-label">Choose Your Custom Vanity URL</label>
+          <div class="username-input-wrap">
+            <span class="input-prefix">/c/</span>
+            <input type="text" id="modal-reg-username" class="form-input username-field" placeholder="yourname" pattern="[a-zA-Z0-9_-]{3,20}" required>
+          </div>
+          <span class="form-hint">Your public share link: <strong>virtualcard.com/c/<span id="modal-username-preview">yourname</span></strong></span>
+        </div>
+
+        <div class="form-group">
+          <label for="modal-reg-password" class="form-label">Password</label>
+          <input type="password" id="modal-reg-password" class="form-input" placeholder="Minimum 6 characters" minlength="6" required>
+        </div>
+
+        <button type="submit" class="btn-modal-submit" id="modal-reg-submit-btn">
+          <span>Create Account & Publish Card 🚀</span>
+        </button>
+      </form>
+
+      <!-- Login Form -->
+      <form id="modal-login-form" class="modal-form" style="display: none;">
+        <div class="form-group">
+          <label for="modal-login-identifier" class="form-label">Email Address or Username</label>
+          <input type="text" id="modal-login-identifier" class="form-input" placeholder="e.g. dokitoor or email@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="modal-login-password" class="form-label">Password</label>
+          <input type="password" id="modal-login-password" class="form-input" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn-modal-submit" id="modal-login-submit-btn">
+          <span>Sign In & Publish Card 🔑</span>
+        </button>
+      </form>
+
+    </div>
+  </div>
+
   <script src="/dashboard.js"></script>
 </body>
 </html>
