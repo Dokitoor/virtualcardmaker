@@ -139,13 +139,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const portraitImg = document.getElementById('card-portrait-img');
     const appleTouchIcon = document.getElementById('apple-touch-icon-link');
     if (portraitImg) {
-      portraitImg.src = data.photoUrl || '/assets/oluseyi-ogundipe.jpg';
+      portraitImg.src = data.photoUrl || '/assets/dummy-avatar.svg';
       portraitImg.alt = `Portrait of ${data.fullName}`;
     }
-    if (appleTouchIcon) appleTouchIcon.href = data.photoUrl || '/assets/oluseyi-ogundipe.jpg';
+    if (appleTouchIcon) appleTouchIcon.href = data.photoUrl || '/assets/dummy-avatar.svg';
 
     // Precompute Base64 photo for iOS vCard
-    precomputePhoto(data.photoUrl || '/assets/oluseyi-ogundipe.jpg');
+    precomputePhoto(data.photoUrl || '/assets/dummy-avatar.svg');
 
     // Capabilities Pills
     const capsGrid = document.getElementById('card-capabilities-grid');
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('modal-author-text').textContent = `— ${data.fullName}`;
 
     // Pass Modal Values
-    document.getElementById('pass-avatar-img').src = data.photoUrl || '/assets/oluseyi-ogundipe.jpg';
+    document.getElementById('pass-avatar-img').src = data.photoUrl || '/assets/dummy-avatar.svg';
     document.getElementById('pass-org-name').textContent = data.fullName.toUpperCase();
     document.getElementById('pass-name-val').textContent = data.fullName;
     document.getElementById('pass-role-val').textContent = data.roleTitle;
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('pass-back-competencies-text').textContent = Array.isArray(data.capabilities) ? data.capabilities.join(' · ') : '';
 
     // Share Sheet Details
-    document.getElementById('share-avatar-img').src = data.photoUrl || '/assets/oluseyi-ogundipe.jpg';
+    document.getElementById('share-avatar-img').src = data.photoUrl || '/assets/dummy-avatar.svg';
     document.getElementById('share-sheet-name').textContent = data.fullName;
 
     // Attach Copy Handlers

@@ -114,24 +114,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       saveCardBtn.innerHTML = '<span>Publish & Claim Custom Link 🚀</span>';
       liveCardIframe.src = `/c/demo`;
 
-      // Check if draft exists in localStorage or load defaults
+      // Check if draft exists in localStorage or load clean empty inputs with placeholders
       const savedDraft = localStorage.getItem('card_draft');
       if (savedDraft) {
         try { populateForm(JSON.parse(savedDraft)); } catch {}
       } else {
         populateForm({
-          fullName: 'Oluseyi Ogundipe',
-          roleTitle: 'Product & Information Designer | Project Manager',
-          positioningStatement: 'Designing digital products, simplifying complex information, and helping turn ideas into meaningful projects.',
-          capabilities: ['PRODUCT DESIGN', 'INFORMATION DESIGN', 'PROJECT MANAGEMENT'],
-          editionMark: 'NAIROBI EDITION 2026',
-          brandSubmark: 'OO—DESIGN',
+          fullName: '',
+          roleTitle: '',
+          positioningStatement: '',
+          capabilities: [],
+          editionMark: 'DIGITAL EDITION 2026',
+          brandSubmark: 'CARD—PASS',
           theme: 'terracotta',
-          email: 'you@example.com',
-          phone: '+234 814 891 8630',
-          whatsapp: '+2348148918630',
-          linkedinUrl: 'https://linkedin.com',
-          portfolioUrl: 'https://example.com'
+          email: '',
+          phone: '',
+          whatsapp: '',
+          linkedinUrl: '',
+          portfolioUrl: '',
+          photoUrl: '/assets/dummy-avatar.svg'
         });
       }
     }
@@ -140,19 +141,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   function emitLiveUpdate() {
     if (!liveCardIframe || !liveCardIframe.contentWindow) return;
     const draftCard = {
-      fullName: editFullName.value,
-      roleTitle: editRoleTitle.value,
-      positioningStatement: editPositioningStatement.value,
-      capabilities: editCapabilities.value ? editCapabilities.value.split(',').map(s => s.trim()).filter(Boolean) : [],
-      editionMark: editEditionMark.value,
-      brandSubmark: editBrandSubmark.value,
-      theme: editTheme.value,
-      email: editEmail.value,
-      phone: editPhone.value,
-      whatsapp: editWhatsapp.value,
-      linkedinUrl: editLinkedinUrl.value,
-      portfolioUrl: editPortfolioUrl.value,
-      photoUrl: draftPhotoUrl || (currentCard ? currentCard.photoUrl : '/assets/oluseyi-ogundipe.jpg')
+      fullName: editFullName.value || 'YOUR NAME',
+      roleTitle: editRoleTitle.value || 'PROFESSIONAL TITLE & ROLE',
+      positioningStatement: editPositioningStatement.value || 'Add a brief tagline or description of what you do to showcase your professional profile.',
+      capabilities: editCapabilities.value ? editCapabilities.value.split(',').map(s => s.trim()).filter(Boolean) : ['PRODUCT DESIGN', 'STRATEGY', 'CREATIVE'],
+      editionMark: editEditionMark.value || 'DIGITAL EDITION 2026',
+      brandSubmark: editBrandSubmark.value || 'CARD—PASS',
+      theme: editTheme.value || 'terracotta',
+      email: editEmail.value || '',
+      phone: editPhone.value || '',
+      whatsapp: editWhatsapp.value || '',
+      linkedinUrl: editLinkedinUrl.value || '',
+      portfolioUrl: editPortfolioUrl.value || '',
+      photoUrl: draftPhotoUrl || (currentCard && currentCard.photoUrl ? currentCard.photoUrl : '/assets/dummy-avatar.svg')
     };
 
     // Save draft locally if guest
