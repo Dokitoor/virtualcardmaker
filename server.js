@@ -40,7 +40,8 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static assets
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.use('/uploads', express.static(uploadsDir));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
+app.use(express.static(__dirname, { index: false }));
 
 // Helper middleware: Auth Check
 function requireAuth(req, res, next) {
