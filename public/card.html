@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title id="card-page-title">Digital Business Card</title>
+  <meta name="description" id="card-page-desc" content="3D Virtual Business Card. Save to iPhone Contacts with photo, Apple Wallet Pass, and QR code.">
+  <meta name="theme-color" content="#FAF8F5">
+
+  <!-- iOS Web App & PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Virtual Card">
+  <link rel="apple-touch-icon" id="apple-touch-icon-link" href="/assets/oluseyi-ogundipe.jpg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@600;700;800&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <!-- Ambient Background Canvas & Grid Accent -->
+  <div class="page-background" aria-hidden="true">
+    <div class="subtle-grain"></div>
+    <div class="architectural-grid"></div>
+  </div>
+
+  <!-- Main Viewport Shell -->
+  <main class="viewport-stage">
+    
+    <!-- Top Micro Bar: Context & Quick Share -->
+    <header class="top-nav-bar">
+      <div class="badge-tag">
+        <span class="pulse-indicator"></span>
+        <span class="mono-label" id="card-edition-tag">DIGITAL EDITION 2026</span>
+      </div>
+      <button id="share-card-btn" class="nav-icon-btn" title="Share digital card" aria-label="Share digital card">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"></circle>
+          <circle cx="6" cy="12" r="3"></circle>
+          <circle cx="18" cy="19" r="3"></circle>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+        </svg>
+        <span class="btn-text">Share</span>
+      </button>
+    </header>
+
+    <!-- 3D Card Scene Container -->
+    <section class="card-scene" id="card-scene">
+      <div class="card-container" id="card-element" role="region" aria-label="Virtual Business Card">
+        
+        <!-- FRONT FACE: IDENTITY & PORTRAIT -->
+        <article class="card-face card-front" id="card-front-face" aria-label="Front of card: Professional Identity">
+          
+          <div class="card-header-bar">
+            <span class="edition-mark">CARD 01 // ID</span>
+            <div class="spec-crosshairs">
+              <span class="crosshair">+</span>
+              <span class="brand-submark" id="card-brand-submark">CARD—PASS</span>
+            </div>
+          </div>
+
+          <div class="portrait-stage">
+            <div class="portrait-frame">
+              <img src="/assets/oluseyi-ogundipe.jpg" alt="Profile portrait" class="portrait-img" id="card-portrait-img" loading="eager" />
+              <div class="portrait-corner-rule" aria-hidden="true"></div>
+              <div class="portrait-badge" aria-hidden="true">
+                <span class="status-dot"></span>
+                <span>AVAILABLE FOR PROJECTS</span>
+              </div>
+            </div>
+            <div class="portrait-caption-tag" aria-hidden="true">
+              <span class="coord">01.02</span>
+              <span class="pipe">/</span>
+              <span class="desc">VERIFIED</span>
+            </div>
+          </div>
+
+          <div class="identity-content">
+            <h1 class="person-name" id="card-person-name">
+              OLUSEYI<br>
+              <span class="name-accent">OGUNDIPE</span>
+            </h1>
+
+            <div class="role-title" id="card-role-title">
+              Product & Information Design <span class="role-separator">|</span> Project Management
+            </div>
+
+            <p class="positioning-statement" id="card-positioning-statement">
+              Designing digital products, simplifying complex information, and helping turn ideas into meaningful projects.
+            </p>
+
+            <div class="capabilities-grid" id="card-capabilities-grid" aria-label="Core Competencies">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+
+          <footer class="face-footer">
+            <button class="flip-trigger-btn" id="flip-to-back-btn" aria-label="Flip card to connect side and QR code">
+              <span class="flip-btn-label">Contact Details & QR</span>
+              <span class="flip-arrow-circle" aria-hidden="true">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14"></path>
+                  <path d="m12 5 7 7-7 7"></path>
+                </svg>
+              </span>
+            </button>
+          </footer>
+        </article>
+
+        <!-- BACK FACE: CONTACT & QR -->
+        <article class="card-face card-back" id="card-back-face" aria-label="Back of card: Contact information and portfolio QR code">
+          
+          <div class="card-header-bar">
+            <span class="edition-mark">CARD 02 // CONNECT</span>
+            <div class="spec-crosshairs">
+              <span class="crosshair">+</span>
+              <span class="brand-submark" id="card-back-location">NAIROBI—KENYA</span>
+            </div>
+          </div>
+
+          <div class="connect-headline-wrap">
+            <div class="connect-kicker">GET IN TOUCH</div>
+            <h2 class="connect-heading">LET'S CONNECT</h2>
+          </div>
+
+          <div class="contact-details-list" role="list">
+            
+            <!-- Email -->
+            <div class="contact-item" role="listitem" id="item-email-wrap">
+              <div class="contact-item-left">
+                <span class="contact-label">Email</span>
+                <a href="#" class="contact-link" id="contact-email-link">...</a>
+              </div>
+              <div class="contact-item-actions">
+                <button class="copy-action-btn" id="copy-email-btn" title="Copy email address" aria-label="Copy email">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                </button>
+                <a href="#" class="direct-action-btn" id="direct-email-btn" title="Send email" aria-label="Send email">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- Phone & WhatsApp -->
+            <div class="contact-item" role="listitem" id="item-phone-wrap">
+              <div class="contact-item-left">
+                <span class="contact-label">Phone / WhatsApp</span>
+                <div class="phone-group">
+                  <a href="#" class="contact-link" id="contact-phone-link">...</a>
+                </div>
+              </div>
+              <div class="contact-item-actions">
+                <a href="#" target="_blank" rel="noopener noreferrer" class="whatsapp-pill-btn" id="contact-whatsapp-link" title="Open WhatsApp chat" aria-label="WhatsApp">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                  <span>Chat</span>
+                </a>
+                <a href="#" class="direct-action-btn" id="direct-phone-btn" title="Call phone number" aria-label="Call phone">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- LinkedIn -->
+            <div class="contact-item" role="listitem" id="item-linkedin-wrap">
+              <div class="contact-item-left">
+                <span class="contact-label">LinkedIn</span>
+                <a href="#" target="_blank" rel="noopener noreferrer" class="contact-link" id="contact-linkedin-link">...</a>
+              </div>
+              <div class="contact-item-actions">
+                <a href="#" target="_blank" rel="noopener noreferrer" class="direct-action-btn" id="direct-linkedin-btn" title="Visit LinkedIn profile" aria-label="Visit LinkedIn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- Portfolio Website -->
+            <div class="contact-item" role="listitem" id="item-portfolio-wrap">
+              <div class="contact-item-left">
+                <span class="contact-label">Portfolio / Website</span>
+                <a href="#" target="_blank" rel="noopener noreferrer" class="contact-link highlight-portfolio" id="contact-portfolio-link">...</a>
+              </div>
+              <div class="contact-item-actions">
+                <a href="#" target="_blank" rel="noopener noreferrer" class="direct-action-btn" id="direct-portfolio-btn" title="Open portfolio website" aria-label="Visit Portfolio">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+                </a>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Prominent QR Code Block -->
+          <div class="qr-showcase-card">
+            <div class="qr-header">
+              <span class="qr-title">SCAN TO EXPLORE WORK</span>
+            </div>
+            
+            <div class="qr-image-wrapper" id="qr-trigger" title="Tap to enlarge QR code for scanning" role="button" tabindex="0" aria-label="Enlarge QR Code to scan easily">
+              <img src="/assets/qr-code.svg" alt="QR Code" class="qr-svg-graphic" id="card-qr-img" />
+              <div class="qr-scan-badge">TAP TO EXPAND</div>
+            </div>
+
+            <p class="qr-supporting-line">Scan to see my digital card & work.</p>
+          </div>
+
+          <footer class="back-footer-actions">
+            <button id="save-vcf-btn" class="save-contact-btn" aria-label="Save contact to iPhone address book with photo">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span>SAVE TO IPHONE CONTACTS</span>
+            </button>
+
+            <button id="open-wallet-btn" class="apple-wallet-trigger-btn" aria-label="View and add card to Apple Wallet">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 4H5c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H5V8h14v10zm-2-7h-4v2h4v-2z"/></svg>
+              <span>ADD TO APPLE WALLET</span>
+            </button>
+
+            <button class="flip-trigger-btn flip-back-btn" id="flip-to-front-btn" aria-label="Flip card back to front identity">
+              <span class="flip-arrow-circle flip-arrow-left" aria-hidden="true">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+              </span>
+              <span class="flip-btn-label">Back to Identity</span>
+            </button>
+          </footer>
+
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Bottom Persistent Controls -->
+    <nav class="bottom-control-dock" aria-label="Card side switcher">
+      <div class="segmented-control" role="tablist">
+        <button class="segment-btn active" id="tab-front" role="tab" aria-selected="true">
+          <span class="dot-status"></span>
+          <span>IDENTITY</span>
+        </button>
+        <button class="segment-btn" id="tab-back" role="tab" aria-selected="false">
+          <span class="dot-status"></span>
+          <span>CONNECT & QR</span>
+        </button>
+      </div>
+
+      <div class="quick-instructions">
+        <span class="kbd-hint"><kbd>Space</kbd> or swipe to flip</span>
+      </div>
+    </nav>
+
+  </main>
+
+  <!-- Fullscreen Modal for Enlarged QR Code -->
+  <div class="qr-modal" id="qr-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="qr-modal-backdrop" id="qr-modal-backdrop"></div>
+    <div class="qr-modal-dialog">
+      <button class="modal-close-btn" id="qr-modal-close" aria-label="Close QR view">✕</button>
+
+      <div class="modal-header">
+        <span class="modal-kicker">PORTFOLIO ACCESS</span>
+        <h3 class="modal-title">SCAN TO EXPLORE WORK</h3>
+        <p class="modal-subtitle">Direct card link</p>
+      </div>
+
+      <div class="modal-qr-wrapper">
+        <img src="/assets/qr-code.svg" alt="QR Code" class="modal-qr-img" id="modal-qr-img" />
+      </div>
+
+      <div class="modal-footer-info">
+        <p class="modal-quote" id="modal-quote-text">"Designing digital products, simplifying complex information..."</p>
+        <span class="modal-author" id="modal-author-text">— Oluseyi Ogundipe</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Apple Wallet Pass Modal -->
+  <div class="apple-wallet-modal" id="apple-wallet-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="wallet-modal-backdrop" id="wallet-modal-backdrop"></div>
+    <div class="wallet-modal-dialog">
+      <button class="modal-close-btn" id="wallet-modal-close" aria-label="Close view">✕</button>
+
+      <div class="wallet-badge-header">
+        <svg class="apple-wallet-logo" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 4H5c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H5V8h14v10zm-2-7h-4v2h4v-2z"/></svg>
+        <span>APPLE WALLET DIGITAL PASS</span>
+      </div>
+
+      <div class="wallet-pass-container" id="wallet-pass-card">
+        
+        <!-- PASS FRONT -->
+        <div class="wallet-pass-face wallet-pass-front">
+          <div class="pass-top-bar">
+            <div class="pass-logo-wrap">
+              <img src="/assets/oluseyi-ogundipe.jpg" alt="Avatar" class="pass-avatar" id="pass-avatar-img" />
+              <div class="pass-org-info">
+                <span class="pass-org-name" id="pass-org-name">OLUSEYI OGUNDIPE</span>
+                <span class="pass-type-tag">BUSINESS CARD</span>
+              </div>
+            </div>
+            <div class="pass-event-badge" id="pass-event-badge">NAIROBI 2026</div>
+          </div>
+
+          <div class="pass-primary-fields">
+            <div class="pass-field-group">
+              <span class="pass-field-label">NAME</span>
+              <span class="pass-field-value primary-val" id="pass-name-val">Oluseyi Ogundipe</span>
+            </div>
+            <div class="pass-field-group">
+              <span class="pass-field-label">TITLE</span>
+              <span class="pass-field-value" id="pass-role-val">Product & Information Designer</span>
+            </div>
+          </div>
+
+          <div class="pass-aux-grid">
+            <div class="pass-field-group">
+              <span class="pass-field-label">PHONE</span>
+              <span class="pass-field-value" id="pass-phone-val">+234...</span>
+            </div>
+            <div class="pass-field-group">
+              <span class="pass-field-label">EMAIL</span>
+              <span class="pass-field-value" id="pass-email-val">oluseyi...</span>
+            </div>
+            <div class="pass-field-group">
+              <span class="pass-field-label">WEBSITE</span>
+              <span class="pass-field-value" id="pass-website-val">website.com</span>
+            </div>
+          </div>
+
+          <div class="pass-perforation-line">
+            <span class="notch notch-left"></span>
+            <span class="dashed-line"></span>
+            <span class="notch notch-right"></span>
+          </div>
+
+          <div class="pass-barcode-section">
+            <div class="pass-qr-wrapper">
+              <img src="/assets/qr-code.svg" alt="Pass Barcode" class="pass-qr-img" id="pass-qr-img" />
+            </div>
+            <span class="pass-serial" id="pass-serial-val">PASS ID: OO-2026-NRB</span>
+          </div>
+
+          <button class="pass-info-flip-btn" id="flip-wallet-pass-btn" title="Flip to see pass details" aria-label="Flip Pass">i</button>
+        </div>
+
+        <!-- PASS BACK -->
+        <div class="wallet-pass-face wallet-pass-back">
+          <div class="pass-back-header">
+            <span class="pass-back-title">PASS DETAILS</span>
+            <button class="pass-back-close-btn" id="flip-wallet-pass-back-btn">Done</button>
+          </div>
+
+          <div class="pass-back-content">
+            <div class="pass-back-item">
+              <span class="pass-back-label">ABOUT</span>
+              <p class="pass-back-text" id="pass-back-about-text">Designing digital products...</p>
+            </div>
+            <div class="pass-back-item">
+              <span class="pass-back-label">CORE COMPETENCIES</span>
+              <p class="pass-back-text" id="pass-back-competencies-text">Product Design</p>
+            </div>
+          </div>
+
+          <div class="pass-back-actions">
+            <button id="wallet-save-vcf-btn" class="pass-action-btn primary-action">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span>Add to iPhone Contacts</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="wallet-modal-actions">
+        <button id="download-pass-btn" class="download-pkpass-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          <span>DOWNLOAD PASS (.PKPASS)</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- iPhone Native Share Hub Modal -->
+  <div class="iphone-share-modal" id="iphone-share-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="iphone-share-backdrop" id="iphone-share-backdrop"></div>
+    <div class="iphone-share-sheet">
+      <div class="share-sheet-handle"></div>
+      
+      <div class="share-sheet-header">
+        <img src="/assets/oluseyi-ogundipe.jpg" alt="Avatar" class="share-sheet-avatar" id="share-avatar-img" />
+        <div class="share-sheet-info">
+          <h3 id="share-sheet-name" class="share-sheet-name">Oluseyi Ogundipe</h3>
+          <p class="share-sheet-sub">Share Digital Business Card</p>
+        </div>
+        <button class="share-sheet-close" id="iphone-share-close">✕</button>
+      </div>
+
+      <div class="share-options-grid">
+        <button class="share-option-btn" id="share-airdrop-btn">
+          <div class="share-option-icon icon-airdrop">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2z"/><path d="M12 6v12M6 12h12"/></svg>
+          </div>
+          <span class="share-option-label">AirDrop & Share</span>
+        </button>
+
+        <button class="share-option-btn" id="share-vcf-btn">
+          <div class="share-option-icon icon-contacts">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <span class="share-option-label">Save Contact</span>
+        </button>
+
+        <button class="share-option-btn" id="share-wallet-btn">
+          <div class="share-option-icon icon-wallet">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19 4H5c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H5V8h14v10zm-2-7h-4v2h4v-2z"/></svg>
+          </div>
+          <span class="share-option-label">Apple Wallet</span>
+        </button>
+
+        <button class="share-option-btn" id="share-sms-btn">
+          <div class="share-option-icon icon-messages">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <span class="share-option-label">iMessage / SMS</span>
+        </button>
+
+        <button class="share-option-btn" id="share-whatsapp-btn">
+          <div class="share-option-icon icon-whatsapp">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </div>
+          <span class="share-option-label">WhatsApp</span>
+        </button>
+
+        <button class="share-option-btn" id="share-qr-btn">
+          <div class="share-option-icon icon-qr">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </div>
+          <span class="share-option-label">Scan QR Code</span>
+        </button>
+      </div>
+
+      <div class="share-sheet-footer">
+        <button class="copy-link-btn" id="share-copy-link-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          <span>Copy Card Link</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification Box -->
+  <div class="toast-notification" id="toast-notification" role="status" aria-live="polite">
+    <span class="toast-icon">✓</span>
+    <span class="toast-message" id="toast-message">Copied to clipboard</span>
+  </div>
+
+  <script src="/public/card.js"></script>
+</body>
+</html>

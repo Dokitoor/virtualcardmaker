@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Card Builder Dashboard — VirtualCard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="dashboard-body">
+
+  <!-- Ambient Grid -->
+  <div class="page-background" aria-hidden="true">
+    <div class="subtle-grain"></div>
+    <div class="architectural-grid"></div>
+  </div>
+
+  <!-- Top Dashboard Navigation Header -->
+  <header class="dashboard-top-nav">
+    <div class="dash-brand">
+      <a href="/" class="auth-logo">
+        <span class="logo-mark">VIRTUAL</span><span class="logo-accent">CARD</span>
+      </a>
+      <span class="dash-badge">BUILDER DASHBOARD</span>
+    </div>
+
+    <div class="dash-user-bar">
+      <div class="user-info-pill">
+        <span class="user-dot"></span>
+        <span id="user-display-email">Loading...</span>
+      </div>
+      <button id="logout-btn" class="btn-subtle-logout">Logout</button>
+    </div>
+  </header>
+
+  <!-- Dashboard Workspace Layout (Split Screen Editor & Live Preview) -->
+  <main class="dashboard-workspace">
+    
+    <!-- LEFT PANEL: CARD EDITOR FORM -->
+    <section class="editor-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Edit Card Details</h2>
+        <span class="panel-sub">Changes update live in your 3D card preview</span>
+      </div>
+
+      <!-- Share URL Banner -->
+      <div class="vanity-share-box">
+        <div class="vanity-info">
+          <span class="vanity-label">YOUR PUBLIC CARD URL</span>
+          <a href="#" id="vanity-url-link" target="_blank" class="vanity-url-display">Loading URL...</a>
+        </div>
+        <div class="vanity-actions">
+          <button id="copy-url-btn" class="btn-copy-url">Copy Link</button>
+          <a href="#" id="open-live-btn" target="_blank" class="btn-open-live">Open Card ↗</a>
+        </div>
+      </div>
+
+      <form id="card-editor-form" class="editor-form" enctype="multipart/form-data">
+        
+        <!-- SECTION 1: IDENTITY -->
+        <fieldset class="form-section">
+          <legend class="section-legend">01. IDENTITY & PROFILE</legend>
+
+          <div class="form-group">
+            <label for="edit-fullName" class="form-label">Full Name</label>
+            <input type="text" id="edit-fullName" class="form-input" placeholder="e.g. Oluseyi Ogundipe" required>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-roleTitle" class="form-label">Professional Role & Title</label>
+            <input type="text" id="edit-roleTitle" class="form-input" placeholder="e.g. Product & Information Designer | Project Manager" required>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-positioningStatement" class="form-label">Bio / Positioning Statement</label>
+            <textarea id="edit-positioningStatement" class="form-textarea" rows="3" placeholder="Brief tagline or description of what you do..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-photoFile" class="form-label">Portrait Photo</label>
+            <div class="photo-upload-wrap">
+              <input type="file" id="edit-photoFile" accept="image/*" class="form-file-input">
+              <span class="upload-hint">Upload a portrait image (JPG or PNG)</span>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- SECTION 2: COMPETENCIES & BRANDING -->
+        <fieldset class="form-section">
+          <legend class="section-legend">02. COMPETENCIES & EDITION</legend>
+
+          <div class="form-group">
+            <label for="edit-capabilities" class="form-label">Core Competencies (Comma separated)</label>
+            <input type="text" id="edit-capabilities" class="form-input" placeholder="PRODUCT DESIGN, INFORMATION DESIGN, PROJECT MANAGEMENT">
+            <span class="form-hint">Displayed as styled pills on the front of your card</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="edit-editionMark" class="form-label">Edition / Event Tag</label>
+              <input type="text" id="edit-editionMark" class="form-input" placeholder="NAIROBI EDITION 2026">
+            </div>
+            <div class="form-group flex-1">
+              <label for="edit-brandSubmark" class="form-label">Brand Code</label>
+              <input type="text" id="edit-brandSubmark" class="form-input" placeholder="OO—DESIGN">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-theme" class="form-label">Editorial Theme Color</label>
+            <select id="edit-theme" class="form-select">
+              <option value="terracotta">Editorial Burnt Terracotta (Default)</option>
+              <option value="sapphire">Midnight Sapphire</option>
+              <option value="emerald">Emerald Obsidian</option>
+              <option value="gold">Champagne Gold</option>
+              <option value="monochrome">Minimalist Monochrome</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <!-- SECTION 3: CONTACT & LINKS -->
+        <fieldset class="form-section">
+          <legend class="section-legend">03. CONTACT & SOCIAL LINKS</legend>
+
+          <div class="form-group">
+            <label for="edit-email" class="form-label">Public Contact Email</label>
+            <input type="email" id="edit-email" class="form-input" placeholder="you@example.com">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="edit-phone" class="form-label">Phone Number</label>
+              <input type="text" id="edit-phone" class="form-input" placeholder="+234 814 891 8630">
+            </div>
+            <div class="form-group flex-1">
+              <label for="edit-whatsapp" class="form-label">WhatsApp Number (with country code)</label>
+              <input type="text" id="edit-whatsapp" class="form-input" placeholder="+2348148918630">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-linkedinUrl" class="form-label">LinkedIn Profile URL</label>
+            <input type="url" id="edit-linkedinUrl" class="form-input" placeholder="https://www.linkedin.com/in/username">
+          </div>
+
+          <div class="form-group">
+            <label for="edit-portfolioUrl" class="form-label">Portfolio / Website URL</label>
+            <input type="url" id="edit-portfolioUrl" class="form-input" placeholder="https://yourwebsite.com">
+          </div>
+        </fieldset>
+
+        <div class="form-actions-sticky">
+          <button type="submit" id="save-card-btn" class="btn-save-card">
+            <span>Save & Publish Changes</span>
+          </button>
+        </div>
+
+      </form>
+    </section>
+
+    <!-- RIGHT PANEL: LIVE 3D CARD PREVIEW -->
+    <section class="preview-panel">
+      <div class="preview-header">
+        <span class="preview-title">LIVE PREVIEW</span>
+        <span class="preview-hint">Real-time render of <code>/c/<span id="preview-username-tag">you</span></code></span>
+      </div>
+
+      <div class="preview-viewport-frame">
+        <iframe id="live-card-iframe" src="about:blank" title="Live Card Preview" class="card-iframe-container"></iframe>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast Notification -->
+  <div class="toast-notification" id="toast-notification" role="status" aria-live="polite">
+    <span class="toast-icon">✓</span>
+    <span class="toast-message" id="toast-message">Changes saved!</span>
+  </div>
+
+  <script src="/dashboard.js"></script>
+</body>
+</html>

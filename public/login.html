@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In / Register — VirtualCard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="auth-body">
+
+  <div class="page-background" aria-hidden="true">
+    <div class="subtle-grain"></div>
+    <div class="architectural-grid"></div>
+  </div>
+
+  <div class="auth-container">
+    
+    <div class="auth-header">
+      <a href="/" class="auth-logo">
+        <span class="logo-mark">VIRTUAL</span><span class="logo-accent">CARD</span>
+      </a>
+      <p class="auth-subtitle">Create and manage your 3D digital business card</p>
+    </div>
+
+    <!-- Auth Tabs -->
+    <div class="auth-tabs" role="tablist">
+      <button class="auth-tab-btn active" id="tab-login-btn">Sign In</button>
+      <button class="auth-tab-btn" id="tab-register-btn">Create Account</button>
+    </div>
+
+    <!-- Error / Success Alert -->
+    <div class="auth-alert" id="auth-alert" style="display: none;"></div>
+
+    <!-- LOGIN FORM -->
+    <form id="login-form" class="auth-form active">
+      <div class="form-group">
+        <label for="login-email" class="form-label">Email Address</label>
+        <input type="email" id="login-email" class="form-input" placeholder="you@example.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="login-password" class="form-label">Password</label>
+        <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+      </div>
+
+      <button type="submit" class="btn-auth-submit" id="login-submit-btn">
+        <span>Sign In to Dashboard</span>
+      </button>
+
+      <p class="auth-footer-note">
+        Demo login available: <strong>oluseyi.ogundipe@outlook.com</strong> / <code>password123</code>
+      </p>
+    </form>
+
+    <!-- REGISTER FORM -->
+    <form id="register-form" class="auth-form" style="display: none;">
+      <div class="form-group">
+        <label for="reg-email" class="form-label">Email Address</label>
+        <input type="email" id="reg-email" class="form-input" placeholder="you@example.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-username" class="form-label">Choose Username (Your Card URL)</label>
+        <div class="username-input-wrap">
+          <span class="input-prefix">/c/</span>
+          <input type="text" id="reg-username" class="form-input username-field" placeholder="yourname" pattern="[a-zA-Z0-9_-]{3,20}" required>
+        </div>
+        <span class="form-hint">Your share link will be: <strong>virtualcard.com/c/<span id="username-preview">yourname</span></strong></span>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-password" class="form-label">Password</label>
+        <input type="password" id="reg-password" class="form-input" placeholder="Minimum 6 characters" minlength="6" required>
+      </div>
+
+      <button type="submit" class="btn-auth-submit" id="register-submit-btn">
+        <span>Create My Free Digital Card</span>
+      </button>
+    </form>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabLoginBtn = document.getElementById('tab-login-btn');
+      const tabRegisterBtn = document.getElementById('tab-register-btn');
+      const loginForm = document.getElementById('login-form');
+      const registerForm = document.getElementById('register-form');
+      const authAlert = document.getElementById('auth-alert');
+      const regUsername = document.getElementById('reg-username');
+      const usernamePreview = document.getElementById('username-preview');
+
+      // Check URL query for tab selection (?tab=register)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('tab') === 'register') {
+        switchTab('register');
+      }
+
+      function switchTab(tab) {
+        if (tab === 'register') {
+          tabRegisterBtn.classList.add('active');
+          tabLoginBtn.classList.remove('active');
+          registerForm.style.display = 'flex';
+          loginForm.style.display = 'none';
+        } else {
+          tabLoginBtn.classList.add('active');
+          tabRegisterBtn.classList.remove('active');
+          loginForm.style.display = 'flex';
+          registerForm.style.display = 'none';
+        }
+        authAlert.style.display = 'none';
+      }
+
+      tabLoginBtn.addEventListener('click', () => switchTab('login'));
+      tabRegisterBtn.addEventListener('click', () => switchTab('register'));
+
+      regUsername.addEventListener('input', () => {
+        const val = regUsername.value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+        usernamePreview.textContent = val || 'yourname';
+      });
+
+      function showAlert(msg, isError = true) {
+        authAlert.textContent = msg;
+        authAlert.className = 'auth-alert ' + (isError ? 'alert-error' : 'alert-success');
+        authAlert.style.display = 'block';
+      }
+
+      // Handle Login
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Login failed');
+
+          localStorage.setItem('card_token', data.token);
+          localStorage.setItem('card_user', JSON.stringify(data.user));
+          showAlert('Logged in successfully! Redirecting...', false);
+
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 800);
+        } catch (err) {
+          showAlert(err.message);
+        }
+      });
+
+      // Handle Registration
+      registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('reg-email').value;
+        const username = regUsername.value.trim().toLowerCase();
+        const password = document.getElementById('reg-password').value;
+
+        try {
+          const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, username, password })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Registration failed');
+
+          localStorage.setItem('card_token', data.token);
+          localStorage.setItem('card_user', JSON.stringify(data.user));
+          showAlert('Account created! Loading your editor...', false);
+
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 800);
+        } catch (err) {
+          showAlert(err.message);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

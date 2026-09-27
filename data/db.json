@@ -1,0 +1,110 @@
+{
+  "users": [
+    {
+      "id": "user_dokitoor",
+      "email": "oluseyi.ogundipe@outlook.com",
+      "username": "dokitoor",
+      "passwordHash": "1250d4612d87d180f7fc81cc4a1d1e1b4f28fedffff0670ac2f810e1fa9f8f38",
+      "createdAt": "2026-09-27T14:06:36.567Z"
+    },
+    {
+      "id": "user_oluseyi",
+      "email": "oluseyi@example.com",
+      "username": "oluseyi",
+      "passwordHash": "1250d4612d87d180f7fc81cc4a1d1e1b4f28fedffff0670ac2f810e1fa9f8f38",
+      "createdAt": "2026-09-27T14:06:36.568Z"
+    },
+    {
+      "id": "usr_1790518987129_cqr9",
+      "email": "sarah@example.com",
+      "username": "sarah",
+      "passwordHash": "1250d4612d87d180f7fc81cc4a1d1e1b4f28fedffff0670ac2f810e1fa9f8f38",
+      "createdAt": "2026-09-27T14:23:07.130Z"
+    }
+  ],
+  "cards": [
+    {
+      "id": "card_dokitoor",
+      "userId": "user_dokitoor",
+      "username": "dokitoor",
+      "fullName": "Oluseyi Ogundipe",
+      "roleTitle": "Product & Information Design | Project Management",
+      "positioningStatement": "Designing digital products, simplifying complex information, and helping turn ideas into meaningful projects.",
+      "capabilities": [
+        "PRODUCT DESIGN",
+        "INFORMATION DESIGN",
+        "PROJECT MANAGEMENT"
+      ],
+      "editionMark": "NAIROBI EDITION 2026",
+      "brandSubmark": "OO—DESIGN",
+      "photoUrl": "/assets/oluseyi-ogundipe.jpg",
+      "email": "oluseyi.ogundipe@outlook.com",
+      "phone": "+234 814 891 8630",
+      "whatsapp": "+2348148918630",
+      "linkedinUrl": "https://www.linkedin.com/in/dokitoor-oluseyi/",
+      "portfolioUrl": "https://oluseyiogundipe.com",
+      "theme": "terracotta",
+      "updatedAt": "2026-09-27T14:06:36.568Z"
+    },
+    {
+      "id": "card_oluseyi",
+      "userId": "user_oluseyi",
+      "username": "oluseyi",
+      "fullName": "Oluseyi Ogundipe",
+      "roleTitle": "Product & Information Design | Project Management",
+      "positioningStatement": "Designing digital products, simplifying complex information, and helping turn ideas into meaningful projects.",
+      "capabilities": [
+        "PRODUCT DESIGN",
+        "INFORMATION DESIGN",
+        "PROJECT MANAGEMENT"
+      ],
+      "editionMark": "NAIROBI EDITION 2026",
+      "brandSubmark": "OO—DESIGN",
+      "photoUrl": "/assets/oluseyi-ogundipe.jpg",
+      "email": "oluseyi.ogundipe@outlook.com",
+      "phone": "+234 814 891 8630",
+      "whatsapp": "+2348148918630",
+      "linkedinUrl": "https://www.linkedin.com/in/dokitoor-oluseyi/",
+      "portfolioUrl": "https://oluseyiogundipe.com",
+      "theme": "terracotta",
+      "updatedAt": "2026-09-27T14:06:36.568Z"
+    },
+    {
+      "id": "card_1790518987130",
+      "userId": "usr_1790518987129_cqr9",
+      "username": "sarah",
+      "fullName": "Sarah Jenkins",
+      "roleTitle": "Lead UX Strategist & Brand Director",
+      "positioningStatement": "Crafting human-centered digital experiences for high-growth tech startups.",
+      "capabilities": [
+        "UX STRATEGY",
+        "BRAND IDENTITY",
+        "UI SYSTEMS"
+      ],
+      "editionMark": "DIGITAL PASS 2026",
+      "brandSubmark": "SARAH—PASS",
+      "photoUrl": "/assets/oluseyi-ogundipe.jpg",
+      "email": "sarah@example.com",
+      "phone": "",
+      "whatsapp": "",
+      "linkedinUrl": "",
+      "portfolioUrl": "",
+      "theme": "emerald",
+      "updatedAt": "2026-09-27T14:23:46.791Z"
+    }
+  ],
+  "sessions": {
+    "token_1790517996588_h8nu2nesuk": {
+      "userId": "user_dokitoor",
+      "createdAt": "2026-09-27T14:06:36.588Z"
+    },
+    "token_1790518987135_gny6fi5quu": {
+      "userId": "usr_1790518987129_cqr9",
+      "createdAt": "2026-09-27T14:23:07.135Z"
+    },
+    "token_1790519026752_1ld6hfqq6b": {
+      "userId": "usr_1790518987129_cqr9",
+      "createdAt": "2026-09-27T14:23:46.752Z"
+    }
+  }
+}
