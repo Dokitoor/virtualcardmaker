@@ -20,6 +20,13 @@
       "username": "sarah",
       "passwordHash": "1250d4612d87d180f7fc81cc4a1d1e1b4f28fedffff0670ac2f810e1fa9f8f38",
       "createdAt": "2026-09-27T14:23:07.130Z"
+    },
+    {
+      "id": "usr_1790522117152_c079",
+      "email": "sheyivetdoc@gmail",
+      "username": "myman",
+      "passwordHash": "ea033b466464282e2775dab3bef17a282fb766e9423787675a9001d3c1523e57",
+      "createdAt": "2026-09-27T15:15:17.152Z"
     }
   ],
   "cards": [
@@ -91,6 +98,52 @@
       "portfolioUrl": "",
       "theme": "emerald",
       "updatedAt": "2026-09-27T14:23:46.791Z"
+    },
+    {
+      "id": "card_1790522117152",
+      "userId": "usr_1790522117152_c079",
+      "username": "myman",
+      "fullName": "Lovina Ikwe",
+      "roleTitle": "Doctor of Veterinary Medicine",
+      "positioningStatement": "I am a vet with a lot of excellence",
+      "capabilities": [
+        "Small animal Medicine",
+        "Poultry",
+        "Large animal Medicine"
+      ],
+      "editionMark": "VCN Conference",
+      "brandSubmark": "MYMAN—PASS",
+      "photoUrl": "/uploads/portrait_1790522438785_tg8fm8.jpg",
+      "email": "sheyivetdoc@gmail",
+      "phone": "08113177445",
+      "whatsapp": "+2348113177445",
+      "linkedinUrl": "",
+      "portfolioUrl": "",
+      "theme": "emerald",
+      "updatedAt": "2026-09-27T15:20:38.797Z"
+    },
+    {
+      "id": "card_demo",
+      "userId": "user_demo",
+      "username": "demo",
+      "fullName": "Alex Morgan",
+      "roleTitle": "Principal Product Architect & Design Strategist",
+      "positioningStatement": "Crafting high-impact digital experiences, architectural design systems, and brand strategies for global tech leaders.",
+      "capabilities": [
+        "PRODUCT ARCHITECTURE",
+        "DESIGN SYSTEMS",
+        "BRAND STRATEGY"
+      ],
+      "editionMark": "GLOBAL EDITION 2026",
+      "brandSubmark": "AM—STUDIO",
+      "photoUrl": "/assets/dummy-avatar.svg",
+      "email": "alex.morgan@example.com",
+      "phone": "+1 415 555 0192",
+      "whatsapp": "+14155550192",
+      "linkedinUrl": "https://linkedin.com",
+      "portfolioUrl": "https://example.com",
+      "theme": "sapphire",
+      "updatedAt": "2026-09-27T16:29:00.000Z"
     }
   ],
   "sessions": {
@@ -105,6 +158,10 @@
     "token_1790519026752_1ld6hfqq6b": {
       "userId": "usr_1790518987129_cqr9",
       "createdAt": "2026-09-27T14:23:46.752Z"
+    },
+    "token_1790522117165_2tq8l6fouy": {
+      "userId": "usr_1790522117152_c079",
+      "createdAt": "2026-09-27T15:15:17.165Z"
     }
   }
 }

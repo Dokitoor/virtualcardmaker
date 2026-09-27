@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="50%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="avatarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="400" height="400" fill="url(#bgGrad)"/>
+  <circle cx="200" cy="140" r="160" fill="#2563EB" opacity="0.15"/>
+  <circle cx="340" cy="320" r="120" fill="#38BDF8" opacity="0.1"/>
+
+  <!-- Minimalist Executive Avatar Silhouetted Portrait -->
+  <g filter="url(#shadow)">
+    <!-- Head -->
+    <circle cx="200" cy="150" r="62" fill="url(#avatarGrad)"/>
+    <!-- Suit / Collar Shoulders -->
+    <path d="M90 350 C90 260 130 230 200 230 C270 230 310 260 310 350 Z" fill="url(#avatarGrad)"/>
+    <!-- Tie Accent -->
+    <polygon points="190,235 210,235 204,330 196,330" fill="#0F172A"/>
+    <!-- Shirt Collar -->
+    <polygon points="175,230 200,265 190,230" fill="#FFFFFF"/>
+    <polygon points="225,230 200,265 210,230" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Sleek Badge Overlay -->
+  <rect x="135" y="325" width="130" height="30" rx="15" fill="#2563EB" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="200" y="344" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="800" letter-spacing="1.5" text-anchor="middle">DEMO PROFILE</text>
+</svg>

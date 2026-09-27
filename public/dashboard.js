@@ -75,6 +75,56 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  let draftPhotoUrl = null;
+
+  function emitLiveUpdate() {
+    if (!liveCardIframe || !liveCardIframe.contentWindow) return;
+    const draftCard = {
+      fullName: editFullName.value,
+      roleTitle: editRoleTitle.value,
+      positioningStatement: editPositioningStatement.value,
+      capabilities: editCapabilities.value ? editCapabilities.value.split(',').map(s => s.trim()).filter(Boolean) : [],
+      editionMark: editEditionMark.value,
+      brandSubmark: editBrandSubmark.value,
+      theme: editTheme.value,
+      email: editEmail.value,
+      phone: editPhone.value,
+      whatsapp: editWhatsapp.value,
+      linkedinUrl: editLinkedinUrl.value,
+      portfolioUrl: editPortfolioUrl.value,
+      photoUrl: draftPhotoUrl || (currentCard ? currentCard.photoUrl : '')
+    };
+    liveCardIframe.contentWindow.postMessage({ type: 'LIVE_CARD_UPDATE', card: draftCard }, '*');
+  }
+
+  // Attach real-time input listeners across all form controls
+  const allFormInputs = cardEditorForm.querySelectorAll('input:not([type="file"]), textarea, select');
+  allFormInputs.forEach(input => {
+    input.addEventListener('input', emitLiveUpdate);
+    input.addEventListener('change', emitLiveUpdate);
+    input.addEventListener('keyup', emitLiveUpdate);
+  });
+
+  // Real-time photo file preview listener
+  if (editPhotoFile) {
+    editPhotoFile.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          draftPhotoUrl = evt.target.result;
+          emitLiveUpdate();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  // Send initial live sync when iframe loads
+  liveCardIframe.addEventListener('load', () => {
+    setTimeout(emitLiveUpdate, 350);
+  });
+
   function populateForm(card) {
     if (!card) return;
     editFullName.value = card.fullName || '';
@@ -89,6 +139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     editWhatsapp.value = card.whatsapp || '';
     editLinkedinUrl.value = card.linkedinUrl || '';
     editPortfolioUrl.value = card.portfolioUrl || '';
+    emitLiveUpdate();
   }
 
   // Reload Live Iframe

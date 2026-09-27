@@ -462,4 +462,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (qrTrigger) qrTrigger.onclick = openQrModal;
   if (qrModalClose) qrModalClose.onclick = closeQrModal;
   if (qrModalBackdrop) qrModalBackdrop.onclick = closeQrModal;
+
+  // Real-Time Live Card Update Listener from Dashboard Editor
+  window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'LIVE_CARD_UPDATE' && event.data.card) {
+      const updatedData = Object.assign({}, cardData || {}, event.data.card);
+      renderCard(updatedData);
+    }
+  });
 });
