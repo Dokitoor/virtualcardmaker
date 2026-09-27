@@ -456,37 +456,41 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 11px 16px;
-  background-color: var(--text-main);
-  color: var(--text-inverse);
+  background-color: #141312;
+  color: #FFFFFF;
   border: none;
   border-radius: 12px;
   font-family: var(--font-body);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.01em;
   cursor: pointer;
   transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(20, 19, 18, 0.12);
 }
 
 .flip-trigger-btn:hover {
-  background-color: #262422;
+  background-color: var(--accent-primary);
+  color: #FFFFFF;
   transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(200, 75, 36, 0.28);
 }
 
 .flip-arrow-circle {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.18);
+  background-color: rgba(255, 255, 255, 0.2);
+  color: currentColor;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.25s ease;
+  transition: transform 0.25s ease, background-color 0.25s ease;
 }
 
 .flip-trigger-btn:hover .flip-arrow-circle {
   transform: translateX(3px);
-  background-color: var(--accent-primary);
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 /* --------------------------------------------------------------------------
@@ -1683,6 +1687,171 @@ body[data-theme="monochrome"] {
   --accent-primary: #FFFFFF;
   --accent-primary-hover: #CCCCCC;
   --border-hairline: rgba(255, 255, 255, 0.25);
+}
+
+/* --------------------------------------------------------------------------
+   THEME HIGH-CONTRAST BUTTON OVERRIDES
+   -------------------------------------------------------------------------- */
+
+/* Monochrome Theme Button Overrides */
+body[data-theme="monochrome"] .flip-trigger-btn {
+  background-color: #FFFFFF;
+  color: #000000;
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15);
+}
+body[data-theme="monochrome"] .flip-trigger-btn:hover {
+  background-color: #E5E5E5;
+  color: #000000;
+  box-shadow: 0 6px 18px rgba(255, 255, 255, 0.25);
+}
+body[data-theme="monochrome"] .flip-trigger-btn .flip-arrow-circle {
+  background-color: rgba(0, 0, 0, 0.12);
+  color: #000000;
+}
+body[data-theme="monochrome"] .flip-trigger-btn:hover .flip-arrow-circle {
+  background-color: rgba(0, 0, 0, 0.22);
+  color: #000000;
+}
+body[data-theme="monochrome"] .save-contact-btn {
+  background-color: #FFFFFF;
+  color: #000000;
+}
+body[data-theme="monochrome"] .save-contact-btn:hover {
+  background-color: #E5E5E5;
+  color: #000000;
+}
+
+/* Sapphire Theme Button Overrides */
+body[data-theme="sapphire"] .flip-trigger-btn {
+  background-color: #00F5D4;
+  color: #0B132B;
+  box-shadow: 0 4px 14px rgba(0, 245, 212, 0.25);
+}
+body[data-theme="sapphire"] .flip-trigger-btn:hover {
+  background-color: #00BBF9;
+  color: #0B132B;
+  box-shadow: 0 6px 18px rgba(0, 187, 249, 0.35);
+}
+body[data-theme="sapphire"] .flip-trigger-btn .flip-arrow-circle {
+  background-color: rgba(11, 19, 43, 0.15);
+  color: #0B132B;
+}
+body[data-theme="sapphire"] .flip-trigger-btn:hover .flip-arrow-circle {
+  background-color: rgba(11, 19, 43, 0.25);
+  color: #0B132B;
+}
+body[data-theme="sapphire"] .save-contact-btn {
+  background-color: #00F5D4;
+  color: #0B132B;
+}
+body[data-theme="sapphire"] .save-contact-btn:hover {
+  background-color: #00BBF9;
+  color: #0B132B;
+}
+
+/* Emerald Theme Button Overrides */
+body[data-theme="emerald"] .flip-trigger-btn {
+  background-color: #10B981;
+  color: #04140F;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
+}
+body[data-theme="emerald"] .flip-trigger-btn:hover {
+  background-color: #059669;
+  color: #FFFFFF;
+  box-shadow: 0 6px 18px rgba(5, 150, 105, 0.35);
+}
+body[data-theme="emerald"] .flip-trigger-btn .flip-arrow-circle {
+  background-color: rgba(4, 20, 15, 0.15);
+  color: #04140F;
+}
+body[data-theme="emerald"] .flip-trigger-btn:hover .flip-arrow-circle {
+  background-color: rgba(255, 255, 255, 0.22);
+  color: #FFFFFF;
+}
+body[data-theme="emerald"] .save-contact-btn {
+  background-color: #10B981;
+  color: #04140F;
+}
+body[data-theme="emerald"] .save-contact-btn:hover {
+  background-color: #059669;
+  color: #FFFFFF;
+}
+
+/* Gold Theme Button Overrides */
+body[data-theme="gold"] .flip-trigger-btn {
+  background-color: #D4AF37;
+  color: #121212;
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.25);
+}
+body[data-theme="gold"] .flip-trigger-btn:hover {
+  background-color: #E5BE48;
+  color: #121212;
+  box-shadow: 0 6px 18px rgba(229, 190, 72, 0.35);
+}
+body[data-theme="gold"] .flip-trigger-btn .flip-arrow-circle {
+  background-color: rgba(18, 18, 18, 0.15);
+  color: #121212;
+}
+body[data-theme="gold"] .flip-trigger-btn:hover .flip-arrow-circle {
+  background-color: rgba(18, 18, 18, 0.25);
+  color: #121212;
+}
+body[data-theme="gold"] .save-contact-btn {
+  background-color: #D4AF37;
+  color: #121212;
+}
+body[data-theme="gold"] .save-contact-btn:hover {
+  background-color: #E5BE48;
+  color: #121212;
+}
+
+/* Shared Dark Card Back & Secondary Action Buttons Overrides */
+body[data-theme="monochrome"] .flip-back-btn:hover,
+body[data-theme="sapphire"] .flip-back-btn:hover,
+body[data-theme="emerald"] .flip-back-btn:hover,
+body[data-theme="gold"] .flip-back-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: #FFFFFF;
+  color: #FFFFFF;
+}
+
+body[data-theme="monochrome"] .flip-back-btn:hover .flip-arrow-left,
+body[data-theme="sapphire"] .flip-back-btn:hover .flip-arrow-left,
+body[data-theme="emerald"] .flip-back-btn:hover .flip-arrow-left,
+body[data-theme="gold"] .flip-back-btn:hover .flip-arrow-left {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+}
+
+body[data-theme="monochrome"] .copy-action-btn:hover,
+body[data-theme="monochrome"] .direct-action-btn:hover,
+body[data-theme="sapphire"] .copy-action-btn:hover,
+body[data-theme="sapphire"] .direct-action-btn:hover,
+body[data-theme="emerald"] .copy-action-btn:hover,
+body[data-theme="emerald"] .direct-action-btn:hover,
+body[data-theme="gold"] .copy-action-btn:hover,
+body[data-theme="gold"] .direct-action-btn:hover {
+  background-color: #FFFFFF;
+  color: #000000;
+  border-color: #FFFFFF;
+}
+
+body[data-theme="monochrome"] .nav-icon-btn,
+body[data-theme="sapphire"] .nav-icon-btn,
+body[data-theme="emerald"] .nav-icon-btn,
+body[data-theme="gold"] .nav-icon-btn {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+body[data-theme="monochrome"] .nav-icon-btn:hover,
+body[data-theme="sapphire"] .nav-icon-btn:hover,
+body[data-theme="emerald"] .nav-icon-btn:hover,
+body[data-theme="gold"] .nav-icon-btn:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+  border-color: #FFFFFF;
 }
 
 /* Landing Page Layout */
