@@ -93,15 +93,16 @@ app.post('/api/auth/register', (req, res) => {
 
 // Login User
 app.post('/api/auth/login', (req, res) => {
-  const { email, password } = req.body;
+  const identifier = (req.body.email || req.body.username || req.body.identifier || '').trim();
+  const password = req.body.password;
 
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required.' });
+  if (!identifier || !password) {
+    return res.status(400).json({ error: 'Email or Username and password are required.' });
   }
 
-  const user = db.findUserByEmail(email);
+  const user = db.findUserByIdentifier(identifier);
   if (!user || user.passwordHash !== db.hashPassword(password)) {
-    return res.status(401).json({ error: 'Invalid email or password.' });
+    return res.status(401).json({ error: 'Invalid email/username or password.' });
   }
 
   const token = db.createSession(user.id);

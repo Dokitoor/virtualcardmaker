@@ -27,6 +27,20 @@
       "username": "myman",
       "passwordHash": "ea033b466464282e2775dab3bef17a282fb766e9423787675a9001d3c1523e57",
       "createdAt": "2026-09-27T15:15:17.152Z"
+    },
+    {
+      "id": "usr_1790523606951_d8w7",
+      "email": "o.ogundipe2902@miva.edu.ng",
+      "username": "omedia",
+      "passwordHash": "51d172030a31aa94b83bbc040077343e1725de0e61ccb541b8526ddbb8b43990",
+      "createdAt": "2026-09-27T15:40:06.952Z"
+    },
+    {
+      "id": "usr_1790524003277_fzfm",
+      "email": "testuser@example.com",
+      "username": "testuser",
+      "passwordHash": "1250d4612d87d180f7fc81cc4a1d1e1b4f28fedffff0670ac2f810e1fa9f8f38",
+      "createdAt": "2026-09-27T15:46:43.277Z"
     }
   ],
   "cards": [
@@ -144,6 +158,52 @@
       "portfolioUrl": "https://example.com",
       "theme": "sapphire",
       "updatedAt": "2026-09-27T16:29:00.000Z"
+    },
+    {
+      "id": "card_1790523606952",
+      "userId": "usr_1790523606951_d8w7",
+      "username": "omedia",
+      "fullName": "Omedia",
+      "roleTitle": "Digital Creator & Professional",
+      "positioningStatement": "Welcome to my digital business card. Connect with me across links below.",
+      "capabilities": [
+        "PRODUCT DESIGN",
+        "STRATEGY",
+        "CREATIVE"
+      ],
+      "editionMark": "DIGITAL PASS 2026",
+      "brandSubmark": "OMEDIA—PASS",
+      "photoUrl": "/assets/oluseyi-ogundipe.jpg",
+      "email": "o.ogundipe2902@miva.edu.ng",
+      "phone": "",
+      "whatsapp": "",
+      "linkedinUrl": "",
+      "portfolioUrl": "",
+      "theme": "terracotta",
+      "updatedAt": "2026-09-27T15:40:06.952Z"
+    },
+    {
+      "id": "card_1790524003277",
+      "userId": "usr_1790524003277_fzfm",
+      "username": "testuser",
+      "fullName": "Testuser",
+      "roleTitle": "Digital Creator & Professional",
+      "positioningStatement": "Welcome to my digital business card. Connect with me across links below.",
+      "capabilities": [
+        "PRODUCT DESIGN",
+        "STRATEGY",
+        "CREATIVE"
+      ],
+      "editionMark": "DIGITAL PASS 2026",
+      "brandSubmark": "TESTUSER—PASS",
+      "photoUrl": "/assets/oluseyi-ogundipe.jpg",
+      "email": "testuser@example.com",
+      "phone": "",
+      "whatsapp": "",
+      "linkedinUrl": "",
+      "portfolioUrl": "",
+      "theme": "terracotta",
+      "updatedAt": "2026-09-27T15:46:43.277Z"
     }
   ],
   "sessions": {
@@ -162,6 +222,30 @@
     "token_1790522117165_2tq8l6fouy": {
       "userId": "usr_1790522117152_c079",
       "createdAt": "2026-09-27T15:15:17.165Z"
+    },
+    "token_1790523606970_6jxiz6x2fe": {
+      "userId": "usr_1790523606951_d8w7",
+      "createdAt": "2026-09-27T15:40:06.970Z"
+    },
+    "token_1790523627721_mdt59fg772": {
+      "userId": "usr_1790523606951_d8w7",
+      "createdAt": "2026-09-27T15:40:27.721Z"
+    },
+    "token_1790523647361_tz0537oba5": {
+      "userId": "user_dokitoor",
+      "createdAt": "2026-09-27T15:40:47.361Z"
+    },
+    "token_1790523897317_czc0w6x9q3": {
+      "userId": "user_dokitoor",
+      "createdAt": "2026-09-27T15:44:57.317Z"
+    },
+    "token_1790523934816_dfesxm0k7f": {
+      "userId": "user_dokitoor",
+      "createdAt": "2026-09-27T15:45:34.817Z"
+    },
+    "token_1790524003281_t372ahrdhr": {
+      "userId": "usr_1790524003277_fzfm",
+      "createdAt": "2026-09-27T15:46:43.281Z"
     }
   }
 }

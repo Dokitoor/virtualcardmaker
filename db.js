@@ -100,13 +100,22 @@ module.exports = {
   hashPassword,
   
   findUserByEmail(email) {
+    if (!email) return null;
     const db = loadDB();
     return db.users.find(u => u.email.toLowerCase() === email.toLowerCase());
   },
 
   findUserByUsername(username) {
+    if (!username) return null;
     const db = loadDB();
     return db.users.find(u => u.username.toLowerCase() === username.toLowerCase());
+  },
+
+  findUserByIdentifier(identifier) {
+    if (!identifier) return null;
+    const db = loadDB();
+    const clean = identifier.trim().toLowerCase();
+    return db.users.find(u => u.email.toLowerCase() === clean || u.username.toLowerCase() === clean);
   },
 
   findUserById(id) {
