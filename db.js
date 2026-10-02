@@ -145,7 +145,7 @@ module.exports = {
       capabilities: ['PRODUCT DESIGN', 'STRATEGY', 'CREATIVE'],
       editionMark: 'DIGITAL PASS 2026',
       brandSubmark: username.toUpperCase() + '—PASS',
-      photoUrl: '/assets/oluseyi-ogundipe.jpg',
+      photoUrl: '/assets/default-avatar.png',
       email: newUser.email,
       phone: '',
       whatsapp: '',

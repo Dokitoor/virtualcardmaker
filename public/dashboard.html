@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Card Builder Dashboard — VirtualCard</title>
+  <title>Card Builder Dashboard — Meetme</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
 </head>
-<body class="dashboard-body">
+<body class="dashboard-body" data-dashboard-theme="light">
 
-  <!-- Ambient Grid -->
+  <!-- Ambient Background -->
   <div class="page-background" aria-hidden="true">
     <div class="subtle-grain"></div>
     <div class="architectural-grid"></div>
@@ -19,14 +19,34 @@
 
   <!-- Top Dashboard Navigation Header -->
   <header class="dashboard-top-nav">
-    <div class="dash-brand">
-      <a href="/" class="auth-logo">
-        <span class="logo-mark">VIRTUAL</span><span class="logo-accent">CARD</span>
+    <div class="dash-brand-wrap">
+      <a href="/" class="dash-auth-logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="7.2" cy="5.2" r="2.2"/>
+          <circle cx="16.8" cy="5.2" r="2.2"/>
+          <path d="M4.5 19.5V13.8C4.5 11.5 6.3 9.8 8.5 9.8C9.6 9.8 10.6 10.2 11.3 11L12 11.8L12.7 11C13.4 10.2 14.4 9.8 15.5 9.8C17.7 9.8 19.5 11.5 19.5 13.8V19.5H16.2V14.2C16.2 13.5 15.6 12.8 14.8 12.8C14.2 12.8 13.6 13.2 13.3 13.8L12 15.8L10.7 13.8C10.4 13.2 9.8 12.8 9.2 12.8C8.4 12.8 7.8 13.5 7.8 14.2V19.5H4.5Z"/>
+        </svg>
+        <span class="dash-logo-text">Meetme</span>
       </a>
-      <span class="dash-badge">BUILDER DASHBOARD</span>
+      <span class="dash-badge">CARD BUILDER</span>
     </div>
 
-    <div class="dash-user-bar">
+    <!-- Center Share URL Banner -->
+    <div class="dash-vanity-pill" id="vanity-share-box">
+      <span class="vanity-dot"></span>
+      <span class="vanity-label">PUBLIC LINK:</span>
+      <a href="#" id="vanity-url-link" target="_blank" class="vanity-url-display">Loading URL...</a>
+      <button id="copy-url-btn" class="btn-copy-sm" type="button">Copy</button>
+      <a href="#" id="open-live-btn" target="_blank" class="btn-open-sm">View ↗</a>
+    </div>
+
+    <!-- Right Controls: Theme Toggle & User Auth -->
+    <div class="dash-controls-wrap">
+      <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" title="Toggle Light/Dark Mode">
+        <span id="theme-icon">🌙</span>
+        <span id="theme-text">Dark Mode</span>
+      </button>
+
       <div class="user-info-pill">
         <span class="user-dot"></span>
         <span id="user-display-email">Loading...</span>
@@ -35,129 +55,310 @@
     </div>
   </header>
 
-  <!-- Dashboard Workspace Layout (Split Screen Editor & Live Preview) -->
+  <!-- Dashboard Workspace Layout -->
   <main class="dashboard-workspace">
     
-    <!-- LEFT PANEL: CARD EDITOR FORM -->
+    <!-- LEFT PANEL: MINIMAL INTERACTIVE FORM STAGE -->
     <section class="editor-panel">
-      <div class="panel-header">
-        <h2 class="panel-title">Edit Card Details</h2>
-        <span class="panel-sub">Changes update live in your 3D card preview</span>
-      </div>
-
-      <!-- Share URL Banner -->
-      <div class="vanity-share-box">
-        <div class="vanity-info">
-          <span class="vanity-label">YOUR PUBLIC CARD URL</span>
-          <a href="#" id="vanity-url-link" target="_blank" class="vanity-url-display">Loading URL...</a>
-        </div>
-        <div class="vanity-actions">
-          <button id="copy-url-btn" class="btn-copy-url">Copy Link</button>
-          <a href="#" id="open-live-btn" target="_blank" class="btn-open-live">Open Card ↗</a>
-        </div>
-      </div>
-
-      <form id="card-editor-form" class="editor-form" enctype="multipart/form-data">
+      <div class="wizard-minimal-card">
         
-        <!-- SECTION 1: IDENTITY -->
-        <fieldset class="form-section">
-          <legend class="section-legend">01. IDENTITY & PROFILE</legend>
-
-          <div class="form-group">
-            <label for="edit-fullName" class="form-label">Full Name</label>
-            <input type="text" id="edit-fullName" class="form-input" placeholder="e.g. Oluseyi Ogundipe" required>
+        <!-- TOP MINIMAL PROGRESS INDICATOR & ACTIVE STAGE BADGE -->
+        <div class="wizard-minimal-header">
+          <div class="active-stage-pill">
+            <span class="stage-step-num" id="active-step-num">01 / 09</span>
+            <span class="stage-divider">•</span>
+            <span class="stage-name-text" id="active-stage-name">Personal Details</span>
           </div>
 
-          <div class="form-group">
-            <label for="edit-roleTitle" class="form-label">Professional Role & Title</label>
-            <input type="text" id="edit-roleTitle" class="form-input" placeholder="e.g. Product & Information Designer | Project Manager" required>
+          <div class="minimal-progress-track">
+            <div class="minimal-progress-bar" id="wizard-progress-fill" style="width: 11%;"></div>
           </div>
-
-          <div class="form-group">
-            <label for="edit-positioningStatement" class="form-label">Bio / Positioning Statement</label>
-            <textarea id="edit-positioningStatement" class="form-textarea" rows="3" placeholder="Brief tagline or description of what you do..."></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="edit-photoFile" class="form-label">Portrait Photo</label>
-            <div class="photo-upload-wrap">
-              <input type="file" id="edit-photoFile" accept="image/*" class="form-file-input">
-              <span class="upload-hint">Upload a portrait image (JPG or PNG)</span>
-            </div>
-          </div>
-        </fieldset>
-
-        <!-- SECTION 2: COMPETENCIES & BRANDING -->
-        <fieldset class="form-section">
-          <legend class="section-legend">02. COMPETENCIES & EDITION</legend>
-
-          <div class="form-group">
-            <label for="edit-capabilities" class="form-label">Core Competencies (Comma separated)</label>
-            <input type="text" id="edit-capabilities" class="form-input" placeholder="PRODUCT DESIGN, INFORMATION DESIGN, PROJECT MANAGEMENT">
-            <span class="form-hint">Displayed as styled pills on the front of your card</span>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group flex-1">
-              <label for="edit-editionMark" class="form-label">Edition / Event Tag</label>
-              <input type="text" id="edit-editionMark" class="form-input" placeholder="NAIROBI EDITION 2026">
-            </div>
-            <div class="form-group flex-1">
-              <label for="edit-brandSubmark" class="form-label">Brand Code</label>
-              <input type="text" id="edit-brandSubmark" class="form-input" placeholder="OO—DESIGN">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="edit-theme" class="form-label">Editorial Theme Color</label>
-            <select id="edit-theme" class="form-select">
-              <option value="terracotta">Editorial Burnt Terracotta (Default)</option>
-              <option value="sapphire">Midnight Sapphire</option>
-              <option value="emerald">Emerald Obsidian</option>
-              <option value="gold">Champagne Gold</option>
-              <option value="monochrome">Minimalist Monochrome</option>
-            </select>
-          </div>
-        </fieldset>
-
-        <!-- SECTION 3: CONTACT & LINKS -->
-        <fieldset class="form-section">
-          <legend class="section-legend">03. CONTACT & SOCIAL LINKS</legend>
-
-          <div class="form-group">
-            <label for="edit-email" class="form-label">Public Contact Email</label>
-            <input type="email" id="edit-email" class="form-input" placeholder="you@example.com">
-          </div>
-
-          <div class="form-row">
-            <div class="form-group flex-1">
-              <label for="edit-phone" class="form-label">Phone Number</label>
-              <input type="text" id="edit-phone" class="form-input" placeholder="+234 814 891 8630">
-            </div>
-            <div class="form-group flex-1">
-              <label for="edit-whatsapp" class="form-label">WhatsApp Number (with country code)</label>
-              <input type="text" id="edit-whatsapp" class="form-input" placeholder="+2348148918630">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="edit-linkedinUrl" class="form-label">LinkedIn Profile URL</label>
-            <input type="url" id="edit-linkedinUrl" class="form-input" placeholder="https://www.linkedin.com/in/username">
-          </div>
-
-          <div class="form-group">
-            <label for="edit-portfolioUrl" class="form-label">Portfolio / Website URL</label>
-            <input type="url" id="edit-portfolioUrl" class="form-input" placeholder="https://yourwebsite.com">
-          </div>
-        </fieldset>
-
-        <div class="form-actions-sticky">
-          <button type="submit" id="save-card-btn" class="btn-save-card">
-            <span>Save & Publish Changes</span>
-          </button>
         </div>
 
-      </form>
+        <!-- FORM QUESTION SCREENS -->
+        <form id="card-editor-form" class="wizard-form" enctype="multipart/form-data">
+          
+          <!-- QUESTION 1: FULL NAME -->
+          <div class="wizard-step-screen active" data-step="1">
+            <div class="step-header">
+              <h2 class="step-main-title">What is your full name?</h2>
+              <p class="step-main-sub">This will be the primary name displayed on your 3D digital card face.</p>
+            </div>
+
+            <div class="step-single-field">
+              <div class="form-group">
+                <label for="edit-fullName" class="form-label sr-only">Full Name</label>
+                <input type="text" id="edit-fullName" class="form-input form-input-huge" placeholder="e.g. Oluseyi Ogundipe" autofocus>
+                <span class="field-keyboard-tip">Press <kbd>Enter ↵</kbd> or click Continue</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- QUESTION 2: ROLE TITLE -->
+          <div class="wizard-step-screen" data-step="2">
+            <div class="step-header">
+              <h2 class="step-main-title">What is your professional title or role?</h2>
+              <p class="step-main-sub">Describe your primary expertise or role (e.g. Product Designer | Project Manager).</p>
+            </div>
+
+            <div class="step-single-field">
+              <div class="form-group">
+                <label for="edit-roleTitle" class="form-label sr-only">Professional Role Title</label>
+                <input type="text" id="edit-roleTitle" class="form-input form-input-huge" placeholder="e.g. Product & Information Designer | Project Manager">
+                <span class="field-keyboard-tip">Press <kbd>Enter ↵</kbd> or click Continue</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- QUESTION 3: BIO STATEMENT -->
+          <div class="wizard-step-screen" data-step="3">
+            <div class="step-header">
+              <h2 class="step-main-title">Add a short bio or positioning statement</h2>
+              <p class="step-main-sub">Write a brief tagline or description of what you do and your key focus.</p>
+            </div>
+
+            <div class="step-single-field">
+              <div class="form-group">
+                <label for="edit-positioningStatement" class="form-label sr-only">Bio Statement</label>
+                <textarea id="edit-positioningStatement" class="form-textarea form-textarea-lg" rows="4" placeholder="e.g. Designing digital products, simplifying complex information, and turning ideas into meaningful projects."></textarea>
+                <span class="form-hint">Displayed on the front face of your digital card</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- QUESTION 4: PORTRAIT PHOTO -->
+          <div class="wizard-step-screen" data-step="4">
+            <div class="step-header">
+              <h2 class="step-main-title">Upload your portrait photo</h2>
+              <p class="step-main-sub">A clear, warm portrait photo gives your card a personal human connection.</p>
+            </div>
+
+            <div class="step-single-field">
+              <div class="photo-upload-card-lg">
+                <div class="photo-preview-avatar-lg">
+                  <img id="avatar-preview-img" src="/assets/default-avatar.png" alt="Avatar preview">
+                </div>
+                <div class="photo-upload-controls">
+                  <label for="edit-photoFile" class="photo-dropzone-lg">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <span class="dropzone-text">Click to choose portrait photo</span>
+                    <span class="dropzone-sub">Supports JPG or PNG (Max 5MB)</span>
+                    <input type="file" id="edit-photoFile" accept="image/*" class="form-file-input">
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- QUESTION 5: CORE SKILLS -->
+          <div class="wizard-step-screen" data-step="5">
+            <div class="step-header">
+              <h2 class="step-main-title">What are your core competencies & skills?</h2>
+              <p class="step-main-sub">Enter your top skills separated by commas to feature them as styled tags on your card.</p>
+            </div>
+
+            <div class="step-single-field">
+              <div class="form-group">
+                <label for="edit-capabilities" class="form-label sr-only">Core Competencies</label>
+                <input type="text" id="edit-capabilities" class="form-input form-input-huge" placeholder="PRODUCT DESIGN, INFORMATION DESIGN, PROJECT MANAGEMENT">
+                <span class="form-hint">Separate competencies with commas (e.g. DESIGN, STRATEGY, MANAGEMENT)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- QUESTION 6: EDITORIAL THEME COLOR -->
+          <div class="wizard-step-screen" data-step="6">
+            <div class="step-header">
+              <h2 class="step-main-title">Select an editorial theme color for your card</h2>
+              <p class="step-main-sub">Choose a curated color palette that matches your brand style.</p>
+            </div>
+
+            <div class="step-single-field">
+              <div class="theme-options-grid" id="theme-options-grid">
+                <button type="button" class="theme-card-option active" data-theme-val="terracotta">
+                  <span class="theme-swatch swatch-terracotta"></span>
+                  <div class="theme-option-info">
+                    <span class="theme-option-name">Burnt Terracotta</span>
+                    <span class="theme-option-desc">Warm & Editorial</span>
+                  </div>
+                </button>
+
+                <button type="button" class="theme-card-option" data-theme-val="sapphire">
+                  <span class="theme-swatch swatch-sapphire"></span>
+                  <div class="theme-option-info">
+                    <span class="theme-option-name">Midnight Sapphire</span>
+                    <span class="theme-option-desc">Deep Blue Elegance</span>
+                  </div>
+                </button>
+
+                <button type="button" class="theme-card-option" data-theme-val="emerald">
+                  <span class="theme-swatch swatch-emerald"></span>
+                  <div class="theme-option-info">
+                    <span class="theme-option-name">Emerald Obsidian</span>
+                    <span class="theme-option-desc">Rich Botanical Green</span>
+                  </div>
+                </button>
+
+                <button type="button" class="theme-card-option" data-theme-val="gold">
+                  <span class="theme-swatch swatch-gold"></span>
+                  <div class="theme-option-info">
+                    <span class="theme-option-name">Champagne Gold</span>
+                    <span class="theme-option-desc">Warm Luxury Accent</span>
+                  </div>
+                </button>
+
+                <button type="button" class="theme-card-option" data-theme-val="monochrome">
+                  <span class="theme-swatch swatch-monochrome"></span>
+                  <div class="theme-option-info">
+                    <span class="theme-option-name">Minimalist Monochrome</span>
+                    <span class="theme-option-desc">Sleek High Contrast</span>
+                  </div>
+                </button>
+              </div>
+
+              <!-- Hidden select for form bindings -->
+              <select id="edit-theme" class="form-select" style="display: none;">
+                <option value="terracotta">Burnt Terracotta</option>
+                <option value="sapphire">Midnight Sapphire</option>
+                <option value="emerald">Emerald Obsidian</option>
+                <option value="gold">Champagne Gold</option>
+                <option value="monochrome">Minimalist Monochrome</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- QUESTION 7: EVENT NAME -->
+          <div class="wizard-step-screen" data-step="7">
+            <div class="step-header">
+              <h2 class="step-main-title">What event are you planning to use this card for?</h2>
+              <p class="step-main-sub">Enter the name of your upcoming event, summit, or conference.</p>
+            </div>
+
+            <div class="step-single-field">
+              <div class="form-group">
+                <label for="edit-editionMark" class="form-label sr-only">Event Name</label>
+                <input type="text" id="edit-editionMark" class="form-input form-input-huge" placeholder="e.g. Men's Wealth Conference">
+                <span class="field-keyboard-tip">Press <kbd>Enter ↵</kbd> or click Continue</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- QUESTION 8: CONTACT INFO -->
+          <div class="wizard-step-screen" data-step="8">
+            <div class="step-header">
+              <h2 class="step-main-title">How can people reach out to you directly?</h2>
+              <p class="step-main-sub">Enter your public contact email, phone number, and WhatsApp number.</p>
+            </div>
+
+            <div class="step-single-field">
+              <div class="form-group">
+                <label for="edit-email" class="form-label">Public Contact Email</label>
+                <input type="email" id="edit-email" class="form-input" placeholder="you@example.com">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="edit-phone" class="form-label">Phone Number</label>
+                  <input type="text" id="edit-phone" class="form-input" placeholder="+234 814 891 8630">
+                </div>
+                <div class="form-group flex-1">
+                  <label for="edit-whatsapp" class="form-label">WhatsApp Number</label>
+                  <input type="text" id="edit-whatsapp" class="form-input" placeholder="+2348148918630">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- QUESTION 9: SOCIAL & PORTFOLIO LINKS -->
+          <div class="wizard-step-screen" data-step="9">
+            <div class="step-header">
+              <h2 class="step-main-title">Where can people find your work & profile?</h2>
+              <p class="step-main-sub">Add your LinkedIn profile URL and portfolio or website link.</p>
+            </div>
+
+            <div class="step-single-field">
+              <div class="form-group">
+                <label for="edit-linkedinUrl" class="form-label">LinkedIn Profile URL</label>
+                <input type="url" id="edit-linkedinUrl" class="form-input" placeholder="https://www.linkedin.com/in/username">
+              </div>
+
+              <div class="form-group">
+                <label for="edit-portfolioUrl" class="form-label">Portfolio / Website URL</label>
+                <input type="url" id="edit-portfolioUrl" class="form-input" placeholder="https://yourwebsite.com">
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 10: DEDICATED ACCOUNT CREATION PAGE -->
+          <div class="wizard-step-screen" data-step="10">
+            <div class="step-header">
+              <h2 class="step-main-title" id="step10-main-title">Create your account to publish</h2>
+              <p class="step-main-sub" id="step10-main-sub">Your card is ready! Create your free account to publish your card and claim your custom share link.</p>
+            </div>
+
+            <div id="step10-auth-alert" class="modal-alert" style="display: none;"></div>
+
+            <div class="step-single-field" id="step10-register-box">
+              <div class="form-group">
+                <label for="step10-reg-email" class="form-label">Email Address</label>
+                <input type="email" id="step10-reg-email" class="form-input" placeholder="you@example.com">
+              </div>
+
+              <div class="form-group">
+                <label for="step10-reg-username" class="form-label">Choose Your Custom Vanity URL</label>
+                <div class="username-input-wrap">
+                  <span class="input-prefix">/c/</span>
+                  <input type="text" id="step10-reg-username" class="form-input username-field" placeholder="yourname" pattern="[a-zA-Z0-9_-]{3,20}">
+                </div>
+                <span class="form-hint">Your public card link will be: <strong>virtualcard.com/c/<span id="step10-username-preview">yourname</span></strong></span>
+              </div>
+
+              <div class="form-group">
+                <label for="step10-reg-password" class="form-label">Password</label>
+                <input type="password" id="step10-reg-password" class="form-input" placeholder="Minimum 6 characters" minlength="6">
+              </div>
+
+              <div style="text-align: center; margin-top: 6px; font-size: 13px; color: var(--dash-text-muted);">
+                Already have an account? <button type="button" id="step10-show-login-btn" style="background:none;border:none;color:var(--dash-text);font-weight:700;text-decoration:underline;cursor:pointer;">Sign In instead</button>
+              </div>
+            </div>
+
+            <div class="step-single-field" id="step10-login-box" style="display: none;">
+              <div class="form-group">
+                <label for="step10-login-identifier" class="form-label">Email Address or Username</label>
+                <input type="text" id="step10-login-identifier" class="form-input" placeholder="e.g. dokitoor or email@example.com">
+              </div>
+
+              <div class="form-group">
+                <label for="step10-login-password" class="form-label">Password</label>
+                <input type="password" id="step10-login-password" class="form-input" placeholder="Your password">
+              </div>
+
+              <div style="text-align: center; margin-top: 6px; font-size: 13px; color: var(--dash-text-muted);">
+                Need an account? <button type="button" id="step10-show-register-btn" style="background:none;border:none;color:var(--dash-text);font-weight:700;text-decoration:underline;cursor:pointer;">Create Account</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- WIZARD NAVIGATION BOTTOM BAR -->
+          <div class="wizard-nav-bar">
+            <button type="button" id="next-step-btn" class="btn-wizard-next">
+              <span>Continue</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+
+            <button type="submit" id="save-card-btn" class="btn-save-card" style="display: none;">
+              <span>Save & Publish Changes 🚀</span>
+            </button>
+
+            <button type="button" id="prev-step-btn" class="btn-wizard-back" disabled>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              <span>Back</span>
+            </button>
+          </div>
+
+        </form>
+      </div>
     </section>
 
     <!-- RIGHT PANEL: LIVE 3D CARD PREVIEW -->
@@ -180,7 +381,7 @@
     <span class="toast-message" id="toast-message">Changes saved!</span>
   </div>
 
-  <!-- Auth Modal (Create Account or Sign In to Publish Card) -->
+  <!-- Auth Modal -->
   <div class="dash-modal-overlay" id="auth-modal" style="display: none;">
     <div class="dash-modal-content">
       <button class="dash-modal-close" id="auth-modal-close" aria-label="Close modal">&times;</button>

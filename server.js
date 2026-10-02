@@ -227,6 +227,6 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Multi-User Digital Card Platform live at http://localhost:${PORT}`);
+  console.log(`🚀 Meetme Digital Card Platform live at http://localhost:${PORT}`);
   console.log(`👉 Test custom user card: http://localhost:${PORT}/c/dokitoor`);
 });

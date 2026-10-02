@@ -5,42 +5,14 @@
       "email": "oluseyi.ogundipe@outlook.com",
       "username": "dokitoor",
       "passwordHash": "1250d4612d87d180f7fc81cc4a1d1e1b4f28fedffff0670ac2f810e1fa9f8f38",
-      "createdAt": "2026-09-27T14:06:36.567Z"
+      "createdAt": "2026-10-01T23:20:14.531Z"
     },
     {
       "id": "user_oluseyi",
       "email": "oluseyi@example.com",
       "username": "oluseyi",
       "passwordHash": "1250d4612d87d180f7fc81cc4a1d1e1b4f28fedffff0670ac2f810e1fa9f8f38",
-      "createdAt": "2026-09-27T14:06:36.568Z"
-    },
-    {
-      "id": "usr_1790518987129_cqr9",
-      "email": "sarah@example.com",
-      "username": "sarah",
-      "passwordHash": "1250d4612d87d180f7fc81cc4a1d1e1b4f28fedffff0670ac2f810e1fa9f8f38",
-      "createdAt": "2026-09-27T14:23:07.130Z"
-    },
-    {
-      "id": "usr_1790522117152_c079",
-      "email": "sheyivetdoc@gmail",
-      "username": "myman",
-      "passwordHash": "ea033b466464282e2775dab3bef17a282fb766e9423787675a9001d3c1523e57",
-      "createdAt": "2026-09-27T15:15:17.152Z"
-    },
-    {
-      "id": "usr_1790523606951_d8w7",
-      "email": "o.ogundipe2902@miva.edu.ng",
-      "username": "omedia",
-      "passwordHash": "51d172030a31aa94b83bbc040077343e1725de0e61ccb541b8526ddbb8b43990",
-      "createdAt": "2026-09-27T15:40:06.952Z"
-    },
-    {
-      "id": "usr_1790524003277_fzfm",
-      "email": "testuser@example.com",
-      "username": "testuser",
-      "passwordHash": "1250d4612d87d180f7fc81cc4a1d1e1b4f28fedffff0670ac2f810e1fa9f8f38",
-      "createdAt": "2026-09-27T15:46:43.277Z"
+      "createdAt": "2026-10-01T23:20:14.531Z"
     }
   ],
   "cards": [
@@ -65,7 +37,7 @@
       "linkedinUrl": "https://www.linkedin.com/in/dokitoor-oluseyi/",
       "portfolioUrl": "https://oluseyiogundipe.com",
       "theme": "terracotta",
-      "updatedAt": "2026-09-27T14:06:36.568Z"
+      "updatedAt": "2026-10-01T23:20:14.531Z"
     },
     {
       "id": "card_oluseyi",
@@ -88,188 +60,8 @@
       "linkedinUrl": "https://www.linkedin.com/in/dokitoor-oluseyi/",
       "portfolioUrl": "https://oluseyiogundipe.com",
       "theme": "terracotta",
-      "updatedAt": "2026-09-27T14:06:36.568Z"
-    },
-    {
-      "id": "card_1790518987130",
-      "userId": "usr_1790518987129_cqr9",
-      "username": "sarah",
-      "fullName": "Sarah Jenkins",
-      "roleTitle": "Lead UX Strategist & Brand Director",
-      "positioningStatement": "Crafting human-centered digital experiences for high-growth tech startups.",
-      "capabilities": [
-        "UX STRATEGY",
-        "BRAND IDENTITY",
-        "UI SYSTEMS"
-      ],
-      "editionMark": "DIGITAL PASS 2026",
-      "brandSubmark": "SARAH—PASS",
-      "photoUrl": "/assets/oluseyi-ogundipe.jpg",
-      "email": "sarah@example.com",
-      "phone": "",
-      "whatsapp": "",
-      "linkedinUrl": "",
-      "portfolioUrl": "",
-      "theme": "emerald",
-      "updatedAt": "2026-09-27T14:23:46.791Z"
-    },
-    {
-      "id": "card_1790522117152",
-      "userId": "usr_1790522117152_c079",
-      "username": "myman",
-      "fullName": "Lovina Ikwe",
-      "roleTitle": "Doctor of Veterinary Medicine",
-      "positioningStatement": "I am a vet with a lot of excellence",
-      "capabilities": [
-        "Small animal Medicine",
-        "Poultry",
-        "Large animal Medicine"
-      ],
-      "editionMark": "VCN Conference",
-      "brandSubmark": "MYMAN—PASS",
-      "photoUrl": "/uploads/portrait_1790522438785_tg8fm8.jpg",
-      "email": "sheyivetdoc@gmail",
-      "phone": "08113177445",
-      "whatsapp": "+2348113177445",
-      "linkedinUrl": "",
-      "portfolioUrl": "",
-      "theme": "emerald",
-      "updatedAt": "2026-09-27T15:20:38.797Z"
-    },
-    {
-      "id": "card_demo",
-      "userId": "user_demo",
-      "username": "demo",
-      "fullName": "Alex Morgan",
-      "roleTitle": "Principal Product Architect & Design Strategist",
-      "positioningStatement": "Crafting high-impact digital experiences, architectural design systems, and brand strategies for global tech leaders.",
-      "capabilities": [
-        "PRODUCT ARCHITECTURE",
-        "DESIGN SYSTEMS",
-        "BRAND STRATEGY"
-      ],
-      "editionMark": "GLOBAL EDITION 2026",
-      "brandSubmark": "AM—STUDIO",
-      "photoUrl": "/assets/dummy-avatar.svg",
-      "email": "alex.morgan@example.com",
-      "phone": "+1 415 555 0192",
-      "whatsapp": "+14155550192",
-      "linkedinUrl": "https://linkedin.com",
-      "portfolioUrl": "https://example.com",
-      "theme": "sapphire",
-      "updatedAt": "2026-09-27T16:29:00.000Z"
-    },
-    {
-      "id": "card_1790523606952",
-      "userId": "usr_1790523606951_d8w7",
-      "username": "omedia",
-      "fullName": "Omedia",
-      "roleTitle": "Digital Creator & Professional",
-      "positioningStatement": "Welcome to my digital business card. Connect with me across links below.",
-      "capabilities": [
-        "PRODUCT DESIGN",
-        "STRATEGY",
-        "CREATIVE"
-      ],
-      "editionMark": "DIGITAL PASS 2026",
-      "brandSubmark": "OMEDIA—PASS",
-      "photoUrl": "/assets/oluseyi-ogundipe.jpg",
-      "email": "o.ogundipe2902@miva.edu.ng",
-      "phone": "",
-      "whatsapp": "",
-      "linkedinUrl": "",
-      "portfolioUrl": "",
-      "theme": "terracotta",
-      "updatedAt": "2026-09-27T15:40:06.952Z"
-    },
-    {
-      "id": "card_1790524003277",
-      "userId": "usr_1790524003277_fzfm",
-      "username": "testuser",
-      "fullName": "Testuser",
-      "roleTitle": "Digital Creator & Professional",
-      "positioningStatement": "Welcome to my digital business card. Connect with me across links below.",
-      "capabilities": [
-        "PRODUCT DESIGN",
-        "STRATEGY",
-        "CREATIVE"
-      ],
-      "editionMark": "DIGITAL PASS 2026",
-      "brandSubmark": "TESTUSER—PASS",
-      "photoUrl": "/assets/oluseyi-ogundipe.jpg",
-      "email": "testuser@example.com",
-      "phone": "",
-      "whatsapp": "",
-      "linkedinUrl": "",
-      "portfolioUrl": "",
-      "theme": "terracotta",
-      "updatedAt": "2026-09-27T15:46:43.277Z"
+      "updatedAt": "2026-10-01T23:20:14.531Z"
     }
   ],
-  "sessions": {
-    "token_1790517996588_h8nu2nesuk": {
-      "userId": "user_dokitoor",
-      "createdAt": "2026-09-27T14:06:36.588Z"
-    },
-    "token_1790518987135_gny6fi5quu": {
-      "userId": "usr_1790518987129_cqr9",
-      "createdAt": "2026-09-27T14:23:07.135Z"
-    },
-    "token_1790519026752_1ld6hfqq6b": {
-      "userId": "usr_1790518987129_cqr9",
-      "createdAt": "2026-09-27T14:23:46.752Z"
-    },
-    "token_1790522117165_2tq8l6fouy": {
-      "userId": "usr_1790522117152_c079",
-      "createdAt": "2026-09-27T15:15:17.165Z"
-    },
-    "token_1790523606970_6jxiz6x2fe": {
-      "userId": "usr_1790523606951_d8w7",
-      "createdAt": "2026-09-27T15:40:06.970Z"
-    },
-    "token_1790523627721_mdt59fg772": {
-      "userId": "usr_1790523606951_d8w7",
-      "createdAt": "2026-09-27T15:40:27.721Z"
-    },
-    "token_1790523647361_tz0537oba5": {
-      "userId": "user_dokitoor",
-      "createdAt": "2026-09-27T15:40:47.361Z"
-    },
-    "token_1790523897317_czc0w6x9q3": {
-      "userId": "user_dokitoor",
-      "createdAt": "2026-09-27T15:44:57.317Z"
-    },
-    "token_1790523934816_dfesxm0k7f": {
-      "userId": "user_dokitoor",
-      "createdAt": "2026-09-27T15:45:34.817Z"
-    },
-    "token_1790524003281_t372ahrdhr": {
-      "userId": "usr_1790524003277_fzfm",
-      "createdAt": "2026-09-27T15:46:43.281Z"
-    },
-    "token_1790524253705_glbloitmj6": {
-      "userId": "user_dokitoor",
-      "createdAt": "2026-09-27T15:50:53.705Z"
-    },
-    "token_1790524260984_crqnsiy3zp": {
-      "userId": "user_dokitoor",
-      "createdAt": "2026-09-27T15:51:00.984Z"
-    },
-    "token_1790524262997_bv50ghklor": {
-      "userId": "user_dokitoor",
-      "createdAt": "2026-09-27T15:51:02.997Z"
-    },
-    "token_1790524264939_twp1en9q2r": {
-      "userId": "user_dokitoor",
-      "createdAt": "2026-09-27T15:51:04.939Z"
-    },
-    "token_1790524269867_63kxwi87eq": {
-      "userId": "user_dokitoor",
-      "createdAt": "2026-09-27T15:51:09.867Z"
-    },
-    "token_1790524281121_0utz2b4g4v": {
-      "userId": "user_dokitoor",
-      "createdAt": "2026-09-27T15:51:21.121Z"
-    }
-  }
+  "sessions": {}
 }
