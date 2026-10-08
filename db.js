@@ -1,211 +1,417 @@
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { createClient } = require('@supabase/supabase-js');
 
 const DB_PATH = path.join(__dirname, 'data', 'db.json');
+const JWT_SECRET = process.env.JWT_SECRET || 'meetme_secret_salt_card_platform_2026';
 
-// Ensure data directory exists
-if (!fs.existsSync(path.join(__dirname, 'data'))) {
-  fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
+// Initialize Supabase Client if environment variables exist
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+let supabase = null;
+
+if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+  try {
+    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: false }
+    });
+    console.log('⚡ Connected to Supabase Cloud Database & Storage');
+  } catch (err) {
+    console.warn('⚠️ Supabase initialization notice:', err.message);
+  }
 }
 
-// Seed initial default database
-function getInitialData() {
-  return {
-    users: [
-      {
-        id: 'user_dokitoor',
-        email: 'oluseyi.ogundipe@outlook.com',
-        username: 'dokitoor',
-        passwordHash: hashPassword('password123'),
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'user_oluseyi',
-        email: 'oluseyi@example.com',
-        username: 'oluseyi',
-        passwordHash: hashPassword('password123'),
-        createdAt: new Date().toISOString()
-      }
-    ],
-    cards: [
-      {
-        id: 'card_dokitoor',
-        userId: 'user_dokitoor',
-        username: 'dokitoor',
-        fullName: '',
-        roleTitle: '',
-        positioningStatement: '',
-        capabilities: [],
-        editionMark: 'DIGITAL PASS 2026',
-        brandSubmark: 'CARD—PASS',
-        photoUrl: '',
-        email: 'oluseyi.ogundipe@outlook.com',
-        phone: '',
-        whatsapp: '',
-        linkedinUrl: '',
-        portfolioUrl: '',
-        theme: 'terracotta',
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 'card_oluseyi',
-        userId: 'user_oluseyi',
-        username: 'oluseyi',
-        fullName: '',
-        roleTitle: '',
-        positioningStatement: '',
-        capabilities: [],
-        editionMark: 'DIGITAL PASS 2026',
-        brandSubmark: 'CARD—PASS',
-        photoUrl: '',
-        email: 'oluseyi@example.com',
-        phone: '',
-        whatsapp: '',
-        linkedinUrl: '',
-        portfolioUrl: '',
-        theme: 'terracotta',
-        updatedAt: new Date().toISOString()
-      }
-    ],
-    sessions: {}
-  };
+// Ensure local data directory exists for fallback
+if (!fs.existsSync(path.join(__dirname, 'data'))) {
+  fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
 }
 
 function hashPassword(password) {
   return crypto.createHash('sha256').update(password + 'salt_card_platform_2026').digest('hex');
 }
 
-function loadDB() {
-  if (!fs.existsSync(DB_PATH)) {
-    const initial = getInitialData();
-    saveDB(initial);
-    return initial;
-  }
+// Stateless HMAC Session Tokens (Survives serverless cold starts across Vercel instances)
+function createSession(userId) {
+  const payload = JSON.stringify({ userId, iat: Date.now() });
+  const b64Payload = Buffer.from(payload).toString('base64url');
+  const sig = crypto.createHmac('sha256', JWT_SECRET).update(b64Payload).digest('base64url');
+  return `${b64Payload}.${sig}`;
+}
+
+async function getUserBySession(token) {
+  if (!token || typeof token !== 'string') return null;
+  const parts = token.split('.');
+  if (parts.length !== 2) return null;
+  const [b64Payload, sig] = parts;
+  const expectedSig = crypto.createHmac('sha256', JWT_SECRET).update(b64Payload).digest('base64url');
+  if (sig !== expectedSig) return null;
+
   try {
-    const data = fs.readFileSync(DB_PATH, 'utf-8');
-    return JSON.parse(data);
+    const payload = JSON.parse(Buffer.from(b64Payload, 'base64url').toString('utf8'));
+    return await findUserById(payload.userId);
   } catch {
-    const initial = getInitialData();
-    saveDB(initial);
-    return initial;
+    return null;
   }
 }
 
-function saveDB(data) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf-8');
+function deleteSession(token) {
+  // Stateless tokens do not require server deletion
+  return true;
+}
+
+// --------------------------------------------------------------------------
+// LOCAL JSON DB FALLBACK HELPERS
+// --------------------------------------------------------------------------
+function loadLocalDB() {
+  if (!fs.existsSync(DB_PATH)) return { users: [], cards: [], sessions: {} };
+  try {
+    return JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+  } catch {
+    return { users: [], cards: [], sessions: {} };
+  }
+}
+
+function saveLocalDB(data) {
+  try {
+    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (err) {
+    console.warn('Local DB write notice:', err.message);
+  }
+}
+
+// --------------------------------------------------------------------------
+// ROW MAPPERS FOR SUPABASE (Postgres snake_case <-> JS camelCase)
+// --------------------------------------------------------------------------
+function cardFromRow(row) {
+  if (!row) return null;
+  let capabilities = [];
+  if (Array.isArray(row.capabilities)) {
+    capabilities = row.capabilities;
+  } else if (typeof row.capabilities === 'string') {
+    try { capabilities = JSON.parse(row.capabilities); } catch { capabilities = []; }
+  }
+
+  return {
+    id: row.id,
+    userId: row.user_id,
+    username: row.username,
+    fullName: row.full_name || '',
+    roleTitle: row.role_title || '',
+    positioningStatement: row.positioning_statement || '',
+    capabilities,
+    editionMark: row.edition_mark || 'DIGITAL PASS 2026',
+    brandSubmark: row.brand_submark || 'CARD—PASS',
+    photoUrl: row.photo_url || '',
+    email: row.email || '',
+    phone: row.phone || '',
+    whatsapp: row.whatsapp || '',
+    linkedinUrl: row.linkedin_url || '',
+    portfolioUrl: row.portfolio_url || '',
+    theme: row.theme || 'terracotta',
+    updatedAt: row.updated_at
+  };
+}
+
+function cardToRow(userId, updates) {
+  const row = { updated_at: new Date().toISOString() };
+  if (updates.fullName !== undefined) row.full_name = updates.fullName;
+  if (updates.roleTitle !== undefined) row.role_title = updates.roleTitle;
+  if (updates.positioningStatement !== undefined) row.positioning_statement = updates.positioningStatement;
+  if (updates.capabilities !== undefined) row.capabilities = updates.capabilities;
+  if (updates.editionMark !== undefined) row.edition_mark = updates.editionMark;
+  if (updates.brandSubmark !== undefined) row.brand_submark = updates.brandSubmark;
+  if (updates.photoUrl !== undefined) row.photo_url = updates.photoUrl;
+  if (updates.email !== undefined) row.email = updates.email;
+  if (updates.phone !== undefined) row.phone = updates.phone;
+  if (updates.whatsapp !== undefined) row.whatsapp = updates.whatsapp;
+  if (updates.linkedinUrl !== undefined) row.linkedin_url = updates.linkedinUrl;
+  if (updates.portfolioUrl !== undefined) row.portfolio_url = updates.portfolioUrl;
+  if (updates.theme !== undefined) row.theme = updates.theme;
+  return row;
+}
+
+// --------------------------------------------------------------------------
+// DATABASE METHODS
+// --------------------------------------------------------------------------
+
+async function findUserByEmail(email) {
+  if (!email) return null;
+  const cleanEmail = email.trim().toLowerCase();
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .ilike('email', cleanEmail)
+      .maybeSingle();
+    if (!error && data) {
+      return {
+        id: data.id,
+        email: data.email,
+        username: data.username,
+        passwordHash: data.password_hash,
+        createdAt: data.created_at
+      };
+    }
+  }
+
+  const db = loadLocalDB();
+  return db.users.find(u => u.email.toLowerCase() === cleanEmail) || null;
+}
+
+async function findUserByUsername(username) {
+  if (!username) return null;
+  const clean = username.trim().toLowerCase();
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .ilike('username', clean)
+      .maybeSingle();
+    if (!error && data) {
+      return {
+        id: data.id,
+        email: data.email,
+        username: data.username,
+        passwordHash: data.password_hash,
+        createdAt: data.created_at
+      };
+    }
+  }
+
+  const db = loadLocalDB();
+  return db.users.find(u => u.username.toLowerCase() === clean) || null;
+}
+
+async function findUserByIdentifier(identifier) {
+  if (!identifier) return null;
+  const clean = identifier.trim().toLowerCase();
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .or(`email.ilike.${clean},username.ilike.${clean}`)
+      .maybeSingle();
+    if (!error && data) {
+      return {
+        id: data.id,
+        email: data.email,
+        username: data.username,
+        passwordHash: data.password_hash,
+        createdAt: data.created_at
+      };
+    }
+  }
+
+  const db = loadLocalDB();
+  return db.users.find(u => u.email.toLowerCase() === clean || u.username.toLowerCase() === clean) || null;
+}
+
+async function findUserById(id) {
+  if (!id) return null;
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+    if (!error && data) {
+      return {
+        id: data.id,
+        email: data.email,
+        username: data.username,
+        passwordHash: data.password_hash,
+        createdAt: data.created_at
+      };
+    }
+  }
+
+  const db = loadLocalDB();
+  return db.users.find(u => u.id === id) || null;
+}
+
+async function createUser(email, username, password) {
+  const cleanEmail = email.trim().toLowerCase();
+  const cleanUsername = username.trim().toLowerCase();
+  const userId = 'usr_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+  const cardId = 'card_' + Date.now();
+  const passwordHash = hashPassword(password);
+  const now = new Date().toISOString();
+
+  const newUser = {
+    id: userId,
+    email: cleanEmail,
+    username: cleanUsername,
+    passwordHash,
+    createdAt: now
+  };
+
+  const defaultCard = {
+    id: cardId,
+    userId,
+    username: cleanUsername,
+    fullName: '',
+    roleTitle: '',
+    positioningStatement: '',
+    capabilities: [],
+    editionMark: 'DIGITAL PASS 2026',
+    brandSubmark: cleanUsername.toUpperCase() + '—PASS',
+    photoUrl: '',
+    email: cleanEmail,
+    phone: '',
+    whatsapp: '',
+    linkedinUrl: '',
+    portfolioUrl: '',
+    theme: 'terracotta',
+    updatedAt: now
+  };
+
+  if (supabase) {
+    const { error: userError } = await supabase.from('users').insert({
+      id: userId,
+      email: cleanEmail,
+      username: cleanUsername,
+      password_hash: passwordHash,
+      created_at: now
+    });
+    if (userError) throw new Error(userError.message);
+
+    const { error: cardError } = await supabase.from('cards').insert({
+      id: cardId,
+      user_id: userId,
+      username: cleanUsername,
+      full_name: '',
+      role_title: '',
+      positioning_statement: '',
+      capabilities: [],
+      edition_mark: 'DIGITAL PASS 2026',
+      brand_submark: cleanUsername.toUpperCase() + '—PASS',
+      photo_url: '',
+      email: cleanEmail,
+      phone: '',
+      whatsapp: '',
+      linkedin_url: '',
+      portfolio_url: '',
+      theme: 'terracotta',
+      updated_at: now
+    });
+    if (cardError) throw new Error(cardError.message);
+
+    return { user: newUser, card: defaultCard };
+  }
+
+  // Local fallback
+  const db = loadLocalDB();
+  db.users.push(newUser);
+  db.cards.push(defaultCard);
+  saveLocalDB(db);
+  return { user: newUser, card: defaultCard };
+}
+
+async function getCardByUsername(username) {
+  if (!username) return null;
+  const clean = username.trim().toLowerCase();
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('cards')
+      .select('*')
+      .ilike('username', clean)
+      .maybeSingle();
+    if (!error && data) return cardFromRow(data);
+  }
+
+  const db = loadLocalDB();
+  return db.cards.find(c => c.username.toLowerCase() === clean) || null;
+}
+
+async function getCardByUserId(userId) {
+  if (!userId) return null;
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('cards')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (!error && data) return cardFromRow(data);
+  }
+
+  const db = loadLocalDB();
+  return db.cards.find(c => c.userId === userId) || null;
+}
+
+async function updateCard(userId, updates) {
+  if (!userId) return null;
+
+  if (supabase) {
+    const rowUpdates = cardToRow(userId, updates);
+    const { data, error } = await supabase
+      .from('cards')
+      .update(rowUpdates)
+      .eq('user_id', userId)
+      .select('*')
+      .maybeSingle();
+    if (!error && data) return cardFromRow(data);
+  }
+
+  // Local fallback
+  const db = loadLocalDB();
+  const cardIndex = db.cards.findIndex(c => c.userId === userId);
+  if (cardIndex === -1) return null;
+
+  db.cards[cardIndex] = {
+    ...db.cards[cardIndex],
+    ...updates,
+    updatedAt: new Date().toISOString()
+  };
+
+  saveLocalDB(db);
+  return db.cards[cardIndex];
+}
+
+// Upload portrait buffer directly to Supabase Storage (public 'avatars' bucket)
+async function uploadPhotoToStorage(fileBuffer, originalName, mimeType) {
+  if (!supabase) return null;
+  const ext = path.extname(originalName).toLowerCase() || '.jpg';
+  const fileName = `portrait_${Date.now()}_${Math.random().toString(36).substring(2, 8)}${ext}`;
+
+  const { data, error } = await supabase.storage
+    .from('avatars')
+    .upload(fileName, fileBuffer, {
+      contentType: mimeType || 'image/jpeg',
+      upsert: true
+    });
+
+  if (error) {
+    console.warn('Supabase storage upload error:', error.message);
+    return null;
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from('avatars')
+    .getPublicUrl(fileName);
+
+  return publicUrlData.publicUrl;
 }
 
 module.exports = {
   hashPassword,
-  
-  findUserByEmail(email) {
-    if (!email) return null;
-    const db = loadDB();
-    return db.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-  },
-
-  findUserByUsername(username) {
-    if (!username) return null;
-    const db = loadDB();
-    return db.users.find(u => u.username.toLowerCase() === username.toLowerCase());
-  },
-
-  findUserByIdentifier(identifier) {
-    if (!identifier) return null;
-    const db = loadDB();
-    const clean = identifier.trim().toLowerCase();
-    return db.users.find(u => u.email.toLowerCase() === clean || u.username.toLowerCase() === clean);
-  },
-
-  findUserById(id) {
-    const db = loadDB();
-    return db.users.find(u => u.id === id);
-  },
-
-  createUser(email, username, password) {
-    const db = loadDB();
-    const newUser = {
-      id: 'usr_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
-      email: email.toLowerCase(),
-      username: username.toLowerCase(),
-      passwordHash: hashPassword(password),
-      createdAt: new Date().toISOString()
-    };
-    db.users.push(newUser);
-
-    // Create default card for new user with empty initial fields
-    const defaultCard = {
-      id: 'card_' + Date.now(),
-      userId: newUser.id,
-      username: newUser.username,
-      fullName: '',
-      roleTitle: '',
-      positioningStatement: '',
-      capabilities: [],
-      editionMark: 'DIGITAL PASS 2026',
-      brandSubmark: username.toUpperCase() + '—PASS',
-      photoUrl: '',
-      email: newUser.email,
-      phone: '',
-      whatsapp: '',
-      linkedinUrl: '',
-      portfolioUrl: '',
-      theme: 'terracotta',
-      updatedAt: new Date().toISOString()
-    };
-    db.cards.push(defaultCard);
-
-    saveDB(db);
-    return { user: newUser, card: defaultCard };
-  },
-
-  getCardByUsername(username) {
-    const db = loadDB();
-    return db.cards.find(c => c.username.toLowerCase() === username.toLowerCase());
-  },
-
-  getCardByUserId(userId) {
-    const db = loadDB();
-    return db.cards.find(c => c.userId === userId);
-  },
-
-  updateCard(userId, cardUpdates) {
-    const db = loadDB();
-    const cardIndex = db.cards.findIndex(c => c.userId === userId);
-    if (cardIndex === -1) return null;
-
-    db.cards[cardIndex] = {
-      ...db.cards[cardIndex],
-      ...cardUpdates,
-      updatedAt: new Date().toISOString()
-    };
-
-    saveDB(db);
-    return db.cards[cardIndex];
-  },
-
-  createSession(userId) {
-    const db = loadDB();
-    const token = 'token_' + Date.now() + '_' + Math.random().toString(36).substring(2, 12);
-    db.sessions[token] = { userId, createdAt: new Date().toISOString() };
-    saveDB(db);
-    return token;
-  },
-
-  getUserBySession(token) {
-    if (!token) return null;
-    const db = loadDB();
-    const session = db.sessions[token];
-    if (!session) return null;
-    return db.users.find(u => u.id === session.userId);
-  },
-
-  deleteSession(token) {
-    const db = loadDB();
-    if (db.sessions[token]) {
-      delete db.sessions[token];
-      saveDB(db);
-    }
-  }
+  createSession,
+  getUserBySession,
+  deleteSession,
+  findUserByEmail,
+  findUserByUsername,
+  findUserByIdentifier,
+  findUserById,
+  createUser,
+  getCardByUsername,
+  getCardByUserId,
+  updateCard,
+  uploadPhotoToStorage
 };

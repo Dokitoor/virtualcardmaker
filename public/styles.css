@@ -403,13 +403,62 @@ body {
   min-height: var(--card-min-height);
   position: relative;
   transform-style: preserve-3d;
-  transition: transform var(--flip-duration) var(--flip-ease);
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
   cursor: default;
 }
 
 .card-container.is-flipped {
   transform: rotateY(180deg);
 }
+
+/* 3D Entrance Animation */
+.card-container.card-entrance-anim {
+  animation: cardEntrance3D 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes cardEntrance3D {
+  0% {
+    opacity: 0;
+    transform: perspective(1400px) rotateY(-35deg) rotateX(15deg) translateY(45px) scale(0.91);
+  }
+  65% {
+    transform: perspective(1400px) rotateY(8deg) rotateX(-4deg) translateY(-4px) scale(1.015);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1400px) rotateY(0deg) rotateX(0deg) translateY(0) scale(1);
+  }
+}
+
+/* Real-Time Live Typing Pulse Feedback */
+.card-container.typing-pulse {
+  animation: liveCardTypePulse 0.28s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+}
+
+@keyframes liveCardTypePulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.012) translateY(-2px); }
+  100% { transform: scale(1); }
+}
+
+/* Celebration Gold Shimmer Flash */
+.card-container.card-celebrate-flash::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--card-radius);
+  background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,215,0,0.4) 50%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+  z-index: 100;
+  animation: celebrateShimmer 1.2s ease-out forwards;
+}
+
+@keyframes celebrateShimmer {
+  0% { opacity: 0; transform: translateX(-100%) rotate(25deg); }
+  50% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(100%) rotate(25deg); }
+}
+
 
 /* Card Faces Common Styles */
 .card-face {
@@ -3963,4 +4012,29 @@ body[data-dashboard-theme="dark"] .form-textarea::placeholder {
   .cruip-features-grid, .cruip-steps-grid { grid-template-columns: 1fr; }
   .footer-inner { flex-direction: column; gap: 16px; text-align: center; }
 }
+
+/* ==========================================================================
+   UI PLACEHOLDER STYLING (CLEAN EMPTY CARD STATE)
+   ========================================================================== */
+.is-placeholder-text {
+  opacity: 0.42;
+  font-style: normal;
+  letter-spacing: 0.03em;
+}
+
+.capability-pill.is-placeholder {
+  opacity: 0.45;
+  border-style: dashed !important;
+  background-color: transparent !important;
+}
+
+.contact-item.is-placeholder-row {
+  opacity: 0.55;
+}
+
+.contact-item.is-placeholder-row .contact-link {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
 
