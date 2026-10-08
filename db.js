@@ -23,9 +23,14 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
   }
 }
 
-// Ensure local data directory exists for fallback
-if (!fs.existsSync(path.join(__dirname, 'data'))) {
-  fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
+// Ensure local data directory exists for fallback (safe for read-only serverless filesystems)
+try {
+  const dataDir = path.join(__dirname, 'data');
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+} catch (e) {
+  // Read-only filesystem in serverless environments like Vercel
 }
 
 function hashPassword(password) {

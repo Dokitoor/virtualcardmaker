@@ -1,10 +1,10 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/c/:username", "destination": "/public/card.html" },
-    { "source": "/dashboard", "destination": "/public/dashboard.html" },
-    { "source": "/login", "destination": "/public/login.html" },
-    { "source": "/api/:path*", "destination": "/api/index.js" },
-    { "source": "/", "destination": "/public/landing.html" }
+    { "source": "/c/:path*", "destination": "/card.html" },
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/landing", "destination": "/index.html" },
+    { "source": "/api/:match*", "destination": "/api/index.js" }
   ]
 }

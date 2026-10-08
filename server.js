@@ -9,11 +9,16 @@ const db = require('./db');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Ensure uploads directory exists (local dev fallback)
+// Ensure uploads directory exists (local dev fallback, safe on serverless)
 const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+try {
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+} catch (e) {
+  // Read-only filesystem in serverless environments like Vercel
 }
+
 
 // Multer Storage: Memory storage keeps buffer in RAM for cloud upload (Vercel-compatible)
 const storage = multer.memoryStorage();
@@ -59,11 +64,12 @@ async function requireAuth(req, res, next) {
 }
 
 // --------------------------------------------------------------------------
-// API ENDPOINTS
+// API ENDPOINTS (Mounted on both /api and root for serverless compatibility)
 // --------------------------------------------------------------------------
+const apiRouter = express.Router();
 
 // Register User
-app.post('/api/auth/register', async (req, res) => {
+apiRouter.post('/auth/register', async (req, res) => {
   try {
     const { email, username, password } = req.body;
 
@@ -101,7 +107,7 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 // Login User
-app.post('/api/auth/login', async (req, res) => {
+apiRouter.post('/auth/login', async (req, res) => {
   try {
     const identifier = (req.body.email || req.body.username || req.body.identifier || '').trim();
     const password = req.body.password;
@@ -130,7 +136,7 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // Logout User
-app.post('/api/auth/logout', requireAuth, (req, res) => {
+apiRouter.post('/auth/logout', requireAuth, (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader ? authHeader.replace('Bearer ', '') : null;
   if (token) db.deleteSession(token);
@@ -138,7 +144,7 @@ app.post('/api/auth/logout', requireAuth, (req, res) => {
 });
 
 // Get Current User & Card Details
-app.get('/api/me', requireAuth, async (req, res) => {
+apiRouter.get('/me', requireAuth, async (req, res) => {
   try {
     const card = await db.getCardByUserId(req.user.id);
     res.json({
@@ -151,7 +157,7 @@ app.get('/api/me', requireAuth, async (req, res) => {
 });
 
 // Update Card Details & Photo Upload
-app.post('/api/card', requireAuth, upload.single('photo'), async (req, res) => {
+apiRouter.post('/card', requireAuth, upload.single('photo'), async (req, res) => {
   try {
     const {
       fullName,
@@ -217,7 +223,7 @@ app.post('/api/card', requireAuth, upload.single('photo'), async (req, res) => {
 });
 
 // Fetch Public Card Data by Username
-app.get('/api/cards/:username', async (req, res) => {
+apiRouter.get('/cards/:username', async (req, res) => {
   try {
     const username = req.params.username;
     const card = await db.getCardByUsername(username);
@@ -231,6 +237,10 @@ app.get('/api/cards/:username', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// Mount API router
+app.use('/api', apiRouter);
+app.use(apiRouter);
 
 // --------------------------------------------------------------------------
 // HTML PAGE ROUTING
@@ -253,12 +263,12 @@ app.get('/login', (req, res) => {
 
 // Root: Platform Landing Page
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'landing.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Fallback to landing page
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'landing.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start listener only if run directly (allows serverless import by Vercel)
