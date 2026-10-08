@@ -38,8 +38,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static assets
+app.use('/assets', express.static(path.join(__dirname, 'public', 'assets')));
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.use('/uploads', express.static(uploadsDir));
+app.use('/public', express.static(path.join(__dirname, 'public'), { index: false }));
 app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 app.use(express.static(__dirname, { index: false }));
 

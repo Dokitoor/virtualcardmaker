@@ -34,6 +34,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   const walletSaveVcfBtn = document.getElementById('wallet-save-vcf-btn');
   const downloadPassBtn = document.getElementById('download-pass-btn');
 
+  // Direct Synchronous API for parent dashboard editor
+  window.updateLiveCard = function(data) {
+    if (!data) return;
+    hasReceivedLiveUpdate = true;
+    cardData = Object.assign({}, data);
+    renderCard(cardData);
+    if (cardElement) {
+      cardElement.classList.remove('typing-pulse');
+      void cardElement.offsetWidth;
+      cardElement.classList.add('typing-pulse');
+    }
+  };
+
+  // Synchronous Handshake with parent dashboard window
+  if (window.parent && window.parent !== window) {
+    try {
+      window.parent.postMessage({ type: 'IFRAME_READY' }, '*');
+      if (typeof window.parent.getCurrentDraftCard === 'function') {
+        const parentDraft = window.parent.getCurrentDraftCard();
+        if (parentDraft) {
+          window.updateLiveCard(parentDraft);
+        }
+      }
+    } catch (err) {}
+  }
+
   const iphoneShareModal = document.getElementById('iphone-share-modal');
   const iphoneShareClose = document.getElementById('iphone-share-close');
   const iphoneShareBackdrop = document.getElementById('iphone-share-backdrop');
@@ -83,38 +109,52 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch {}
   }
 
+  let hasReceivedLiveUpdate = false;
+
   // Fetch Public Card Data
-  try {
-    const res = await fetch(`/api/cards/${username}`);
-    if (!res.ok) throw new Error('Card not found');
-    const result = await res.json();
-    cardData = result.card;
-    renderCard(cardData);
-  } catch (err) {
-    console.warn('Falling back to default card', err);
-    cardData = {
-      username: username,
-      fullName: 'Oluseyi Ogundipe',
-      roleTitle: 'Product & Information Design | Project Management',
-      positioningStatement: 'Designing digital products, simplifying complex information, and helping turn ideas into meaningful projects.',
-      capabilities: ['PRODUCT DESIGN', 'INFORMATION DESIGN', 'PROJECT MANAGEMENT'],
-      editionMark: 'NAIROBI EDITION 2026',
-      brandSubmark: 'OO—DESIGN',
-      photoUrl: '/assets/oluseyi-ogundipe.jpg',
-      email: 'oluseyi.ogundipe@outlook.com',
-      phone: '+234 814 891 8630',
-      whatsapp: '+2348148918630',
-      linkedinUrl: 'https://www.linkedin.com/in/dokitoor-oluseyi/',
-      portfolioUrl: 'https://oluseyiogundipe.com',
-      theme: 'terracotta'
-    };
-    renderCard(cardData);
+  async function loadPublicCardData() {
+    try {
+      const res = await fetch(`/api/cards/${username}`);
+      if (!res.ok) throw new Error('Card not found');
+      const result = await res.json();
+      if (!hasReceivedLiveUpdate) {
+        cardData = result.card;
+        renderCard(cardData);
+      }
+    } catch (err) {
+      console.warn('Falling back to blank card state', err);
+      if (!hasReceivedLiveUpdate) {
+        cardData = {
+          username: username || 'cardholder',
+          fullName: '',
+          roleTitle: '',
+          positioningStatement: '',
+          capabilities: [],
+          editionMark: 'DIGITAL PASS 2026',
+          brandSubmark: 'CARD—PASS',
+          photoUrl: '',
+          email: '',
+          phone: '',
+          whatsapp: '',
+          linkedinUrl: '',
+          portfolioUrl: '',
+          theme: 'terracotta'
+        };
+        renderCard(cardData);
+      }
+    }
   }
 
   function renderCard(data) {
-    document.title = `${data.fullName} — Digital Business Card`;
+    const hasName = Boolean(data.fullName && data.fullName.trim());
+    document.title = hasName ? `${data.fullName} — Digital Business Card` : 'Digital Business Card — Meetme';
+    
     const pageDesc = document.getElementById('card-page-desc');
-    if (pageDesc) pageDesc.content = `${data.fullName} — ${data.roleTitle}. ${data.positioningStatement}`;
+    if (pageDesc) {
+      pageDesc.content = hasName 
+        ? `${data.fullName} — ${data.roleTitle || 'Digital Business Card'}. ${data.positioningStatement || ''}`
+        : 'Digital Business Card — Save to iPhone Contacts with photo, Apple Wallet Pass, and QR code.';
+    }
 
     // Apply Theme
     if (data.theme) {
@@ -122,113 +162,205 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Header & Brand
-    document.getElementById('card-edition-tag').textContent = data.editionMark || 'DIGITAL EDITION 2026';
-    document.getElementById('card-brand-submark').textContent = data.brandSubmark || 'CARD—PASS';
-    document.getElementById('card-back-location').textContent = data.brandSubmark || 'DIGITAL—CARD';
+    const edTag = document.getElementById('card-edition-tag');
+    const brandSub = document.getElementById('card-brand-submark');
+    const backLoc = document.getElementById('card-back-location');
+    if (edTag) edTag.textContent = data.editionMark || 'DIGITAL EDITION 2026';
+    if (brandSub) brandSub.textContent = data.brandSubmark || 'CARD—PASS';
+    if (backLoc) backLoc.textContent = data.brandSubmark || 'DIGITAL—CARD';
 
-    // Front Face Identity
-    const nameParts = data.fullName.split(' ');
-    const firstName = nameParts[0] || 'CARD';
-    const lastName = nameParts.slice(1).join(' ') || 'HOLDER';
-    document.getElementById('card-person-name').innerHTML = `${firstName}<br><span class="name-accent">${lastName}</span>`;
+    // Front Face Identity Placeholders
+    const nameEl = document.getElementById('card-person-name');
+    if (hasName) {
+      const nameParts = data.fullName.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+      nameEl.classList.remove('is-placeholder-text');
+      if (lastName) {
+        nameEl.innerHTML = `${firstName}<br><span class="name-accent">${lastName}</span>`;
+      } else {
+        nameEl.innerHTML = `<span class="name-accent">${firstName}</span>`;
+      }
+    } else {
+      nameEl.classList.add('is-placeholder-text');
+      nameEl.innerHTML = `YOUR NAME<br><span class="name-accent">SURNAME</span>`;
+    }
     
-    document.getElementById('card-role-title').textContent = data.roleTitle || '';
-    document.getElementById('card-positioning-statement').textContent = data.positioningStatement || '';
+    const roleEl = document.getElementById('card-role-title');
+    if (data.roleTitle && data.roleTitle.trim()) {
+      roleEl.classList.remove('is-placeholder-text');
+      roleEl.textContent = data.roleTitle;
+    } else {
+      roleEl.classList.add('is-placeholder-text');
+      roleEl.textContent = 'YOUR PROFESSIONAL TITLE / ROLE';
+    }
 
-    // Portrait Image
+    const posEl = document.getElementById('card-positioning-statement');
+    if (data.positioningStatement && data.positioningStatement.trim()) {
+      posEl.classList.remove('is-placeholder-text');
+      posEl.textContent = data.positioningStatement;
+    } else {
+      posEl.classList.add('is-placeholder-text');
+      posEl.textContent = 'Your personal bio or positioning statement will appear here once configured in your dashboard.';
+    }
+
+    // Portrait Image Placeholder with Infallible Fallback
     const portraitImg = document.getElementById('card-portrait-img');
     const appleTouchIcon = document.getElementById('apple-touch-icon-link');
+    const displayPhoto = data.photoUrl || '/assets/dummy-avatar.svg';
     if (portraitImg) {
-      portraitImg.src = data.photoUrl || '/assets/dummy-avatar.svg';
-      portraitImg.alt = `Portrait of ${data.fullName}`;
+      portraitImg.onerror = () => {
+        portraitImg.onerror = null;
+        portraitImg.src = '/assets/dummy-avatar.svg';
+      };
+      portraitImg.src = displayPhoto;
+      portraitImg.alt = hasName ? `Portrait of ${data.fullName}` : 'Default avatar placeholder';
     }
-    if (appleTouchIcon) appleTouchIcon.href = data.photoUrl || '/assets/dummy-avatar.svg';
+    if (appleTouchIcon) appleTouchIcon.href = displayPhoto;
 
     // Precompute Base64 photo for iOS vCard
-    precomputePhoto(data.photoUrl || '/assets/dummy-avatar.svg');
+    precomputePhoto(displayPhoto);
 
-    // Capabilities Pills
+    // Capabilities Pills & Placeholders
     const capsGrid = document.getElementById('card-capabilities-grid');
     if (capsGrid) {
       capsGrid.innerHTML = '';
-      const caps = Array.isArray(data.capabilities) ? data.capabilities : ['PRODUCT DESIGN', 'STRATEGY'];
-      caps.forEach((cap, idx) => {
-        const pill = document.createElement('span');
-        pill.className = 'capability-pill';
-        pill.innerHTML = `<span class="cap-num">0${idx + 1}</span> ${cap}`;
-        capsGrid.appendChild(pill);
-      });
+      const caps = Array.isArray(data.capabilities) && data.capabilities.length > 0 ? data.capabilities : [];
+      if (caps.length > 0) {
+        caps.forEach((cap, idx) => {
+          const pill = document.createElement('span');
+          pill.className = 'capability-pill';
+          pill.innerHTML = `<span class="cap-num">0${idx + 1}</span> ${cap}`;
+          capsGrid.appendChild(pill);
+        });
+      } else {
+        // Placeholder Capabilities
+        const sampleCaps = ['YOUR SKILL 01', 'YOUR SKILL 02', 'YOUR SKILL 03'];
+        sampleCaps.forEach((cap, idx) => {
+          const pill = document.createElement('span');
+          pill.className = 'capability-pill is-placeholder';
+          pill.innerHTML = `<span class="cap-num">0${idx + 1}</span> ${cap}`;
+          capsGrid.appendChild(pill);
+        });
+      }
     }
 
-    // Back Face Contacts
+    // Back Face Contacts & Placeholders
+    const emailWrap = document.getElementById('item-email-wrap');
     const emailLink = document.getElementById('contact-email-link');
     const directEmailBtn = document.getElementById('direct-email-btn');
     const copyEmailBtn = document.getElementById('copy-email-btn');
-    if (data.email) {
-      emailLink.href = `mailto:${data.email}`;
-      emailLink.textContent = data.email;
-      directEmailBtn.href = `mailto:${data.email}`;
-      copyEmailBtn.setAttribute('data-copy', data.email);
-    } else {
-      document.getElementById('item-email-wrap').style.display = 'none';
+    if (emailWrap && emailLink) {
+      if (data.email) {
+        emailWrap.classList.remove('is-placeholder-row');
+        emailWrap.style.display = 'flex';
+        emailLink.href = `mailto:${data.email}`;
+        emailLink.textContent = data.email;
+        if (directEmailBtn) directEmailBtn.href = `mailto:${data.email}`;
+        if (copyEmailBtn) copyEmailBtn.setAttribute('data-copy', data.email);
+      } else {
+        emailWrap.classList.add('is-placeholder-row');
+        emailWrap.style.display = 'flex';
+        emailLink.href = '#';
+        emailLink.textContent = 'your.email@example.com';
+      }
     }
 
+    const phoneWrap = document.getElementById('item-phone-wrap');
     const phoneLink = document.getElementById('contact-phone-link');
     const directPhoneBtn = document.getElementById('direct-phone-btn');
     const whatsappLink = document.getElementById('contact-whatsapp-link');
-    if (data.phone) {
-      phoneLink.href = `tel:${data.phone.replace(/\s+/g, '')}`;
-      phoneLink.textContent = data.phone;
-      directPhoneBtn.href = `tel:${data.phone.replace(/\s+/g, '')}`;
-      if (data.whatsapp) {
-        whatsappLink.href = `https://wa.me/${data.whatsapp.replace(/[^0-9]/g, '')}`;
+    if (phoneWrap && phoneLink) {
+      if (data.phone) {
+        phoneWrap.classList.remove('is-placeholder-row');
+        phoneWrap.style.display = 'flex';
+        phoneLink.href = `tel:${data.phone.replace(/\s+/g, '')}`;
+        phoneLink.textContent = data.phone;
+        if (directPhoneBtn) directPhoneBtn.href = `tel:${data.phone.replace(/\s+/g, '')}`;
+        if (whatsappLink) {
+          const waNum = data.whatsapp ? data.whatsapp.replace(/[^0-9]/g, '') : data.phone.replace(/[^0-9]/g, '');
+          whatsappLink.href = `https://wa.me/${waNum}`;
+        }
       } else {
-        whatsappLink.href = `https://wa.me/${data.phone.replace(/[^0-9]/g, '')}`;
+        phoneWrap.classList.add('is-placeholder-row');
+        phoneWrap.style.display = 'flex';
+        phoneLink.href = '#';
+        phoneLink.textContent = '+1 (555) 000-0000';
       }
-    } else {
-      document.getElementById('item-phone-wrap').style.display = 'none';
     }
 
+    const linkedinWrap = document.getElementById('item-linkedin-wrap');
     const linkedinLink = document.getElementById('contact-linkedin-link');
     const directLinkedinBtn = document.getElementById('direct-linkedin-btn');
-    if (data.linkedinUrl) {
-      linkedinLink.href = data.linkedinUrl;
-      linkedinLink.textContent = data.linkedinUrl.replace(/^https?:\/\/(www\.)?/, '');
-      directLinkedinBtn.href = data.linkedinUrl;
-    } else {
-      document.getElementById('item-linkedin-wrap').style.display = 'none';
+    if (linkedinWrap && linkedinLink) {
+      if (data.linkedinUrl) {
+        linkedinWrap.classList.remove('is-placeholder-row');
+        linkedinWrap.style.display = 'flex';
+        linkedinLink.href = data.linkedinUrl;
+        linkedinLink.textContent = data.linkedinUrl.replace(/^https?:\/\/(www\.)?/, '');
+        if (directLinkedinBtn) directLinkedinBtn.href = data.linkedinUrl;
+      } else {
+        linkedinWrap.classList.add('is-placeholder-row');
+        linkedinWrap.style.display = 'flex';
+        linkedinLink.href = '#';
+        linkedinLink.textContent = 'linkedin.com/in/yourprofile';
+      }
     }
 
+    const portfolioWrap = document.getElementById('item-portfolio-wrap');
     const portfolioLink = document.getElementById('contact-portfolio-link');
     const directPortfolioBtn = document.getElementById('direct-portfolio-btn');
-    if (data.portfolioUrl) {
-      portfolioLink.href = data.portfolioUrl;
-      portfolioLink.textContent = data.portfolioUrl.replace(/^https?:\/\/(www\.)?/, '');
-      directPortfolioBtn.href = data.portfolioUrl;
-    } else {
-      document.getElementById('item-portfolio-wrap').style.display = 'none';
+    if (portfolioWrap && portfolioLink) {
+      if (data.portfolioUrl) {
+        portfolioWrap.classList.remove('is-placeholder-row');
+        portfolioWrap.style.display = 'flex';
+        portfolioLink.href = data.portfolioUrl;
+        portfolioLink.textContent = data.portfolioUrl.replace(/^https?:\/\/(www\.)?/, '');
+        if (directPortfolioBtn) directPortfolioBtn.href = data.portfolioUrl;
+      } else {
+        portfolioWrap.classList.add('is-placeholder-row');
+        portfolioWrap.style.display = 'flex';
+        portfolioLink.href = '#';
+        portfolioLink.textContent = 'yourwebsite.com';
+      }
     }
 
     // Modal Quotes & Info
-    document.getElementById('modal-quote-text').textContent = `"${data.positioningStatement}"`;
-    document.getElementById('modal-author-text').textContent = `— ${data.fullName}`;
+    const modalQuote = document.getElementById('modal-quote-text');
+    const modalAuthor = document.getElementById('modal-author-text');
+    if (modalQuote) modalQuote.textContent = `"${data.positioningStatement || 'Designing digital products, simplifying complex information...'}"`;
+    if (modalAuthor) modalAuthor.textContent = `— ${data.fullName || 'Your Name'}`;
 
     // Pass Modal Values
-    document.getElementById('pass-avatar-img').src = data.photoUrl || '/assets/dummy-avatar.svg';
-    document.getElementById('pass-org-name').textContent = data.fullName.toUpperCase();
-    document.getElementById('pass-name-val').textContent = data.fullName;
-    document.getElementById('pass-role-val').textContent = data.roleTitle;
-    document.getElementById('pass-phone-val').textContent = data.phone || 'N/A';
-    document.getElementById('pass-email-val').textContent = data.email ? (data.email.substring(0, 14) + '...') : 'N/A';
-    document.getElementById('pass-website-val').textContent = data.portfolioUrl ? data.portfolioUrl.replace(/^https?:\/\/(www\.)?/, '') : 'virtualcard.com';
-    document.getElementById('pass-event-badge').textContent = data.editionMark || 'DIGITAL PASS';
-    document.getElementById('pass-serial-val').textContent = `PASS ID: ${data.username.toUpperCase()}-2026`;
-    document.getElementById('pass-back-about-text').textContent = data.positioningStatement;
-    document.getElementById('pass-back-competencies-text').textContent = Array.isArray(data.capabilities) ? data.capabilities.join(' · ') : '';
+    const passAvatar = document.getElementById('pass-avatar-img');
+    const passOrg = document.getElementById('pass-org-name');
+    const passName = document.getElementById('pass-name-val');
+    const passRole = document.getElementById('pass-role-val');
+    if (passAvatar) passAvatar.src = displayPhoto;
+    if (passOrg) passOrg.textContent = (data.fullName || 'YOUR NAME').toUpperCase();
+    if (passName) passName.textContent = data.fullName || 'Your Name';
+    if (passRole) passRole.textContent = data.roleTitle || 'Your Title';
+    const passPhone = document.getElementById('pass-phone-val');
+    const passEmail = document.getElementById('pass-email-val');
+    const passWebsite = document.getElementById('pass-website-val');
+    const passEvent = document.getElementById('pass-event-badge');
+    const passSerial = document.getElementById('pass-serial-val');
+    const passBackAbout = document.getElementById('pass-back-about-text');
+    const passBackComp = document.getElementById('pass-back-competencies-text');
+
+    if (passPhone) passPhone.textContent = data.phone || 'N/A';
+    if (passEmail) passEmail.textContent = data.email ? (data.email.substring(0, 14) + '...') : 'N/A';
+    if (passWebsite) passWebsite.textContent = data.portfolioUrl ? data.portfolioUrl.replace(/^https?:\/\/(www\.)?/, '') : 'virtualcard.com';
+    if (passEvent) passEvent.textContent = data.editionMark || 'DIGITAL PASS';
+    if (passSerial) passSerial.textContent = `PASS ID: ${(data.username || 'PASS').toUpperCase()}-2026`;
+    if (passBackAbout) passBackAbout.textContent = data.positioningStatement || 'Your bio will appear here...';
+    if (passBackComp) passBackComp.textContent = Array.isArray(data.capabilities) && data.capabilities.length ? data.capabilities.join(' · ') : 'Skills & Competencies';
 
     // Share Sheet Details
-    document.getElementById('share-avatar-img').src = data.photoUrl || '/assets/dummy-avatar.svg';
-    document.getElementById('share-sheet-name').textContent = data.fullName;
+    const shareAvatar = document.getElementById('share-avatar-img');
+    const shareName = document.getElementById('share-sheet-name');
+    if (shareAvatar) shareAvatar.src = displayPhoto;
+    if (shareName) shareName.textContent = data.fullName || 'Your Name';
 
     // Attach Copy Handlers
     document.querySelectorAll('.copy-action-btn').forEach(btn => {
@@ -247,8 +379,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function precomputePhoto(url) {
+    if (!url || url === '/assets/dummy-avatar.svg') return;
     const img = new Image();
-    img.crossOrigin = 'Anonymous';
+    if (!url.startsWith('data:')) {
+      img.crossOrigin = 'Anonymous';
+    }
     img.src = url;
     img.onload = () => {
       try {
@@ -270,12 +405,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     isFlipped = flipped;
     if (isFlipped) {
       cardElement.classList.add('is-flipped');
-      tabBack.classList.add('active');
-      tabFront.classList.remove('active');
+      cardElement.style.transform = 'rotateY(180deg)';
+      if (tabBack) tabBack.classList.add('active');
+      if (tabFront) tabFront.classList.remove('active');
     } else {
       cardElement.classList.remove('is-flipped');
-      tabFront.classList.add('active');
-      tabBack.classList.remove('active');
+      cardElement.style.transform = 'rotateX(0deg) rotateY(0deg)';
+      if (tabFront) tabFront.classList.add('active');
+      if (tabBack) tabBack.classList.remove('active');
     }
     playSubtleClick();
   }
@@ -450,6 +587,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
   }
 
+  // Initial 3D Entrance Animation
+  if (cardElement) {
+    cardElement.classList.add('card-entrance-anim');
+    setTimeout(() => cardElement.classList.remove('card-entrance-anim'), 1200);
+  }
+
+  // Interactive 3D Gyroscope & Cursor Tilt Motion
+  const cardScene = document.getElementById('card-scene');
+  if (cardScene && cardElement) {
+    cardScene.addEventListener('mousemove', (e) => {
+      if (isFlipped) return;
+      const rect = cardScene.getBoundingClientRect();
+      const x = e.clientX - rect.left - (rect.width / 2);
+      const y = e.clientY - rect.top - (rect.height / 2);
+      const rotX = (-y / (rect.height / 2)) * 7;
+      const rotY = (x / (rect.width / 2)) * 7;
+      cardElement.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    });
+
+    cardScene.addEventListener('mouseleave', () => {
+      if (!isFlipped) {
+        cardElement.style.transform = 'rotateX(0deg) rotateY(0deg)';
+      }
+    });
+  }
+
   // Fullscreen QR Modal
   function openQrModal() {
     if (!qrModal) return;
@@ -463,11 +626,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (qrModalClose) qrModalClose.onclick = closeQrModal;
   if (qrModalBackdrop) qrModalBackdrop.onclick = closeQrModal;
 
-  // Real-Time Live Card Update Listener from Dashboard Editor
+  // Real-Time Live Card Update Listener from Dashboard Editor with Typing & Celebration Animations
   window.addEventListener('message', (event) => {
-    if (event.data && event.data.type === 'LIVE_CARD_UPDATE' && event.data.card) {
-      const updatedData = Object.assign({}, cardData || {}, event.data.card);
-      renderCard(updatedData);
+    let payload = event.data;
+    if (typeof payload === 'string') {
+      try { payload = JSON.parse(payload); } catch {}
+    }
+    if (payload && payload.type === 'LIVE_CARD_UPDATE' && payload.card) {
+      hasReceivedLiveUpdate = true;
+      cardData = Object.assign({}, payload.card);
+      renderCard(cardData);
+
+      // Trigger real-time typing pulse feedback animation on card
+      if (cardElement) {
+        cardElement.classList.remove('typing-pulse');
+        void cardElement.offsetWidth; // trigger reflow for smooth re-animation
+        cardElement.classList.add('typing-pulse');
+      }
+    } else if (event.data && event.data.type === 'CELEBRATE') {
+      if (cardElement) {
+        cardElement.classList.remove('card-entrance-anim', 'card-celebrate-flash');
+        void cardElement.offsetWidth;
+        cardElement.classList.add('card-entrance-anim', 'card-celebrate-flash');
+      }
     }
   });
+
+  loadPublicCardData();
 });

@@ -40,8 +40,12 @@
       <a href="#" id="open-live-btn" target="_blank" class="btn-open-sm">View ↗</a>
     </div>
 
-    <!-- Right Controls: Theme Toggle & User Auth -->
+    <!-- Right Controls: Theme Toggle, Sample Profile Randomizer & User Auth -->
     <div class="dash-controls-wrap">
+      <button id="randomize-profile-btn" class="theme-toggle-btn randomize-btn" type="button" title="Fill out with a sample Nigerian profile across diverse roles">
+        <span>🎲 Sample Profile</span>
+      </button>
+
       <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" title="Toggle Light/Dark Mode">
         <span id="theme-icon">🌙</span>
         <span id="theme-text">Dark Mode</span>
@@ -88,7 +92,7 @@
             <div class="step-single-field">
               <div class="form-group">
                 <label for="edit-fullName" class="form-label sr-only">Full Name</label>
-                <input type="text" id="edit-fullName" class="form-input form-input-huge" placeholder="e.g. Oluseyi Ogundipe" autofocus>
+                <input type="text" id="edit-fullName" class="form-input form-input-huge" placeholder="Enter your full name" autofocus>
                 <span class="field-keyboard-tip">Press <kbd>Enter ↵</kbd> or click Continue</span>
               </div>
             </div>
@@ -98,13 +102,13 @@
           <div class="wizard-step-screen" data-step="2">
             <div class="step-header">
               <h2 class="step-main-title">What is your professional title or role?</h2>
-              <p class="step-main-sub">Describe your primary expertise or role (e.g. Product Designer | Project Manager).</p>
+              <p class="step-main-sub">Describe your primary expertise or role title.</p>
             </div>
 
             <div class="step-single-field">
               <div class="form-group">
                 <label for="edit-roleTitle" class="form-label sr-only">Professional Role Title</label>
-                <input type="text" id="edit-roleTitle" class="form-input form-input-huge" placeholder="e.g. Product & Information Designer | Project Manager">
+                <input type="text" id="edit-roleTitle" class="form-input form-input-huge" placeholder="Enter your professional role title">
                 <span class="field-keyboard-tip">Press <kbd>Enter ↵</kbd> or click Continue</span>
               </div>
             </div>
@@ -120,7 +124,7 @@
             <div class="step-single-field">
               <div class="form-group">
                 <label for="edit-positioningStatement" class="form-label sr-only">Bio Statement</label>
-                <textarea id="edit-positioningStatement" class="form-textarea form-textarea-lg" rows="4" placeholder="e.g. Designing digital products, simplifying complex information, and turning ideas into meaningful projects."></textarea>
+                <textarea id="edit-positioningStatement" class="form-textarea form-textarea-lg" rows="4" placeholder="Enter a brief bio or positioning statement..."></textarea>
                 <span class="form-hint">Displayed on the front face of your digital card</span>
               </div>
             </div>
@@ -130,21 +134,24 @@
           <div class="wizard-step-screen" data-step="4">
             <div class="step-header">
               <h2 class="step-main-title">Upload your portrait photo</h2>
-              <p class="step-main-sub">A clear, warm portrait photo gives your card a personal human connection.</p>
+              <p class="step-main-sub">A clear portrait photo gives your card a personal human connection.</p>
             </div>
 
             <div class="step-single-field">
               <div class="photo-upload-card-lg">
-                <div class="photo-preview-avatar-lg">
-                  <img id="avatar-preview-img" src="/assets/default-avatar.png" alt="Avatar preview">
+                <div class="photo-preview-avatar-lg" id="avatar-preview-wrapper" style="cursor: pointer;" title="Click to choose photo">
+                  <img id="avatar-preview-img" src="/assets/dummy-avatar.svg" alt="Avatar preview">
                 </div>
                 <div class="photo-upload-controls">
-                  <label for="edit-photoFile" class="photo-dropzone-lg">
+                  <label for="edit-photoFile" class="photo-dropzone-lg" style="cursor: pointer;">
                     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                     <span class="dropzone-text">Click to choose portrait photo</span>
                     <span class="dropzone-sub">Supports JPG or PNG (Max 5MB)</span>
                     <input type="file" id="edit-photoFile" accept="image/*" class="form-file-input">
                   </label>
+                  <button type="button" id="explicit-upload-btn" class="btn-wizard-next" style="margin-top: 10px; width: 100%; font-size: 13.5px; padding: 12px; background-color: var(--accent-primary, #321C04);">
+                    📁 Choose Portrait Image File
+                  </button>
                 </div>
               </div>
             </div>
@@ -160,8 +167,8 @@
             <div class="step-single-field">
               <div class="form-group">
                 <label for="edit-capabilities" class="form-label sr-only">Core Competencies</label>
-                <input type="text" id="edit-capabilities" class="form-input form-input-huge" placeholder="PRODUCT DESIGN, INFORMATION DESIGN, PROJECT MANAGEMENT">
-                <span class="form-hint">Separate competencies with commas (e.g. DESIGN, STRATEGY, MANAGEMENT)</span>
+                <input type="text" id="edit-capabilities" class="form-input form-input-huge" placeholder="Enter core skills separated by commas (e.g. DESIGN, STRATEGY, LEADERSHIP)">
+                <span class="form-hint">Separate competencies with commas</span>
               </div>
             </div>
           </div>
@@ -237,7 +244,7 @@
             <div class="step-single-field">
               <div class="form-group">
                 <label for="edit-editionMark" class="form-label sr-only">Event Name</label>
-                <input type="text" id="edit-editionMark" class="form-input form-input-huge" placeholder="e.g. Men's Wealth Conference">
+                <input type="text" id="edit-editionMark" class="form-input form-input-huge" placeholder="Enter event or conference name">
                 <span class="field-keyboard-tip">Press <kbd>Enter ↵</kbd> or click Continue</span>
               </div>
             </div>
@@ -253,17 +260,17 @@
             <div class="step-single-field">
               <div class="form-group">
                 <label for="edit-email" class="form-label">Public Contact Email</label>
-                <input type="email" id="edit-email" class="form-input" placeholder="you@example.com">
+                <input type="email" id="edit-email" class="form-input" placeholder="Enter contact email address">
               </div>
 
               <div class="form-row">
                 <div class="form-group flex-1">
                   <label for="edit-phone" class="form-label">Phone Number</label>
-                  <input type="text" id="edit-phone" class="form-input" placeholder="+234 814 891 8630">
+                  <input type="text" id="edit-phone" class="form-input" placeholder="Enter phone number">
                 </div>
                 <div class="form-group flex-1">
                   <label for="edit-whatsapp" class="form-label">WhatsApp Number</label>
-                  <input type="text" id="edit-whatsapp" class="form-input" placeholder="+2348148918630">
+                  <input type="text" id="edit-whatsapp" class="form-input" placeholder="Enter WhatsApp number">
                 </div>
               </div>
             </div>
@@ -279,7 +286,7 @@
             <div class="step-single-field">
               <div class="form-group">
                 <label for="edit-linkedinUrl" class="form-label">LinkedIn Profile URL</label>
-                <input type="url" id="edit-linkedinUrl" class="form-input" placeholder="https://www.linkedin.com/in/username">
+                <input type="url" id="edit-linkedinUrl" class="form-input" placeholder="https://linkedin.com/in/username">
               </div>
 
               <div class="form-group">
@@ -364,12 +371,184 @@
     <!-- RIGHT PANEL: LIVE 3D CARD PREVIEW -->
     <section class="preview-panel">
       <div class="preview-header">
-        <span class="preview-title">LIVE PREVIEW</span>
-        <span class="preview-hint">Real-time render of <code>/c/<span id="preview-username-tag">you</span></code></span>
+        <div class="preview-header-info">
+          <span class="preview-title">LIVE PREVIEW</span>
+          <span class="preview-hint">Real-time render of <code>/c/<span id="preview-username-tag">you</span></code></span>
+        </div>
+        <div class="preview-quick-themes" id="preview-quick-themes" aria-label="Switch card theme style">
+          <button type="button" class="quick-theme-dot active" data-theme-val="terracotta" title="Burnt Terracotta">
+            <span class="theme-swatch swatch-terracotta"></span>
+          </button>
+          <button type="button" class="quick-theme-dot" data-theme-val="sapphire" title="Midnight Sapphire">
+            <span class="theme-swatch swatch-sapphire"></span>
+          </button>
+          <button type="button" class="quick-theme-dot" data-theme-val="emerald" title="Emerald Obsidian">
+            <span class="theme-swatch swatch-emerald"></span>
+          </button>
+          <button type="button" class="quick-theme-dot" data-theme-val="gold" title="Champagne Gold">
+            <span class="theme-swatch swatch-gold"></span>
+          </button>
+          <button type="button" class="quick-theme-dot" data-theme-val="monochrome" title="Minimalist Monochrome">
+            <span class="theme-swatch swatch-monochrome"></span>
+          </button>
+        </div>
       </div>
 
       <div class="preview-viewport-frame">
-        <iframe id="live-card-iframe" src="about:blank" title="Live Card Preview" class="card-iframe-container"></iframe>
+        <!-- 3D Card Scene Container -->
+        <div class="card-scene" id="card-scene" style="width: 100%; max-width: 420px; margin: 0 auto; perspective: 1400px;">
+          <div class="card-container" id="card-element" data-theme="terracotta" style="position: relative; width: 100%; min-height: 620px; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);">
+            
+            <!-- FRONT FACE: IDENTITY & PORTRAIT -->
+            <article class="card-face card-front" id="card-front-face">
+              
+              <div class="card-header-bar">
+                <span class="edition-mark" id="card-edition-tag">DIGITAL EDITION 2026</span>
+                <div class="spec-crosshairs">
+                  <span class="crosshair">+</span>
+                  <span class="brand-submark" id="card-brand-submark">CARD—PASS</span>
+                </div>
+              </div>
+
+              <div class="portrait-stage">
+                <div class="portrait-frame">
+                  <img src="/assets/dummy-avatar.svg" alt="Profile portrait" class="portrait-img" id="card-portrait-img" loading="eager" />
+                  <div class="portrait-corner-rule" aria-hidden="true"></div>
+                  <div class="portrait-badge" aria-hidden="true">
+                    <span class="status-dot"></span>
+                    <span>AVAILABLE FOR PROJECTS</span>
+                  </div>
+                </div>
+                <div class="portrait-caption-tag" aria-hidden="true">
+                  <span class="coord">01.02</span>
+                  <span class="pipe">/</span>
+                  <span class="desc">VERIFIED</span>
+                </div>
+              </div>
+
+              <div class="identity-content">
+                <h1 class="person-name is-placeholder-text" id="card-person-name">
+                  YOUR NAME<br>
+                  <span class="name-accent">SURNAME</span>
+                </h1>
+
+                <div class="role-title is-placeholder-text" id="card-role-title">
+                  YOUR PROFESSIONAL TITLE / ROLE
+                </div>
+
+                <p class="positioning-statement is-placeholder-text" id="card-positioning-statement">
+                  Your personal bio or positioning statement will appear here once configured in your dashboard.
+                </p>
+
+                <div class="capabilities-grid" id="card-capabilities-grid" aria-label="Core Competencies">
+                  <!-- Dynamically Populated -->
+                </div>
+              </div>
+
+              <footer class="face-footer">
+                <button type="button" class="flip-trigger-btn" id="flip-to-back-btn" aria-label="Flip card to connect side">
+                  <span class="flip-btn-label">Contact Details & QR</span>
+                  <span class="flip-arrow-circle" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M5 12h14"></path>
+                      <path d="m12 5 7 7-7 7"></path>
+                    </svg>
+                  </span>
+                </button>
+              </footer>
+            </article>
+
+            <!-- BACK FACE: CONTACT & QR -->
+            <article class="card-face card-back" id="card-back-face">
+              
+              <div class="card-header-bar">
+                <span class="edition-mark">CARD 02 // CONNECT</span>
+                <div class="spec-crosshairs">
+                  <span class="crosshair">+</span>
+                  <span class="brand-submark" id="card-back-location">CARD—PASS</span>
+                </div>
+              </div>
+
+              <div class="connect-headline-wrap">
+                <div class="connect-kicker">GET IN TOUCH</div>
+                <h2 class="connect-heading">LET'S CONNECT</h2>
+              </div>
+
+              <div class="contact-details-list" role="list">
+                
+                <!-- Email -->
+                <div class="contact-item is-placeholder-row" id="item-email-wrap">
+                  <div class="contact-item-left">
+                    <span class="contact-label">Email</span>
+                    <a href="#" class="contact-link" id="contact-email-link">your.email@example.com</a>
+                  </div>
+                  <div class="contact-item-actions">
+                    <button type="button" class="copy-action-btn" id="copy-email-btn" title="Copy email">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    </button>
+                    <a href="#" class="direct-action-btn" id="direct-email-btn" title="Send email">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Phone & WhatsApp -->
+                <div class="contact-item is-placeholder-row" id="item-phone-wrap">
+                  <div class="contact-item-left">
+                    <span class="contact-label">Phone / WhatsApp</span>
+                    <div class="phone-group">
+                      <a href="#" class="contact-link" id="contact-phone-link">+1 (555) 000-0000</a>
+                    </div>
+                  </div>
+                  <div class="contact-item-actions">
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="whatsapp-pill-btn" id="contact-whatsapp-link" title="Open WhatsApp chat">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                      <span>Chat</span>
+                    </a>
+                    <a href="#" class="direct-action-btn" id="direct-phone-btn" title="Call phone">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    </a>
+                  </div>
+                </div>
+
+                <!-- LinkedIn -->
+                <div class="contact-item is-placeholder-row" id="item-linkedin-wrap">
+                  <div class="contact-item-left">
+                    <span class="contact-label">LinkedIn</span>
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="contact-link" id="contact-linkedin-link">linkedin.com/in/yourprofile</a>
+                  </div>
+                  <div class="contact-item-actions">
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="direct-action-btn" id="direct-linkedin-btn" title="Visit LinkedIn">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Portfolio Website -->
+                <div class="contact-item is-placeholder-row" id="item-portfolio-wrap">
+                  <div class="contact-item-left">
+                    <span class="contact-label">Portfolio / Website</span>
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="contact-link highlight-portfolio" id="contact-portfolio-link">yourwebsite.com</a>
+                  </div>
+                  <div class="contact-item-actions">
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="direct-action-btn" id="direct-portfolio-btn" title="Open portfolio website">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+                    </a>
+                  </div>
+                </div>
+
+              </div>
+
+              <footer class="back-footer-actions">
+                <button type="button" class="flip-trigger-btn" id="flip-to-front-btn" style="background-color: var(--accent-primary, #321C04);">
+                  <span>← Back to Front Face</span>
+                </button>
+              </footer>
+            </article>
+
+          </div>
+        </div>
+        <iframe id="live-card-iframe" src="about:blank" title="Live Card Preview" class="card-iframe-container" style="display: none;"></iframe>
       </div>
     </section>
 

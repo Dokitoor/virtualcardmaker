@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const saveCardBtn = document.getElementById('save-card-btn');
   const previewUsernameTag = document.getElementById('preview-username-tag');
   const liveCardIframe = document.getElementById('live-card-iframe');
+  const nativeCardContainer = document.getElementById('card-element');
   const toastElement = document.getElementById('toast-notification');
   const toastMessage = document.getElementById('toast-message');
 
@@ -135,14 +136,38 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function syncThemeCardUI(themeVal) {
-    if (!themeOptionsGrid) return;
-    const themeCards = themeOptionsGrid.querySelectorAll('.theme-card-option');
-    themeCards.forEach(card => {
-      if (card.getAttribute('data-theme-val') === themeVal) {
-        card.classList.add('active');
+    if (themeOptionsGrid) {
+      const themeCards = themeOptionsGrid.querySelectorAll('.theme-card-option');
+      themeCards.forEach(card => {
+        if (card.getAttribute('data-theme-val') === themeVal) {
+          card.classList.add('active');
+        } else {
+          card.classList.remove('active');
+        }
+      });
+    }
+
+    const quickThemeDots = document.querySelectorAll('.quick-theme-dot');
+    quickThemeDots.forEach(dot => {
+      if (dot.getAttribute('data-theme-val') === themeVal) {
+        dot.classList.add('active');
       } else {
-        card.classList.remove('active');
+        dot.classList.remove('active');
       }
+    });
+  }
+
+  // Quick theme switcher above live preview
+  const quickThemesContainer = document.getElementById('preview-quick-themes');
+  if (quickThemesContainer) {
+    const quickDots = quickThemesContainer.querySelectorAll('.quick-theme-dot');
+    quickDots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        const selectedVal = dot.getAttribute('data-theme-val');
+        if (editTheme) editTheme.value = selectedVal;
+        syncThemeCardUI(selectedVal);
+        emitLiveUpdate();
+      });
     });
   }
 
@@ -258,6 +283,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (nextStepBtn) nextStepBtn.style.display = 'inline-flex';
       if (saveCardBtn) saveCardBtn.style.display = 'none';
     }
+
+    // 5. Auto-rotate preview card: Back face for Contact & Social steps, Front face for Identity steps
+    if (nativeCardContainer) {
+      if (currentStep === 8 || currentStep === 9) {
+        nativeCardContainer.style.transform = 'rotateY(180deg)';
+      } else {
+        nativeCardContainer.style.transform = 'rotateY(0deg)';
+      }
+    }
   }
 
   // Prev / Next Navigation Clicks
@@ -293,24 +327,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (modalAuthAlert) modalAuthAlert.style.display = 'none';
   }
 
-  // Check User Session
-  if (token) {
-    try {
-      const res = await fetch('/api/me', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        currentUser = data.user;
-        currentCard = data.card;
-        isLoggedIn = true;
-      } else {
-        localStorage.removeItem('card_token');
+  // Check User Session asynchronously without blocking event binding & function setup
+  async function initUserSession() {
+    if (token) {
+      try {
+        const res = await fetch('/api/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          currentUser = data.user;
+          currentCard = data.card;
+          isLoggedIn = true;
+        } else {
+          localStorage.removeItem('card_token');
+          token = null;
+        }
+      } catch {
         token = null;
       }
-    } catch {
-      token = null;
     }
+    syncAuthStateUI();
+    emitLiveUpdate();
   }
 
   // Update UI for Auth State
@@ -365,26 +403,234 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  function emitLiveUpdate() {
-    if (!liveCardIframe || !liveCardIframe.contentWindow) return;
-    const draftCard = {
-      fullName: editFullName.value || 'YOUR NAME',
-      roleTitle: editRoleTitle.value || 'PROFESSIONAL TITLE & ROLE',
-      positioningStatement: editPositioningStatement.value || 'Add a brief tagline or description of what you do to showcase your professional profile.',
-      capabilities: editCapabilities.value ? editCapabilities.value.split(',').map(s => s.trim()).filter(Boolean) : ['PRODUCT DESIGN', 'STRATEGY', 'CREATIVE'],
-      editionMark: editEditionMark.value || 'DIGITAL EDITION 2026',
-      brandSubmark: editBrandSubmark.value || 'CARD—PASS',
-      theme: editTheme.value || 'terracotta',
-      email: editEmail.value || '',
-      phone: editPhone.value || '',
-      whatsapp: editWhatsapp.value || '',
-      linkedinUrl: editLinkedinUrl.value || '',
-      portfolioUrl: editPortfolioUrl.value || '',
-      photoUrl: draftPhotoUrl || (currentCard && currentCard.photoUrl ? currentCard.photoUrl : '/assets/default-avatar.png')
+  function getCurrentDraftCard() {
+    return {
+      fullName: editFullName ? editFullName.value : '',
+      roleTitle: editRoleTitle ? editRoleTitle.value : '',
+      positioningStatement: editPositioningStatement ? editPositioningStatement.value : '',
+      capabilities: editCapabilities && editCapabilities.value ? editCapabilities.value.split(',').map(s => s.trim()).filter(Boolean) : [],
+      editionMark: editEditionMark ? editEditionMark.value : 'DIGITAL EDITION 2026',
+      brandSubmark: editBrandSubmark ? editBrandSubmark.value : 'CARD—PASS',
+      theme: editTheme ? editTheme.value : 'terracotta',
+      email: editEmail ? editEmail.value : '',
+      phone: editPhone ? editPhone.value : '',
+      whatsapp: editWhatsapp ? editWhatsapp.value : '',
+      linkedinUrl: editLinkedinUrl ? editLinkedinUrl.value : '',
+      portfolioUrl: editPortfolioUrl ? editPortfolioUrl.value : '',
+      photoUrl: draftPhotoUrl || (currentCard && currentCard.photoUrl ? currentCard.photoUrl : '')
     };
+  }
+  window.getCurrentDraftCard = getCurrentDraftCard;
+
+  function renderNativePreviewCard(data) {
+    if (!data) return;
+
+    const nativeCard = document.getElementById('card-element');
+    if (nativeCard && data.theme) {
+      nativeCard.setAttribute('data-theme', data.theme);
+    }
+
+    // Name
+    const nameEl = document.getElementById('card-person-name');
+    if (nameEl) {
+      if (data.fullName && data.fullName.trim()) {
+        const nameParts = data.fullName.trim().split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+        nameEl.classList.remove('is-placeholder-text');
+        if (lastName) {
+          nameEl.innerHTML = `${firstName}<br><span class="name-accent">${lastName}</span>`;
+        } else {
+          nameEl.innerHTML = `<span class="name-accent">${firstName}</span>`;
+        }
+      } else {
+        nameEl.classList.add('is-placeholder-text');
+        nameEl.innerHTML = `YOUR NAME<br><span class="name-accent">SURNAME</span>`;
+      }
+    }
+
+    // Role
+    const roleEl = document.getElementById('card-role-title');
+    if (roleEl) {
+      if (data.roleTitle && data.roleTitle.trim()) {
+        roleEl.classList.remove('is-placeholder-text');
+        roleEl.textContent = data.roleTitle;
+      } else {
+        roleEl.classList.add('is-placeholder-text');
+        roleEl.textContent = 'YOUR PROFESSIONAL TITLE / ROLE';
+      }
+    }
+
+    // Bio / Positioning Statement
+    const posEl = document.getElementById('card-positioning-statement');
+    if (posEl) {
+      if (data.positioningStatement && data.positioningStatement.trim()) {
+        posEl.classList.remove('is-placeholder-text');
+        posEl.textContent = data.positioningStatement;
+      } else {
+        posEl.classList.add('is-placeholder-text');
+        posEl.textContent = 'Your personal bio or positioning statement will appear here once configured in your dashboard.';
+      }
+    }
+
+    // Photo
+    const portraitImg = document.getElementById('card-portrait-img');
+    if (portraitImg) {
+      portraitImg.src = data.photoUrl || '/assets/dummy-avatar.svg';
+    }
+
+    // Skills
+    const capsGrid = document.getElementById('card-capabilities-grid');
+    if (capsGrid) {
+      capsGrid.innerHTML = '';
+      const caps = Array.isArray(data.capabilities) && data.capabilities.length > 0 ? data.capabilities : [];
+      if (caps.length > 0) {
+        caps.forEach((cap, idx) => {
+          const pill = document.createElement('span');
+          pill.className = 'capability-pill';
+          pill.innerHTML = `<span class="cap-num">0${idx + 1}</span> ${cap}`;
+          capsGrid.appendChild(pill);
+        });
+      } else {
+        ['YOUR SKILL 01', 'YOUR SKILL 02', 'YOUR SKILL 03'].forEach((cap, idx) => {
+          const pill = document.createElement('span');
+          pill.className = 'capability-pill is-placeholder';
+          pill.innerHTML = `<span class="cap-num">0${idx + 1}</span> ${cap}`;
+          capsGrid.appendChild(pill);
+        });
+      }
+    }
+
+    // Event & Submark
+    const edTag = document.getElementById('card-edition-tag');
+    const brandSub = document.getElementById('card-brand-submark');
+    const backLoc = document.getElementById('card-back-location');
+    if (edTag) edTag.textContent = data.editionMark || 'DIGITAL EDITION 2026';
+    if (brandSub) brandSub.textContent = data.brandSubmark || 'CARD—PASS';
+    if (backLoc) backLoc.textContent = data.brandSubmark || 'CARD—PASS';
+
+    // Contacts
+    const emailWrap = document.getElementById('item-email-wrap');
+    const emailLink = document.getElementById('contact-email-link');
+    const directEmailBtn = document.getElementById('direct-email-btn');
+    const copyEmailBtn = document.getElementById('copy-email-btn');
+    if (emailWrap && emailLink) {
+      if (data.email) {
+        emailWrap.classList.remove('is-placeholder-row');
+        emailLink.href = `mailto:${data.email}`;
+        emailLink.textContent = data.email;
+        if (directEmailBtn) directEmailBtn.href = `mailto:${data.email}`;
+      } else {
+        emailWrap.classList.add('is-placeholder-row');
+        emailLink.href = '#';
+        emailLink.textContent = 'your.email@example.com';
+        if (directEmailBtn) directEmailBtn.href = '#';
+      }
+    }
+    if (copyEmailBtn) {
+      copyEmailBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (data.email) {
+          navigator.clipboard.writeText(data.email).then(() => {
+            showToast('📋 Email copied to clipboard!');
+          }).catch(() => {
+            showToast(`Email: ${data.email}`);
+          });
+        }
+      };
+    }
+
+    const phoneWrap = document.getElementById('item-phone-wrap');
+    const phoneLink = document.getElementById('contact-phone-link');
+    const directPhoneBtn = document.getElementById('direct-phone-btn');
+    const whatsappLink = document.getElementById('contact-whatsapp-link');
+
+    if (phoneWrap && phoneLink) {
+      if (data.phone) {
+        phoneWrap.classList.remove('is-placeholder-row');
+        phoneLink.href = `tel:${data.phone.replace(/\s+/g, '')}`;
+        phoneLink.textContent = data.phone;
+        if (directPhoneBtn) directPhoneBtn.href = `tel:${data.phone.replace(/\s+/g, '')}`;
+      } else {
+        phoneWrap.classList.add('is-placeholder-row');
+        phoneLink.href = '#';
+        phoneLink.textContent = '+1 (555) 000-0000';
+        if (directPhoneBtn) directPhoneBtn.href = '#';
+      }
+    }
+
+    if (whatsappLink) {
+      const waNumber = data.whatsapp || data.phone || '';
+      const cleanWa = waNumber.replace(/[^0-9]/g, '');
+      if (cleanWa) {
+        whatsappLink.href = `https://wa.me/${cleanWa}`;
+        whatsappLink.style.display = 'inline-flex';
+      } else {
+        whatsappLink.href = '#';
+      }
+    }
+
+    const linkedinWrap = document.getElementById('item-linkedin-wrap');
+    const linkedinLink = document.getElementById('contact-linkedin-link');
+    const directLinkedinBtn = document.getElementById('direct-linkedin-btn');
+    if (linkedinWrap && linkedinLink) {
+      if (data.linkedinUrl) {
+        linkedinWrap.classList.remove('is-placeholder-row');
+        linkedinLink.href = data.linkedinUrl;
+        linkedinLink.textContent = data.linkedinUrl.replace(/^https?:\/\/(www\.)?/, '');
+        if (directLinkedinBtn) directLinkedinBtn.href = data.linkedinUrl;
+      } else {
+        linkedinWrap.classList.add('is-placeholder-row');
+        linkedinLink.href = '#';
+        linkedinLink.textContent = 'linkedin.com/in/yourprofile';
+        if (directLinkedinBtn) directLinkedinBtn.href = '#';
+      }
+    }
+
+    const portfolioWrap = document.getElementById('item-portfolio-wrap');
+    const portfolioLink = document.getElementById('contact-portfolio-link');
+    const directPortfolioBtn = document.getElementById('direct-portfolio-btn');
+    if (portfolioWrap && portfolioLink) {
+      if (data.portfolioUrl) {
+        portfolioWrap.classList.remove('is-placeholder-row');
+        portfolioLink.href = data.portfolioUrl;
+        portfolioLink.textContent = data.portfolioUrl.replace(/^https?:\/\/(www\.)?/, '');
+        if (directPortfolioBtn) directPortfolioBtn.href = data.portfolioUrl;
+      } else {
+        portfolioWrap.classList.add('is-placeholder-row');
+        portfolioLink.href = '#';
+        portfolioLink.textContent = 'yourwebsite.com';
+        if (directPortfolioBtn) directPortfolioBtn.href = '#';
+      }
+    }
+  }
+
+  // Flip controls for native 3D card preview
+  const nativeFlipToBackBtn = document.getElementById('flip-to-back-btn');
+  const nativeFlipToFrontBtn = document.getElementById('flip-to-front-btn');
+
+  if (nativeFlipToBackBtn && nativeCardContainer) {
+    nativeFlipToBackBtn.onclick = (e) => {
+      e.stopPropagation();
+      nativeCardContainer.style.transform = 'rotateY(180deg)';
+    };
+  }
+  if (nativeFlipToFrontBtn && nativeCardContainer) {
+    nativeFlipToFrontBtn.onclick = (e) => {
+      e.stopPropagation();
+      nativeCardContainer.style.transform = 'rotateY(0deg)';
+    };
+  }
+
+  function emitLiveUpdate() {
+    const draftCard = window.getCurrentDraftCard();
+
+    // 1. Direct Native Preview DOM Update (0ms Instant Sync)
+    renderNativePreviewCard(draftCard);
 
     if (avatarPreviewImg) {
-      avatarPreviewImg.src = draftCard.photoUrl;
+      avatarPreviewImg.src = draftCard.photoUrl || '/assets/dummy-avatar.svg';
     }
 
     syncThemeCardUI(draftCard.theme);
@@ -401,54 +647,233 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    liveCardIframe.contentWindow.postMessage({ type: 'LIVE_CARD_UPDATE', card: draftCard }, '*');
+    // 2. Direct synchronous call for 0ms iframe fallback if active
+    if (liveCardIframe && liveCardIframe.contentWindow) {
+      try {
+        if (typeof liveCardIframe.contentWindow.updateLiveCard === 'function') {
+          liveCardIframe.contentWindow.updateLiveCard(draftCard);
+        }
+      } catch (e) {}
+
+      try {
+        liveCardIframe.contentWindow.postMessage({ type: 'LIVE_CARD_UPDATE', card: draftCard }, '*');
+      } catch (e) {}
+    }
   }
 
-  // Attach real-time input listeners
-  const allFormInputs = cardEditorForm.querySelectorAll('input:not([type="file"]), textarea, select');
-  allFormInputs.forEach(input => {
-    input.addEventListener('input', emitLiveUpdate);
-    input.addEventListener('change', emitLiveUpdate);
-    input.addEventListener('keyup', emitLiveUpdate);
-  });
+  const NIGERIAN_PROFILES = [
+    {
+      fullName: "Babatunde Adeleke",
+      roleTitle: "Senior Cloud Architect | DevOps Lead",
+      positioningStatement: "Building resilient cloud infrastructure, automating CI/CD pipelines, and driving digital transformation for enterprise solutions.",
+      capabilities: ["AWS & AZURE", "KUBERNETES", "DEVOPS ARCHITECTURE"],
+      editionMark: "LAGOS TECH SUMMIT 2026",
+      brandSubmark: "BA—CLOUD",
+      theme: "sapphire",
+      email: "babatunde.adeleke@example.com",
+      phone: "+234 803 123 4567",
+      whatsapp: "+2348031234567",
+      linkedinUrl: "https://linkedin.com/in/babatunde-adeleke",
+      portfolioUrl: "https://babatundeadeleke.dev"
+    },
+    {
+      fullName: "Chinedu Okonkwo",
+      roleTitle: "Principal Product Manager | Fintech Lead",
+      positioningStatement: "Scaling cross-border payment platforms, leading high-impact engineering teams, and simplifying digital financial services across Africa.",
+      capabilities: ["PRODUCT STRATEGY", "PAYMENT INFRASTRUCTURE", "GROWTH & SCALE"],
+      editionMark: "AFRICA FINTECH 2026",
+      brandSubmark: "CO—PAY",
+      theme: "emerald",
+      email: "chinedu.okonkwo@example.com",
+      phone: "+234 812 987 6543",
+      whatsapp: "+2348129876543",
+      linkedinUrl: "https://linkedin.com/in/chinedu-okonkwo",
+      portfolioUrl: "https://chineduokonkwo.com"
+    },
+    {
+      fullName: "Aisha Bello",
+      roleTitle: "Data Scientist | AI & Machine Learning Lead",
+      positioningStatement: "Developing predictive AI models, extracting deep analytics insights, and applying machine learning to solve complex business challenges.",
+      capabilities: ["MACHINE LEARNING", "PYTHON & PYTORCH", "BIG DATA ANALYTICS"],
+      editionMark: "KANO AI SUMMIT 2026",
+      brandSubmark: "AB—AI",
+      theme: "monochrome",
+      email: "aisha.bello@example.com",
+      phone: "+234 809 456 7890",
+      whatsapp: "+2348094567890",
+      linkedinUrl: "https://linkedin.com/in/aisha-bello",
+      portfolioUrl: "https://aishabello.ai"
+    },
+    {
+      fullName: "Damilola Ogunleye",
+      roleTitle: "Full Stack Engineer | Systems Architect",
+      positioningStatement: "Crafting high-performance web applications, designing microservice APIs, and crafting intuitive user experiences end-to-end.",
+      capabilities: ["FULL STACK DEV", "REACT & NODE.JS", "SYSTEM ARCHITECTURE"],
+      editionMark: "IBADAN DEV SUMMIT 2026",
+      brandSubmark: "DO—CODE",
+      theme: "terracotta",
+      email: "damilola.ogunleye@example.com",
+      phone: "+234 814 222 3344",
+      whatsapp: "+2348142223344",
+      linkedinUrl: "https://linkedin.com/in/damilola-ogunleye",
+      portfolioUrl: "https://damilolaogunleye.dev"
+    },
+    {
+      fullName: "Emeka Nwosu",
+      roleTitle: "Financial Analyst | Venture Investment Strategist",
+      positioningStatement: "Evaluating high-growth tech investments, structuring venture capital deals, and delivering data-backed financial modeling across emerging markets.",
+      capabilities: ["VENTURE CAPITAL", "FINANCIAL MODELING", "MARKET ANALYSIS"],
+      editionMark: "ABUJA CAPITAL FORUM 2026",
+      brandSubmark: "EN—CAPITAL",
+      theme: "gold",
+      email: "emeka.nwosu@example.com",
+      phone: "+234 805 555 6677",
+      whatsapp: "+2348055556677",
+      linkedinUrl: "https://linkedin.com/in/emeka-nwosu",
+      portfolioUrl: "https://emekanwosu.com"
+    },
+    {
+      fullName: "Folake Adeniyi",
+      roleTitle: "Brand Strategist | Digital Marketing Director",
+      positioningStatement: "Building iconic brand identities, crafting omnichannel marketing campaigns, and elevating brand presence across global audiences.",
+      capabilities: ["BRAND STRATEGY", "DIGITAL MARKETING", "CAMPAIGN DIRECTION"],
+      editionMark: "CREATIVE SUMMIT 2026",
+      brandSubmark: "FA—BRAND",
+      theme: "terracotta",
+      email: "folake.adeniyi@example.com",
+      phone: "+234 818 777 8899",
+      whatsapp: "+2348187778899",
+      linkedinUrl: "https://linkedin.com/in/folake-adeniyi",
+      portfolioUrl: "https://folakeadeniyi.com"
+    },
+    {
+      fullName: "Ngozi Eze",
+      roleTitle: "Legal Consultant | Corporate & Tech Counsel",
+      positioningStatement: "Advising tech startups on regulatory compliance, intellectual property protection, corporate governance, and cross-border commercial contracts.",
+      capabilities: ["CORPORATE LAW", "TECH REGULATION", "IP & CONTRACTS"],
+      editionMark: "LEGAL TECH FORUM 2026",
+      brandSubmark: "NE—LAW",
+      theme: "monochrome",
+      email: "ngozi.eze@example.com",
+      phone: "+234 802 333 4455",
+      whatsapp: "+2348023334455",
+      linkedinUrl: "https://linkedin.com/in/ngozi-eze",
+      portfolioUrl: "https://ngozieze.law"
+    }
+  ];
 
-  // Photo file preview listener
-  if (editPhotoFile) {
-    editPhotoFile.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          draftPhotoUrl = evt.target.result;
-          if (avatarPreviewImg) avatarPreviewImg.src = draftPhotoUrl;
-          emitLiveUpdate();
-        };
-        reader.readAsDataURL(file);
-      }
+  const randomizeProfileBtn = document.getElementById('randomize-profile-btn');
+  if (randomizeProfileBtn) {
+    randomizeProfileBtn.addEventListener('click', () => {
+      const idx = Math.floor(Math.random() * NIGERIAN_PROFILES.length);
+      const profile = NIGERIAN_PROFILES[idx];
+      populateForm(profile);
+      emitLiveUpdate();
+      showToast(`🎲 Sample Profile Loaded: ${profile.fullName} (${profile.roleTitle.split('|')[0].trim()})`);
     });
   }
 
+  // Multi-event real-time input listeners across all input fields for 100% instant sync
+  const inputsToTrack = [
+    editFullName, editRoleTitle, editPositioningStatement, editCapabilities,
+    editEditionMark, editBrandSubmark, editTheme, editEmail, editPhone,
+    editWhatsapp, editLinkedinUrl, editPortfolioUrl
+  ];
+
+  inputsToTrack.forEach(input => {
+    if (input) {
+      ['input', 'keyup', 'keydown', 'change', 'paste', 'compositionend'].forEach(evtType => {
+        input.addEventListener(evtType, emitLiveUpdate);
+      });
+    }
+  });
+
+  cardEditorForm.addEventListener('input', emitLiveUpdate);
+  cardEditorForm.addEventListener('keyup', emitLiveUpdate);
+  cardEditorForm.addEventListener('change', emitLiveUpdate);
+  cardEditorForm.addEventListener('paste', emitLiveUpdate);
+  document.addEventListener('input', emitLiveUpdate);
+
+  // Photo file real-time preview listener & explicit upload triggers
+  const explicitUploadBtn = document.getElementById('explicit-upload-btn');
+  if (explicitUploadBtn) {
+    explicitUploadBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (editPhotoFile) editPhotoFile.click();
+    };
+  }
+
+  const avatarWrapper = document.getElementById('avatar-preview-wrapper');
+  if (avatarWrapper) {
+    avatarWrapper.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (editPhotoFile) editPhotoFile.click();
+    };
+  }
+
+  if (avatarPreviewImg) {
+    avatarPreviewImg.style.cursor = 'pointer';
+    avatarPreviewImg.title = 'Click to choose portrait photo';
+    avatarPreviewImg.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (editPhotoFile) editPhotoFile.click();
+    };
+  }
+
+  if (editPhotoFile) {
+    const processImageFile = (file) => {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        draftPhotoUrl = evt.target.result;
+        if (avatarPreviewImg) avatarPreviewImg.src = draftPhotoUrl;
+        emitLiveUpdate();
+      };
+      reader.readAsDataURL(file);
+    };
+
+    editPhotoFile.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) processImageFile(e.target.files[0]);
+    });
+  }
+
+  // Handshake listener from card iframe
+  window.addEventListener('message', (e) => {
+    if (e.data && e.data.type === 'IFRAME_READY') {
+      emitLiveUpdate();
+    }
+  });
+
   liveCardIframe.addEventListener('load', () => {
-    setTimeout(emitLiveUpdate, 350);
+    emitLiveUpdate();
+    setTimeout(emitLiveUpdate, 150);
+    setTimeout(emitLiveUpdate, 500);
   });
 
   function populateForm(card) {
     if (!card) return;
-    editFullName.value = card.fullName || '';
-    editRoleTitle.value = card.roleTitle || '';
-    editPositioningStatement.value = card.positioningStatement || '';
-    editCapabilities.value = Array.isArray(card.capabilities) ? card.capabilities.join(', ') : (card.capabilities || '');
-    editEditionMark.value = card.editionMark || '';
-    editBrandSubmark.value = card.brandSubmark || '';
-    editTheme.value = card.theme || 'terracotta';
-    editEmail.value = card.email || '';
-    editPhone.value = card.phone || '';
-    editWhatsapp.value = card.whatsapp || '';
-    editLinkedinUrl.value = card.linkedinUrl || '';
-    editPortfolioUrl.value = card.portfolioUrl || '';
+    if (editFullName) editFullName.value = card.fullName || '';
+    if (editRoleTitle) editRoleTitle.value = card.roleTitle || '';
+    if (editPositioningStatement) editPositioningStatement.value = card.positioningStatement || '';
+    if (editCapabilities) editCapabilities.value = Array.isArray(card.capabilities) ? card.capabilities.join(', ') : (card.capabilities || '');
+    if (editEditionMark) editEditionMark.value = card.editionMark || '';
+    if (editBrandSubmark) editBrandSubmark.value = card.brandSubmark || '';
+    if (editTheme) editTheme.value = card.theme || 'terracotta';
+    if (editEmail) editEmail.value = card.email || '';
+    if (editPhone) editPhone.value = card.phone || '';
+    if (editWhatsapp) editWhatsapp.value = card.whatsapp || '';
+    if (editLinkedinUrl) editLinkedinUrl.value = card.linkedinUrl || '';
+    if (editPortfolioUrl) editPortfolioUrl.value = card.portfolioUrl || '';
 
-    if (card.photoUrl && avatarPreviewImg) {
-      avatarPreviewImg.src = card.photoUrl;
+    if (card.photoUrl) {
+      draftPhotoUrl = card.photoUrl;
+      if (avatarPreviewImg) avatarPreviewImg.src = card.photoUrl;
+    } else {
+      draftPhotoUrl = null;
+      if (avatarPreviewImg) avatarPreviewImg.src = '/assets/dummy-avatar.svg';
     }
 
     syncThemeCardUI(card.theme || 'terracotta');
@@ -611,21 +1036,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function savePublishedCard() {
     const formData = new FormData();
-    formData.append('fullName', editFullName.value);
-    formData.append('roleTitle', editRoleTitle.value);
-    formData.append('positioningStatement', editPositioningStatement.value);
-    formData.append('capabilities', editCapabilities.value);
-    formData.append('editionMark', editEditionMark.value);
-    formData.append('brandSubmark', editBrandSubmark.value);
-    formData.append('theme', editTheme.value);
-    formData.append('email', editEmail.value);
-    formData.append('phone', editPhone.value);
-    formData.append('whatsapp', editWhatsapp.value);
-    formData.append('linkedinUrl', editLinkedinUrl.value);
-    formData.append('portfolioUrl', editPortfolioUrl.value);
+    formData.append('fullName', editFullName ? editFullName.value : '');
+    formData.append('roleTitle', editRoleTitle ? editRoleTitle.value : '');
+    formData.append('positioningStatement', editPositioningStatement ? editPositioningStatement.value : '');
+    formData.append('capabilities', editCapabilities ? editCapabilities.value : '');
+    formData.append('editionMark', editEditionMark ? editEditionMark.value : '');
+    formData.append('brandSubmark', editBrandSubmark ? editBrandSubmark.value : '');
+    formData.append('theme', editTheme ? editTheme.value : 'terracotta');
+    formData.append('email', editEmail ? editEmail.value : '');
+    formData.append('phone', editPhone ? editPhone.value : '');
+    formData.append('whatsapp', editWhatsapp ? editWhatsapp.value : '');
+    formData.append('linkedinUrl', editLinkedinUrl ? editLinkedinUrl.value : '');
+    formData.append('portfolioUrl', editPortfolioUrl ? editPortfolioUrl.value : '');
 
-    if (editPhotoFile && editPhotoFile.files[0]) {
+    if (editPhotoFile && editPhotoFile.files && editPhotoFile.files[0]) {
       formData.append('photo', editPhotoFile.files[0]);
+    } else if (draftPhotoUrl) {
+      formData.append('photoUrl', draftPhotoUrl);
     }
 
     const res = await fetch('/api/card', {
@@ -705,8 +1132,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (step10Alert) step10Alert.style.display = 'none';
 
       if (isLoginMode) {
-        const identifier = (document.getElementById('step10-login-identifier').value || '').trim();
-        const password = (document.getElementById('step10-login-password').value || '').trim();
+        const logIdEl = document.getElementById('step10-login-identifier');
+        const logPassEl = document.getElementById('step10-login-password');
+        const identifier = (logIdEl ? logIdEl.value : '').trim();
+        const password = (logPassEl ? logPassEl.value : '').trim();
 
         if (!identifier || !password) {
           showStep10Alert('Please enter your email/username and password.');
@@ -743,9 +1172,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }
       } else {
-        const email = (document.getElementById('step10-reg-email').value || '').trim();
-        const username = (document.getElementById('step10-reg-username').value || '').trim().toLowerCase();
-        const password = (document.getElementById('step10-reg-password').value || '').trim();
+        const regEmailEl = document.getElementById('step10-reg-email');
+        const regUserEl = document.getElementById('step10-reg-username');
+        const regPassEl = document.getElementById('step10-reg-password');
+        const email = (regEmailEl ? regEmailEl.value : '').trim();
+        const username = (regUserEl ? regUserEl.value : '').trim().toLowerCase();
+        const password = (regPassEl ? regPassEl.value : '').trim();
 
         if (!email || !username || !password) {
           showStep10Alert('Email, custom username, and password are required.');
@@ -814,5 +1246,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Init Theme & Auth State & Wizard Step 1
   initTheme();
   syncAuthStateUI();
+  emitLiveUpdate();
+  initUserSession();
   goToStep(1);
 });

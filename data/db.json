@@ -13,6 +13,34 @@
       "username": "oluseyi",
       "passwordHash": "1250d4612d87d180f7fc81cc4a1d1e1b4f28fedffff0670ac2f810e1fa9f8f38",
       "createdAt": "2026-10-01T23:20:14.531Z"
+    },
+    {
+      "id": "usr_1791044503928_ctqd",
+      "email": "sheyivetdoc@gmailciom",
+      "username": "hotkid",
+      "passwordHash": "1250d4612d87d180f7fc81cc4a1d1e1b4f28fedffff0670ac2f810e1fa9f8f38",
+      "createdAt": "2026-10-03T16:21:43.928Z"
+    },
+    {
+      "id": "usr_1791459131889_h3c6",
+      "email": "test_1791459131821@example.com",
+      "username": "test_1791459131821",
+      "passwordHash": "1250d4612d87d180f7fc81cc4a1d1e1b4f28fedffff0670ac2f810e1fa9f8f38",
+      "createdAt": "2026-10-08T11:32:11.890Z"
+    },
+    {
+      "id": "usr_1791459434383_spry",
+      "email": "test_1791459434340@example.com",
+      "username": "test_1791459434340",
+      "passwordHash": "1250d4612d87d180f7fc81cc4a1d1e1b4f28fedffff0670ac2f810e1fa9f8f38",
+      "createdAt": "2026-10-08T11:37:14.384Z"
+    },
+    {
+      "id": "usr_1791462967002_5f64",
+      "email": "sheyivetdoc@gmail.com",
+      "username": "sheyisheyimen",
+      "passwordHash": "1250d4612d87d180f7fc81cc4a1d1e1b4f28fedffff0670ac2f810e1fa9f8f38",
+      "createdAt": "2026-10-08T12:36:07.010Z"
     }
   ],
   "cards": [
@@ -20,22 +48,18 @@
       "id": "card_dokitoor",
       "userId": "user_dokitoor",
       "username": "dokitoor",
-      "fullName": "Oluseyi Ogundipe",
-      "roleTitle": "Product & Information Design | Project Management",
-      "positioningStatement": "Designing digital products, simplifying complex information, and helping turn ideas into meaningful projects.",
-      "capabilities": [
-        "PRODUCT DESIGN",
-        "INFORMATION DESIGN",
-        "PROJECT MANAGEMENT"
-      ],
-      "editionMark": "NAIROBI EDITION 2026",
-      "brandSubmark": "OO—DESIGN",
-      "photoUrl": "/assets/oluseyi-ogundipe.jpg",
+      "fullName": "",
+      "roleTitle": "",
+      "positioningStatement": "",
+      "capabilities": [],
+      "editionMark": "DIGITAL PASS 2026",
+      "brandSubmark": "CARD—PASS",
+      "photoUrl": "",
       "email": "oluseyi.ogundipe@outlook.com",
-      "phone": "+234 814 891 8630",
-      "whatsapp": "+2348148918630",
-      "linkedinUrl": "https://www.linkedin.com/in/dokitoor-oluseyi/",
-      "portfolioUrl": "https://oluseyiogundipe.com",
+      "phone": "",
+      "whatsapp": "",
+      "linkedinUrl": "",
+      "portfolioUrl": "",
       "theme": "terracotta",
       "updatedAt": "2026-10-01T23:20:14.531Z"
     },
@@ -43,25 +67,138 @@
       "id": "card_oluseyi",
       "userId": "user_oluseyi",
       "username": "oluseyi",
-      "fullName": "Oluseyi Ogundipe",
-      "roleTitle": "Product & Information Design | Project Management",
-      "positioningStatement": "Designing digital products, simplifying complex information, and helping turn ideas into meaningful projects.",
-      "capabilities": [
-        "PRODUCT DESIGN",
-        "INFORMATION DESIGN",
-        "PROJECT MANAGEMENT"
-      ],
-      "editionMark": "NAIROBI EDITION 2026",
-      "brandSubmark": "OO—DESIGN",
-      "photoUrl": "/assets/oluseyi-ogundipe.jpg",
-      "email": "oluseyi.ogundipe@outlook.com",
-      "phone": "+234 814 891 8630",
-      "whatsapp": "+2348148918630",
-      "linkedinUrl": "https://www.linkedin.com/in/dokitoor-oluseyi/",
-      "portfolioUrl": "https://oluseyiogundipe.com",
+      "fullName": "",
+      "roleTitle": "",
+      "positioningStatement": "",
+      "capabilities": [],
+      "editionMark": "DIGITAL PASS 2026",
+      "brandSubmark": "CARD—PASS",
+      "photoUrl": "",
+      "email": "oluseyi@example.com",
+      "phone": "",
+      "whatsapp": "",
+      "linkedinUrl": "",
+      "portfolioUrl": "",
       "theme": "terracotta",
       "updatedAt": "2026-10-01T23:20:14.531Z"
+    },
+    {
+      "id": "card_1791044503928",
+      "userId": "usr_1791044503928_ctqd",
+      "username": "hotkid",
+      "fullName": "Dr. Amanda Sterling",
+      "roleTitle": "Chief Technology Officer",
+      "positioningStatement": "Pioneering intelligent systems and scalable architectures.",
+      "capabilities": [
+        "AI ARCHITECTURE",
+        "CLOUD SYSTEMS",
+        "LEADERSHIP"
+      ],
+      "editionMark": "DIGITAL PASS 2026",
+      "brandSubmark": "",
+      "photoUrl": "",
+      "email": "amanda.sterling@nexus.tech",
+      "phone": "+1 (555) 019-2831",
+      "whatsapp": "",
+      "linkedinUrl": "",
+      "portfolioUrl": "",
+      "theme": "emerald",
+      "updatedAt": "2026-10-08T12:22:55.226Z"
+    },
+    {
+      "id": "card_1791459131890",
+      "userId": "usr_1791459131889_h3c6",
+      "username": "test_1791459131821",
+      "fullName": "Test Developer",
+      "roleTitle": "Lead Software Architect",
+      "positioningStatement": "Building high quality software systems.",
+      "capabilities": [
+        "JavaScript",
+        "Node.js",
+        "CSS"
+      ],
+      "editionMark": "TEST PASS 2026",
+      "brandSubmark": "TEST_1791459131821—PASS",
+      "photoUrl": "",
+      "email": "test_1791459131821@example.com",
+      "phone": "+1 234 567 8900",
+      "whatsapp": "",
+      "linkedinUrl": "",
+      "portfolioUrl": "",
+      "theme": "deep-emerald",
+      "updatedAt": "2026-10-08T11:32:11.929Z"
+    },
+    {
+      "id": "card_1791459434384",
+      "userId": "usr_1791459434383_spry",
+      "username": "test_1791459434340",
+      "fullName": "Test Developer",
+      "roleTitle": "Lead Software Architect",
+      "positioningStatement": "Building high quality software systems.",
+      "capabilities": [
+        "JavaScript",
+        "Node.js",
+        "CSS"
+      ],
+      "editionMark": "TEST PASS 2026",
+      "brandSubmark": "TEST_1791459434340—PASS",
+      "photoUrl": "",
+      "email": "test_1791459434340@example.com",
+      "phone": "+1 234 567 8900",
+      "whatsapp": "",
+      "linkedinUrl": "",
+      "portfolioUrl": "",
+      "theme": "deep-emerald",
+      "updatedAt": "2026-10-08T11:37:14.417Z"
+    },
+    {
+      "id": "card_1791462967010",
+      "userId": "usr_1791462967002_5f64",
+      "username": "sheyisheyimen",
+      "fullName": "Oluseyi Ogundipe",
+      "roleTitle": "Doctor of Veterinary medicine",
+      "positioningStatement": "I am a doctor with a lot of excelecnce \r\n",
+      "capabilities": [
+        "Small animal Medicine",
+        "Poultry",
+        "Large animal Medicine"
+      ],
+      "editionMark": "NVMA 2026",
+      "brandSubmark": "",
+      "photoUrl": "/uploads/portrait_1791462984683_30ndou.jpg",
+      "email": "sheyivetdoc@gmail",
+      "phone": "08113177445",
+      "whatsapp": "+2348113177445",
+      "linkedinUrl": "https://www.linkedin.com/in/dokitoor-oluseyi/",
+      "portfolioUrl": "https://oluseyiogundipe.com",
+      "theme": "emerald",
+      "updatedAt": "2026-10-08T13:02:41.348Z"
     }
   ],
-  "sessions": {}
+  "sessions": {
+    "token_1791044503935_jsxf58xlgz": {
+      "userId": "usr_1791044503928_ctqd",
+      "createdAt": "2026-10-03T16:21:43.935Z"
+    },
+    "token_1791459131892_o9d9sgo7qc": {
+      "userId": "usr_1791459131889_h3c6",
+      "createdAt": "2026-10-08T11:32:11.892Z"
+    },
+    "token_1791459131904_7ybw4f3h9i": {
+      "userId": "usr_1791459131889_h3c6",
+      "createdAt": "2026-10-08T11:32:11.904Z"
+    },
+    "token_1791459434385_uiqy0x9rpl": {
+      "userId": "usr_1791459434383_spry",
+      "createdAt": "2026-10-08T11:37:14.385Z"
+    },
+    "token_1791459434393_dravw00sn7": {
+      "userId": "usr_1791459434383_spry",
+      "createdAt": "2026-10-08T11:37:14.393Z"
+    },
+    "token_1791462967013_cirqxeuxov": {
+      "userId": "usr_1791462967002_5f64",
+      "createdAt": "2026-10-08T12:36:07.013Z"
+    }
+  }
 }
