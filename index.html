@@ -238,14 +238,17 @@
        ========================================================================= -->
   <section class="h-screen overflow-hidden relative mb-[-25px] bg-black">
     
-    <!-- Background Video -->
+    <!-- Background Video: Ultra-lightweight WebM & FastStart MP4 with instant WebP poster -->
     <video 
       autoplay 
       muted 
       loop 
       playsinline 
-      class="absolute inset-0 w-full h-full object-cover z-0"
-      src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260711_090308_1dd0cea7-f9ba-4db4-8147-c7d746061c9e.mp4">
+      preload="metadata"
+      poster="/assets/hero-video-poster.webp"
+      class="absolute inset-0 w-full h-full object-cover z-0">
+      <source src="/assets/hero-video-optimized.webm" type="video/webm">
+      <source src="/assets/hero-video-optimized.mp4" type="video/mp4">
     </video>
 
     <!-- Semi-transparent overlay -->
@@ -386,12 +389,16 @@
        ========================================================================= -->
   <section class="relative px-5 md:px-10 lg:px-16 py-20 md:py-40 lg:py-48" id="features">
     
-    <!-- Fixed Background Image -->
+    <!-- Fixed Background Image (Lightweight 5KB Internal WebP) -->
     <div class="fixed inset-0 -z-10 pointer-events-none">
       <img 
-        src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260709_082449_46df5cc4-ad98-4541-9236-a2659c1478a4.png&w=1920&q=85" 
+        src="/assets/ambient-landscape.webp" 
         alt="Calm natural ambient landscape background" 
         class="w-full h-full object-cover filter brightness-[0.6]"
+        loading="lazy"
+        decoding="async"
+        width="1920"
+        height="1080"
       />
     </div>
 
@@ -445,7 +452,10 @@
           </div>
           <h3 class="text-white text-xl md:text-2xl font-medium mb-4">Your introduction, in one card</h3>
           <div class="aspect-video rounded-2xl overflow-hidden bg-black/30 w-full mb-6 border border-white/10 group">
-            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/brand-card-intro.jpg" alt="Meetme 3D digital business card presentation">
+            <picture>
+              <source srcset="/assets/brand-card-intro.webp" type="image/webp">
+              <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/brand-card-intro.jpg" alt="Meetme 3D digital business card presentation" loading="lazy" decoding="async" width="1376" height="768">
+            </picture>
           </div>
           <p class="text-white/60 font-medium text-sm md:text-base leading-relaxed">
             Your Meetme card brings your name, role, organisation, bio, links and contact details together in one simple introduction. No digging through profiles or typing numbers into your phone.
@@ -462,7 +472,10 @@
           </div>
           <h3 class="text-white text-xl md:text-2xl font-medium mb-4">Share where you met</h3>
           <div class="aspect-video rounded-2xl overflow-hidden bg-black/30 w-full mb-6 border border-white/10 group">
-            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/brand-event-context.jpg" alt="Professionals exchanging Meetme card at Men's Wealth Conference">
+            <picture>
+              <source srcset="/assets/brand-event-context.webp" type="image/webp">
+              <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/brand-event-context.jpg" alt="Professionals exchanging Meetme card at Men's Wealth Conference" loading="lazy" decoding="async" width="1376" height="768">
+            </picture>
           </div>
           <p class="text-white/60 font-medium text-sm md:text-base leading-relaxed">
             Add the conference, event or community where you met. That little bit of context makes new connections easier to remember long after the event is over.
@@ -479,7 +492,10 @@
           </div>
           <h3 class="text-white text-xl md:text-2xl font-medium mb-4">Stay connected</h3>
           <div class="aspect-video rounded-2xl overflow-hidden bg-black/30 w-full mb-6 border border-white/10 group">
-            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/brand-stay-connected.jpg" alt="Scanning QR code on digital card to add to contacts">
+            <picture>
+              <source srcset="/assets/brand-stay-connected.webp" type="image/webp">
+              <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="/assets/brand-stay-connected.jpg" alt="Scanning QR code on digital card to add to contacts" loading="lazy" decoding="async" width="1376" height="768">
+            </picture>
           </div>
           <p class="text-white/60 font-medium text-sm md:text-base leading-relaxed">
             Share your card, let someone scan your QR code or send your link. They can save your details directly to their contacts and keep the connection going.
@@ -496,11 +512,18 @@
        ========================================================================= -->
   <footer class="footer">
     <div class="footer__illustration-wrapper">
-      <img 
-        src="assets/hand-of-god-handshake.jpg" 
-        alt="Vintage engraved illustration of two hands reaching out to shake hands" 
-        class="footer__illustration" 
-      />
+      <picture>
+        <source srcset="/assets/hand-of-god-handshake.webp" type="image/webp">
+        <img 
+          src="/assets/hand-of-god-handshake.jpg" 
+          alt="Vintage engraved illustration of two hands reaching out to shake hands" 
+          class="footer__illustration" 
+          loading="lazy"
+          decoding="async"
+          width="1376"
+          height="768"
+        />
+      </picture>
     </div>
     <div class="footer__content">
       <!-- Meetme Logo Mark -->
