@@ -356,6 +356,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (passBackAbout) passBackAbout.textContent = data.positioningStatement || 'Your bio will appear here...';
     if (passBackComp) passBackComp.textContent = Array.isArray(data.capabilities) && data.capabilities.length ? data.capabilities.join(' · ') : 'Skills & Competencies';
 
+    // Dynamic High-Resolution Vector QR Code pointing to live card URL
+    const targetUsername = data.username || username || 'cardholder';
+    const cardUrl = `${window.location.origin}/c/${targetUsername}`;
+    const qrEndpoint = `/api/qr?data=${encodeURIComponent(cardUrl)}`;
+
+    const cardQrImg = document.getElementById('card-qr-img');
+    const modalQrImg = document.getElementById('modal-qr-img');
+    const passQrImg = document.getElementById('pass-qr-img');
+
+    if (cardQrImg) {
+      cardQrImg.src = qrEndpoint;
+      cardQrImg.alt = `Scan QR Code to open ${targetUsername}'s digital card`;
+    }
+    if (modalQrImg) {
+      modalQrImg.src = qrEndpoint;
+      modalQrImg.alt = `Scan QR Code to open ${targetUsername}'s digital card`;
+    }
+    if (passQrImg) {
+      passQrImg.src = qrEndpoint;
+      passQrImg.alt = `Apple Wallet pass QR Code for ${targetUsername}`;
+    }
+
     // Share Sheet Details
     const shareAvatar = document.getElementById('share-avatar-img');
     const shareName = document.getElementById('share-sheet-name');

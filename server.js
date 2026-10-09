@@ -4,6 +4,7 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const QRCode = require('qrcode');
 const db = require('./db');
 
 const app = express();
@@ -143,6 +144,25 @@ apiRouter.post('/auth/logout', requireAuth, (req, res) => {
   res.json({ message: 'Logged out successfully.' });
 });
 
+// Reset Password (Verify registered email and username)
+apiRouter.post('/auth/reset-password', async (req, res) => {
+  try {
+    const { email, username, newPassword } = req.body;
+    const user = await db.resetUserPassword(email, username, newPassword);
+    const token = db.createSession(user.id);
+    const card = await db.getCardByUserId(user.id);
+
+    res.json({
+      message: 'Password reset successfully! You are now logged in.',
+      token,
+      user: { id: user.id, email: user.email, username: user.username },
+      card
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message || 'Password reset failed.' });
+  }
+});
+
 // Get Current User & Card Details
 apiRouter.get('/me', requireAuth, async (req, res) => {
   try {
@@ -235,6 +255,26 @@ apiRouter.get('/cards/:username', async (req, res) => {
     res.json({ card });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Dynamic SVG QR Code Generator (Instant, high-resolution vector QR for phone scanning)
+apiRouter.get('/qr', async (req, res) => {
+  try {
+    const text = (req.query.data || req.query.url || '').trim();
+    if (!text) {
+      return res.status(400).send('Missing QR data');
+    }
+    const svg = await QRCode.toString(text, {
+      type: 'svg',
+      margin: 1,
+      color: { dark: '#111827', light: '#ffffff' }
+    });
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.send(svg);
+  } catch (err) {
+    res.status(500).send(err.message);
   }
 });
 

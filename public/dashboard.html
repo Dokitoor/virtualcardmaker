@@ -337,12 +337,45 @@
               </div>
 
               <div class="form-group">
-                <label for="step10-login-password" class="form-label">Password</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label for="step10-login-password" class="form-label" style="margin-bottom: 0;">Password</label>
+                  <button type="button" id="step10-show-reset-btn" style="background:none;border:none;color:var(--dash-text-muted);font-size:12px;cursor:pointer;text-decoration:underline;">Forgot Password?</button>
+                </div>
                 <input type="password" id="step10-login-password" class="form-input" placeholder="Your password">
               </div>
 
               <div style="text-align: center; margin-top: 6px; font-size: 13px; color: var(--dash-text-muted);">
                 Need an account? <button type="button" id="step10-show-register-btn" style="background:none;border:none;color:var(--dash-text);font-weight:700;text-decoration:underline;cursor:pointer;">Create Account</button>
+              </div>
+            </div>
+
+            <!-- Reset Password Box -->
+            <div class="step-single-field" id="step10-reset-box" style="display: none;">
+              <div class="form-group">
+                <label for="step10-reset-email" class="form-label">Registered Email Address</label>
+                <input type="email" id="step10-reset-email" class="form-input" placeholder="you@example.com">
+              </div>
+
+              <div class="form-group">
+                <label for="step10-reset-username" class="form-label">Your Card Username Handle (/c/)</label>
+                <div class="username-input-wrap">
+                  <span class="input-prefix">/c/</span>
+                  <input type="text" id="step10-reset-username" class="form-input username-field" placeholder="yourname">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="step10-reset-password" class="form-label">New Password</label>
+                <input type="password" id="step10-reset-password" class="form-input" placeholder="Minimum 6 characters" minlength="6">
+              </div>
+
+              <div class="form-group">
+                <label for="step10-reset-confirm" class="form-label">Confirm New Password</label>
+                <input type="password" id="step10-reset-confirm" class="form-input" placeholder="Re-type new password" minlength="6">
+              </div>
+
+              <div style="text-align: center; margin-top: 6px; font-size: 13px; color: var(--dash-text-muted);">
+                Remembered your password? <button type="button" id="step10-reset-back-btn" style="background:none;border:none;color:var(--dash-text);font-weight:700;text-decoration:underline;cursor:pointer;">Sign In instead</button>
               </div>
             </div>
           </div>
@@ -535,6 +568,18 @@
 
               </div>
 
+              <!-- Prominent QR Code Block in Preview -->
+              <div class="qr-showcase-card" style="margin: 12px 0;">
+                <div class="qr-header">
+                  <span class="qr-title">SCAN TO OPEN & SAVE CONTACT</span>
+                </div>
+                <div class="qr-image-wrapper" title="Scan with phone camera to open card">
+                  <img src="/assets/qr-code.svg" alt="Preview QR Code" class="qr-svg-graphic" id="preview-card-qr-img" />
+                  <div class="qr-scan-badge">PHONE SCAN</div>
+                </div>
+                <p class="qr-supporting-line">Scan with phone camera to open card and save contact directly.</p>
+              </div>
+
               <footer class="back-footer-actions">
                 <button type="button" class="flip-trigger-btn" id="flip-to-front-btn" style="background-color: var(--accent-primary, #321C04);">
                   <span>← Back to Front Face</span>
@@ -607,13 +652,50 @@
         </div>
 
         <div class="form-group">
-          <label for="modal-login-password" class="form-label">Password</label>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label for="modal-login-password" class="form-label" style="margin-bottom: 0;">Password</label>
+            <button type="button" id="modal-show-reset-btn" style="background:none;border:none;color:var(--dash-text-muted);font-size:12px;cursor:pointer;text-decoration:underline;">Forgot Password?</button>
+          </div>
           <input type="password" id="modal-login-password" class="form-input" placeholder="••••••••" required>
         </div>
 
         <button type="submit" class="btn-modal-submit" id="modal-login-submit-btn">
           <span>Sign In & Publish Card 🔑</span>
         </button>
+      </form>
+
+      <!-- Reset Password Form -->
+      <form id="modal-reset-form" class="modal-form" style="display: none;">
+        <div class="form-group">
+          <label for="modal-reset-email" class="form-label">Registered Email Address</label>
+          <input type="email" id="modal-reset-email" class="form-input" placeholder="you@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="modal-reset-username" class="form-label">Your Card Username Handle (/c/)</label>
+          <div class="username-input-wrap">
+            <span class="input-prefix">/c/</span>
+            <input type="text" id="modal-reset-username" class="form-input username-field" placeholder="yourhandle" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="modal-reset-password" class="form-label">New Password</label>
+          <input type="password" id="modal-reset-password" class="form-input" placeholder="Minimum 6 characters" minlength="6" required>
+        </div>
+
+        <div class="form-group">
+          <label for="modal-reset-confirm" class="form-label">Confirm New Password</label>
+          <input type="password" id="modal-reset-confirm" class="form-input" placeholder="Re-type new password" minlength="6" required>
+        </div>
+
+        <button type="submit" class="btn-modal-submit" id="modal-reset-submit-btn">
+          <span>Reset Password & Sign In 🔑</span>
+        </button>
+
+        <div style="text-align: center; margin-top: 12px; font-size: 13px; color: var(--dash-text-muted);">
+          Remembered your password? <button type="button" id="modal-reset-back-btn" style="background:none;border:none;color:var(--dash-text);font-weight:700;text-decoration:underline;cursor:pointer;">Sign In instead</button>
+        </div>
       </form>
 
     </div>

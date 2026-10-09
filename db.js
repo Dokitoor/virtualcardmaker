@@ -405,6 +405,55 @@ async function uploadPhotoToStorage(fileBuffer, originalName, mimeType) {
   return publicUrlData.publicUrl;
 }
 
+// Reset password by verifying email and username
+async function resetUserPassword(email, username, newPassword) {
+  const cleanEmail = (email || '').trim().toLowerCase();
+  const cleanUsername = (username || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+
+  if (!cleanEmail || !cleanUsername || !newPassword) {
+    throw new Error('Email, username, and new password are required.');
+  }
+  if (newPassword.length < 6) {
+    throw new Error('New password must be at least 6 characters.');
+  }
+
+  // Find user by email
+  const user = await findUserByEmail(cleanEmail);
+  if (!user) {
+    throw new Error('No account found with this email address.');
+  }
+
+  // Verify username matches
+  if (user.username.toLowerCase() !== cleanUsername) {
+    throw new Error('The username does not match the registered email address.');
+  }
+
+  const newHash = hashPassword(newPassword);
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('users')
+      .update({ password_hash: newHash })
+      .eq('id', user.id)
+      .select('*')
+      .maybeSingle();
+
+    if (error) {
+      throw new Error('Database error updating password: ' + error.message);
+    }
+  }
+
+  // Local fallback
+  const localDb = loadLocalDB();
+  const userIndex = localDb.users.findIndex(u => u.id === user.id);
+  if (userIndex !== -1) {
+    localDb.users[userIndex].passwordHash = newHash;
+    saveLocalDB(localDb);
+  }
+
+  return user;
+}
+
 module.exports = {
   hashPassword,
   createSession,
@@ -415,8 +464,10 @@ module.exports = {
   findUserByIdentifier,
   findUserById,
   createUser,
+  resetUserPassword,
   getCardByUsername,
   getCardByUserId,
   updateCard,
   uploadPhotoToStorage
 };
+

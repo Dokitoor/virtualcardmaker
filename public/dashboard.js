@@ -604,6 +604,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (directPortfolioBtn) directPortfolioBtn.href = '#';
       }
     }
+
+    const previewQrImg = document.getElementById('preview-card-qr-img');
+    if (previewQrImg) {
+      const uname = (currentUser && currentUser.username) || (previewUsernameTag ? previewUsernameTag.textContent.trim() : 'you') || 'you';
+      const cardUrl = `${window.location.origin}/c/${uname}`;
+      previewQrImg.src = `/api/qr?data=${encodeURIComponent(cardUrl)}`;
+    }
   }
 
   // Flip controls for native 3D card preview
@@ -942,17 +949,49 @@ document.addEventListener('DOMContentLoaded', async () => {
       modalTabRegister.classList.remove('active');
       modalLoginForm.style.display = 'flex';
       modalRegisterForm.style.display = 'none';
+      const modalResetForm = document.getElementById('modal-reset-form');
+      if (modalResetForm) modalResetForm.style.display = 'none';
+    } else if (tab === 'reset') {
+      modalTabLogin.classList.remove('active');
+      modalTabRegister.classList.remove('active');
+      modalLoginForm.style.display = 'none';
+      modalRegisterForm.style.display = 'none';
+      const modalResetForm = document.getElementById('modal-reset-form');
+      if (modalResetForm) modalResetForm.style.display = 'flex';
     } else {
       modalTabRegister.classList.add('active');
       modalTabLogin.classList.remove('active');
       modalRegisterForm.style.display = 'flex';
       modalLoginForm.style.display = 'none';
+      const modalResetForm = document.getElementById('modal-reset-form');
+      if (modalResetForm) modalResetForm.style.display = 'none';
     }
   }
 
   if (authModalClose) authModalClose.onclick = closeAuthModal;
   if (modalTabRegister) modalTabRegister.onclick = () => switchModalTab('register');
   if (modalTabLogin) modalTabLogin.onclick = () => switchModalTab('login');
+
+  const modalShowResetBtn = document.getElementById('modal-show-reset-btn');
+  const modalResetBackBtn = document.getElementById('modal-reset-back-btn');
+  if (modalShowResetBtn) {
+    modalShowResetBtn.addEventListener('click', () => {
+      const loginId = document.getElementById('modal-login-identifier');
+      const resetEmail = document.getElementById('modal-reset-email');
+      const resetUser = document.getElementById('modal-reset-username');
+      if (loginId && resetEmail && !resetEmail.value) {
+        if (loginId.value.includes('@')) {
+          resetEmail.value = loginId.value.trim();
+        } else if (resetUser && !resetUser.value) {
+          resetUser.value = loginId.value.trim();
+        }
+      }
+      switchModalTab('reset');
+    });
+  }
+  if (modalResetBackBtn) {
+    modalResetBackBtn.addEventListener('click', () => switchModalTab('login'));
+  }
 
   if (modalRegUsername) {
     modalRegUsername.addEventListener('input', () => {
@@ -1052,6 +1091,73 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  const modalResetForm = document.getElementById('modal-reset-form');
+  if (modalResetForm) {
+    modalResetForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideModalAlert();
+
+      const email = document.getElementById('modal-reset-email').value.trim();
+      const username = document.getElementById('modal-reset-username').value.trim().toLowerCase();
+      const newPassword = document.getElementById('modal-reset-password').value.trim();
+      const confirmPassword = document.getElementById('modal-reset-confirm').value.trim();
+
+      if (!email || !username || !newPassword) {
+        showModalAlert('Email, card username handle, and new password are required.');
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        showModalAlert('Password must be at least 6 characters.');
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        showModalAlert('New passwords do not match. Please re-enter.');
+        return;
+      }
+
+      const submitBtn = document.getElementById('modal-reset-submit-btn');
+      try {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span>Resetting Password... ⏳</span>';
+        }
+        const res = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, username, newPassword })
+        });
+        let data;
+        try {
+          data = await res.json();
+        } catch {
+          throw new Error(`Server returned an unexpected response (${res.status}). Please try again.`);
+        }
+        if (!res.ok) throw new Error(data.error || 'Password reset failed.');
+
+        token = data.token;
+        localStorage.setItem('card_token', token);
+        localStorage.setItem('card_user', JSON.stringify(data.user));
+        currentUser = data.user;
+        isLoggedIn = true;
+
+        showModalAlert('Password reset! Updating your card...', false);
+        await savePublishedCard();
+        closeAuthModal();
+        syncAuthStateUI();
+        showToast(`🎉 Password reset! Welcome back, ${currentUser.username}.`);
+      } catch (err) {
+        showModalAlert(err.message);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Reset Password & Sign In 🔑</span>';
+        }
+      }
+    });
+  }
+
   async function savePublishedCard() {
     const formData = new FormData();
     formData.append('fullName', editFullName ? editFullName.value : '');
@@ -1104,6 +1210,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (step10ShowLoginBtn && step10ShowRegisterBtn) {
     step10ShowLoginBtn.addEventListener('click', () => {
+      const step10ResetBox = document.getElementById('step10-reset-box');
+      if (step10ResetBox) step10ResetBox.style.display = 'none';
       step10RegisterBox.style.display = 'none';
       step10LoginBox.style.display = 'block';
       const regEmailEl = document.getElementById('step10-reg-email');
@@ -1119,6 +1227,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     step10ShowRegisterBtn.addEventListener('click', () => {
+      const step10ResetBox = document.getElementById('step10-reset-box');
+      if (step10ResetBox) step10ResetBox.style.display = 'none';
       step10LoginBox.style.display = 'none';
       step10RegisterBox.style.display = 'block';
       if (step10MainTitle) step10MainTitle.textContent = 'Create your account to publish';
@@ -1127,6 +1237,47 @@ document.addEventListener('DOMContentLoaded', async () => {
       const step10Alert = document.getElementById('step10-auth-alert');
       if (step10Alert) step10Alert.style.display = 'none';
     });
+
+    const step10ShowResetBtn = document.getElementById('step10-show-reset-btn');
+    const step10ResetBackBtn = document.getElementById('step10-reset-back-btn');
+    if (step10ShowResetBtn) {
+      step10ShowResetBtn.addEventListener('click', () => {
+        const step10ResetBox = document.getElementById('step10-reset-box');
+        step10LoginBox.style.display = 'none';
+        step10RegisterBox.style.display = 'none';
+        if (step10ResetBox) step10ResetBox.style.display = 'block';
+
+        const logIdEl = document.getElementById('step10-login-identifier');
+        const resetEmailEl = document.getElementById('step10-reset-email');
+        const resetUserEl = document.getElementById('step10-reset-username');
+        if (logIdEl && resetEmailEl && !resetEmailEl.value) {
+          if (logIdEl.value.includes('@')) {
+            resetEmailEl.value = logIdEl.value.trim();
+          } else if (resetUserEl && !resetUserEl.value) {
+            resetUserEl.value = logIdEl.value.trim();
+          }
+        }
+        if (step10MainTitle) step10MainTitle.textContent = 'Reset your password';
+        if (step10MainSub) step10MainSub.textContent = 'Enter your registered email and username handle to set a new password.';
+        if (saveCardBtn) saveCardBtn.innerHTML = '<span>Reset Password & Publish Live 🚀</span>';
+        const step10Alert = document.getElementById('step10-auth-alert');
+        if (step10Alert) step10Alert.style.display = 'none';
+      });
+    }
+
+    if (step10ResetBackBtn) {
+      step10ResetBackBtn.addEventListener('click', () => {
+        const step10ResetBox = document.getElementById('step10-reset-box');
+        if (step10ResetBox) step10ResetBox.style.display = 'none';
+        step10RegisterBox.style.display = 'none';
+        step10LoginBox.style.display = 'block';
+        if (step10MainTitle) step10MainTitle.textContent = 'Sign in to publish your card';
+        if (step10MainSub) step10MainSub.textContent = 'Sign in with your Meetme account to publish your card changes.';
+        if (saveCardBtn) saveCardBtn.innerHTML = '<span>Sign In & Publish Live 🚀</span>';
+        const step10Alert = document.getElementById('step10-auth-alert');
+        if (step10Alert) step10Alert.style.display = 'none';
+      });
+    }
   }
 
   if (step10RegUsername && step10UsernamePreview) {
@@ -1151,7 +1302,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      const isLoginMode = step10RegisterBox && step10RegisterBox.style.display === 'none';
+      const step10ResetBox = document.getElementById('step10-reset-box');
+      const isResetMode = step10ResetBox && step10ResetBox.style.display !== 'none';
+      const isLoginMode = step10LoginBox && step10LoginBox.style.display !== 'none';
       const step10Alert = document.getElementById('step10-auth-alert');
 
       function showStep10Alert(msg, isErr = true) {
@@ -1163,7 +1316,69 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (step10Alert) step10Alert.style.display = 'none';
 
-      if (isLoginMode) {
+      if (isResetMode) {
+        const resetEmailEl = document.getElementById('step10-reset-email');
+        const resetUserEl = document.getElementById('step10-reset-username');
+        const resetPassEl = document.getElementById('step10-reset-password');
+        const resetConfEl = document.getElementById('step10-reset-confirm');
+
+        const email = (resetEmailEl ? resetEmailEl.value : '').trim();
+        const username = (resetUserEl ? resetUserEl.value : '').trim().toLowerCase();
+        const newPassword = (resetPassEl ? resetPassEl.value : '').trim();
+        const confirmPassword = (resetConfEl ? resetConfEl.value : '').trim();
+
+        if (!email || !username || !newPassword) {
+          showStep10Alert('Registered email, username handle, and new password are required.');
+          return;
+        }
+
+        if (newPassword.length < 6) {
+          showStep10Alert('Password must be at least 6 characters.');
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          showStep10Alert('New passwords do not match. Please re-enter.');
+          return;
+        }
+
+        try {
+          if (saveCardBtn) {
+            saveCardBtn.disabled = true;
+            saveCardBtn.innerHTML = '<span>Resetting Password & Publishing... ⏳</span>';
+          }
+          const res = await fetch('/api/auth/reset-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, username, newPassword })
+          });
+          let data;
+          try {
+            data = await res.json();
+          } catch {
+            throw new Error(`Server returned an unexpected response (${res.status}). Please try again.`);
+          }
+          if (!res.ok) throw new Error(data.error || 'Password reset failed.');
+
+          token = data.token;
+          localStorage.setItem('card_token', token);
+          localStorage.setItem('card_user', JSON.stringify(data.user));
+          currentUser = data.user;
+          isLoggedIn = true;
+
+          await savePublishedCard();
+          syncAuthStateUI();
+          showToast(`🎉 Password reset! Card published live at /c/${currentUser.username}`);
+          window.location.href = `/c/${currentUser.username}`;
+        } catch (err) {
+          showStep10Alert(err.message);
+          if (saveCardBtn) {
+            saveCardBtn.disabled = false;
+            saveCardBtn.innerHTML = '<span>Reset Password & Publish Live 🚀</span>';
+          }
+        }
+        return;
+      } else if (isLoginMode) {
         const logIdEl = document.getElementById('step10-login-identifier');
         const logPassEl = document.getElementById('step10-login-password');
         const identifier = (logIdEl ? logIdEl.value : '').trim();
