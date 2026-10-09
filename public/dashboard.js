@@ -59,10 +59,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let currentUser = null;
   let currentCard = null;
+  let userCards = [];
+  let currentCardId = null;
   let isLoggedIn = false;
   let toastTimeout = null;
   let draftPhotoUrl = null;
   let currentStep = 1;
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
   const totalSteps = 10;
 
   const stageNames = [
@@ -337,7 +349,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (res.ok) {
           const data = await res.json();
           currentUser = data.user;
-          currentCard = data.card;
+          userCards = Array.isArray(data.cards) ? data.cards : (data.card ? [data.card] : []);
+          
+          // Select saved card or first card
+          const savedCardId = localStorage.getItem('active_card_id');
+          const foundSaved = userCards.find(c => c.id === savedCardId);
+          currentCard = foundSaved || (userCards.length > 0 ? userCards[0] : data.card);
+          currentCardId = currentCard ? currentCard.id : null;
+          if (currentCardId) localStorage.setItem('active_card_id', currentCardId);
+
           isLoggedIn = true;
         } else {
           localStorage.removeItem('card_token');
@@ -348,6 +368,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
     syncAuthStateUI();
+    renderCardSwitcherUI();
     emitLiveUpdate();
   }
 
@@ -356,20 +377,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (isLoggedIn && currentUser) {
       userDisplayEmail.textContent = currentUser.email;
       logoutBtn.textContent = 'Logout';
-      previewUsernameTag.textContent = currentUser.username;
 
-      const fullVanityUrl = `${window.location.origin}/c/${currentUser.username}`;
+      const activeHandle = (currentCard && currentCard.username) || currentUser.username;
+      previewUsernameTag.textContent = activeHandle;
+
+      const fullVanityUrl = `${window.location.origin}/c/${activeHandle}`;
       vanityUrlLink.href = fullVanityUrl;
       vanityUrlLink.textContent = fullVanityUrl;
       openLiveBtn.href = fullVanityUrl;
 
       saveCardBtn.innerHTML = '<span>Save & Publish Changes 🚀</span>';
-      liveCardIframe.src = `/c/${currentUser.username}`;
+      liveCardIframe.src = `/c/${activeHandle}`;
       populateForm(currentCard);
     } else {
       userDisplayEmail.textContent = '⚡ DRAFT MODE (Unpublished)';
       logoutBtn.textContent = 'Sign In / Register';
       previewUsernameTag.textContent = 'yourname';
+      renderCardSwitcherUI();
 
       const draftVanityUrl = `${window.location.origin}/c/yourname`;
       vanityUrlLink.href = '#';
@@ -1179,6 +1203,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       formData.append('photoUrl', draftPhotoUrl);
     }
 
+    if (currentCard && currentCard.id) {
+      formData.append('cardId', currentCard.id);
+    }
+
     const res = await fetch('/api/card', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` },
@@ -1192,6 +1220,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     if (!res.ok) throw new Error(data.error || 'Failed to save card');
     currentCard = data.card;
+    currentCardId = currentCard.id;
+    if (currentCardId) localStorage.setItem('active_card_id', currentCardId);
+
+    // Update in userCards array
+    const idx = userCards.findIndex(c => c.id === currentCard.id);
+    if (idx !== -1) {
+      userCards[idx] = currentCard;
+    } else {
+      userCards.unshift(currentCard);
+    }
+    renderCardSwitcherUI();
+
     localStorage.removeItem('card_draft');
     return currentCard;
   }
@@ -1495,8 +1535,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       await savePublishedCard();
       showToast('🎉 Card published successfully!');
-      if (liveCardIframe && currentUser) {
-        liveCardIframe.src = `/c/${currentUser.username}?t=` + Date.now();
+      const targetHandle = (currentCard && currentCard.username) || (currentUser && currentUser.username) || '';
+      if (liveCardIframe && targetHandle) {
+        liveCardIframe.src = `/c/${targetHandle}?t=` + Date.now();
       }
     } catch (err) {
       showToast('❌ Submission Error: ' + err.message);
@@ -1507,6 +1548,176 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
   });
+
+  // --------------------------------------------------------------------------
+  // MULTI-CARD SWITCHER & NEW CONFERENCE CARD CREATION LOGIC
+  // --------------------------------------------------------------------------
+  const cardSwitcherWrap = document.getElementById('card-switcher-wrap');
+  const cardSwitcherBtn = document.getElementById('card-switcher-btn');
+  const cardSwitcherDropdown = document.getElementById('card-switcher-dropdown');
+  const switcherCurrentTitle = document.getElementById('switcher-current-title');
+  const cardSwitcherList = document.getElementById('card-switcher-list');
+  const cardCountBadge = document.getElementById('card-count-badge');
+  const openNewCardModalBtn = document.getElementById('open-new-card-modal-btn');
+  const newCardModal = document.getElementById('new-card-modal');
+  const newCardModalClose = document.getElementById('new-card-modal-close');
+  const newCardForm = document.getElementById('new-card-form');
+  const newCardAlert = document.getElementById('new-card-alert');
+  const newCardUsername = document.getElementById('new-card-username');
+  const newCardUsernamePreview = document.getElementById('new-card-username-preview');
+
+  function renderCardSwitcherUI() {
+    if (!cardSwitcherWrap) return;
+
+    if (!isLoggedIn || !userCards || userCards.length === 0) {
+      cardSwitcherWrap.style.display = 'none';
+      return;
+    }
+
+    cardSwitcherWrap.style.display = 'inline-flex';
+    if (cardCountBadge) cardCountBadge.textContent = userCards.length;
+
+    const active = currentCard || userCards[0];
+    if (switcherCurrentTitle) {
+      switcherCurrentTitle.textContent = active.editionMark || active.fullName || `/c/${active.username}`;
+    }
+
+    if (cardSwitcherList) {
+      cardSwitcherList.innerHTML = '';
+      userCards.forEach(c => {
+        const item = document.createElement('div');
+        const isActive = c.id === (currentCard ? currentCard.id : null);
+        item.className = 'card-switcher-item' + (isActive ? ' active' : '');
+        item.innerHTML = `
+          <div class="card-switcher-item-left">
+            <span class="card-switcher-item-name">${escapeHtml(c.editionMark || c.fullName || 'Conference Card')}</span>
+            <span class="card-switcher-item-url">/c/${escapeHtml(c.username)}</span>
+          </div>
+          ${isActive ? '<span class="card-switcher-item-tag">ACTIVE</span>' : ''}
+        `;
+        item.onclick = () => {
+          selectActiveCard(c);
+          if (cardSwitcherDropdown) cardSwitcherDropdown.style.display = 'none';
+        };
+        cardSwitcherList.appendChild(item);
+      });
+    }
+  }
+
+  function selectActiveCard(card) {
+    currentCard = card;
+    currentCardId = card.id;
+    if (card.id) localStorage.setItem('active_card_id', card.id);
+    populateForm(card);
+    syncAuthStateUI();
+    renderCardSwitcherUI();
+    emitLiveUpdate();
+    showToast(`Switched to: ${card.editionMark || card.username}`);
+  }
+
+  if (cardSwitcherBtn && cardSwitcherDropdown) {
+    cardSwitcherBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = cardSwitcherDropdown.style.display === 'block';
+      cardSwitcherDropdown.style.display = isVisible ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', (e) => {
+      if (cardSwitcherWrap && !cardSwitcherWrap.contains(e.target)) {
+        cardSwitcherDropdown.style.display = 'none';
+      }
+    });
+  }
+
+  if (openNewCardModalBtn && newCardModal) {
+    openNewCardModalBtn.addEventListener('click', () => {
+      if (cardSwitcherDropdown) cardSwitcherDropdown.style.display = 'none';
+      if (newCardAlert) newCardAlert.style.display = 'none';
+      if (newCardForm) newCardForm.reset();
+      if (newCardUsernamePreview) newCardUsernamePreview.textContent = 'yourname-event';
+      newCardModal.style.display = 'flex';
+    });
+  }
+
+  if (newCardModalClose && newCardModal) {
+    newCardModalClose.addEventListener('click', () => {
+      newCardModal.style.display = 'none';
+    });
+  }
+
+  if (newCardUsername && newCardUsernamePreview) {
+    newCardUsername.addEventListener('input', (e) => {
+      const clean = e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '');
+      newCardUsernamePreview.textContent = clean || 'yourname-event';
+    });
+  }
+
+  if (newCardForm) {
+    newCardForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const eventName = document.getElementById('new-card-event').value.trim();
+      const username = newCardUsername.value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+      const role = document.getElementById('new-card-role').value.trim();
+      const copyDetails = document.getElementById('new-card-copy-details').checked;
+      const submitBtn = document.getElementById('new-card-submit-btn');
+
+      function showNewCardAlert(msg, isErr = true) {
+        if (!newCardAlert) return;
+        newCardAlert.textContent = msg;
+        newCardAlert.className = 'modal-alert ' + (isErr ? 'alert-error' : 'alert-success');
+        newCardAlert.style.display = 'block';
+      }
+
+      if (!eventName || !username) {
+        showNewCardAlert('Event name and custom link are required.');
+        return;
+      }
+
+      try {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span>Creating Card... ⏳</span>';
+        }
+
+        const payload = {
+          username,
+          editionMark: eventName,
+          roleTitle: role || (currentCard ? currentCard.roleTitle : ''),
+          copyFromCardId: (copyDetails && currentCard) ? currentCard.id : null
+        };
+
+        const res = await fetch('/api/cards', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        let data;
+        try {
+          data = await res.json();
+        } catch {
+          throw new Error(`Server returned an unexpected response (${res.status}). Please try again.`);
+        }
+
+        if (!res.ok) throw new Error(data.error || 'Failed to create conference card.');
+
+        newCardModal.style.display = 'none';
+        userCards = data.cards || [data.card, ...userCards];
+        selectActiveCard(data.card);
+        showToast(`🎉 New card created for ${eventName}! Public link: /c/${data.card.username}`);
+      } catch (err) {
+        showNewCardAlert(err.message);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Create & Launch Card 🚀</span>';
+        }
+      }
+    });
+  }
 
   // Init Theme & Auth State & Wizard Step 1
   initTheme();

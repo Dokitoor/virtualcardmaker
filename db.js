@@ -335,6 +335,40 @@ async function getCardByUsername(username) {
   return db.cards.find(c => c.username.toLowerCase() === clean) || null;
 }
 
+async function getCardsByUserId(userId) {
+  if (!userId) return [];
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('cards')
+      .select('*')
+      .eq('user_id', userId)
+      .order('updated_at', { ascending: false });
+    if (!error && Array.isArray(data)) {
+      return data.map(cardFromRow);
+    }
+  }
+
+  const db = loadLocalDB();
+  return (db.cards || []).filter(c => c.userId === userId);
+}
+
+async function getCardById(cardId) {
+  if (!cardId) return null;
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('cards')
+      .select('*')
+      .eq('id', cardId)
+      .maybeSingle();
+    if (!error && data) return cardFromRow(data);
+  }
+
+  const db = loadLocalDB();
+  return (db.cards || []).find(c => c.id === cardId) || null;
+}
+
 async function getCardByUserId(userId) {
   if (!userId) return null;
 
@@ -343,31 +377,109 @@ async function getCardByUserId(userId) {
       .from('cards')
       .select('*')
       .eq('user_id', userId)
-      .maybeSingle();
-    if (!error && data) return cardFromRow(data);
+      .order('updated_at', { ascending: false })
+      .limit(1);
+    if (!error && data && data.length > 0) return cardFromRow(data[0]);
   }
 
   const db = loadLocalDB();
   return db.cards.find(c => c.userId === userId) || null;
 }
 
-async function updateCard(userId, updates) {
+async function createCardForUser(userId, cardData = {}) {
+  if (!userId) throw new Error('User ID is required');
+
+  const cleanUsername = (cardData.username || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+  if (!cleanUsername || cleanUsername.length < 3) {
+    throw new Error('Card username handle must be at least 3 characters (letters, numbers, underscores, hyphens).');
+  }
+
+  // Check if vanity username is already claimed
+  const existing = await getCardByUsername(cleanUsername);
+  if (existing) {
+    throw new Error(`The card link "/c/${cleanUsername}" is already taken. Please choose another vanity handle.`);
+  }
+
+  const now = new Date().toISOString();
+  const cardId = 'card_' + crypto.randomUUID();
+
+  const newCard = {
+    id: cardId,
+    userId,
+    username: cleanUsername,
+    fullName: cardData.fullName || '',
+    roleTitle: cardData.roleTitle || '',
+    positioningStatement: cardData.positioningStatement || '',
+    capabilities: Array.isArray(cardData.capabilities) ? cardData.capabilities : [],
+    editionMark: cardData.editionMark || 'CONFERENCE PASS 2026',
+    brandSubmark: cardData.brandSubmark || (cleanUsername.toUpperCase() + '—PASS'),
+    photoUrl: cardData.photoUrl || '',
+    email: cardData.email || '',
+    phone: cardData.phone || '',
+    whatsapp: cardData.whatsapp || '',
+    linkedinUrl: cardData.linkedinUrl || '',
+    portfolioUrl: cardData.portfolioUrl || '',
+    theme: cardData.theme || 'terracotta',
+    updatedAt: now
+  };
+
+  if (supabase) {
+    const { error } = await supabase.from('cards').insert({
+      id: cardId,
+      user_id: userId,
+      username: cleanUsername,
+      full_name: newCard.fullName,
+      role_title: newCard.roleTitle,
+      positioning_statement: newCard.positioningStatement,
+      capabilities: newCard.capabilities,
+      edition_mark: newCard.editionMark,
+      brand_submark: newCard.brandSubmark,
+      photo_url: newCard.photoUrl,
+      email: newCard.email,
+      phone: newCard.phone,
+      whatsapp: newCard.whatsapp,
+      linkedin_url: newCard.linkedinUrl,
+      portfolio_url: newCard.portfolioUrl,
+      theme: newCard.theme,
+      updated_at: now
+    });
+    if (error) throw new Error(error.message);
+    return newCard;
+  }
+
+  const db = loadLocalDB();
+  db.cards = db.cards || [];
+  db.cards.push(newCard);
+  saveLocalDB(db);
+  return newCard;
+}
+
+async function updateCard(userId, updates, cardId = null) {
   if (!userId) return null;
+
+  const targetCardId = cardId || updates.cardId || updates.id;
 
   if (supabase) {
     const rowUpdates = cardToRow(userId, updates);
-    const { data, error } = await supabase
-      .from('cards')
-      .update(rowUpdates)
-      .eq('user_id', userId)
-      .select('*')
-      .maybeSingle();
-    if (!error && data) return cardFromRow(data);
+    let query = supabase.from('cards').update(rowUpdates);
+    if (targetCardId) {
+      query = query.eq('id', targetCardId).eq('user_id', userId);
+    } else {
+      query = query.eq('user_id', userId);
+    }
+    const { data, error } = await query.select('*').order('updated_at', { ascending: false }).limit(1);
+    if (!error && data && data.length > 0) return cardFromRow(data[0]);
   }
 
   // Local fallback
   const db = loadLocalDB();
-  const cardIndex = db.cards.findIndex(c => c.userId === userId);
+  let cardIndex = -1;
+  if (targetCardId) {
+    cardIndex = db.cards.findIndex(c => c.id === targetCardId && c.userId === userId);
+  }
+  if (cardIndex === -1) {
+    cardIndex = db.cards.findIndex(c => c.userId === userId);
+  }
   if (cardIndex === -1) return null;
 
   db.cards[cardIndex] = {
@@ -378,6 +490,33 @@ async function updateCard(userId, updates) {
 
   saveLocalDB(db);
   return db.cards[cardIndex];
+}
+
+async function deleteCard(cardId, userId) {
+  if (!cardId || !userId) throw new Error('Card ID and User ID are required');
+
+  const userCards = await getCardsByUserId(userId);
+  if (userCards.length <= 1) {
+    throw new Error('You cannot delete your only card. You must maintain at least one digital card.');
+  }
+
+  const cardToDelete = userCards.find(c => c.id === cardId);
+  if (!cardToDelete) throw new Error('Card not found or access denied.');
+
+  if (supabase) {
+    const { error } = await supabase
+      .from('cards')
+      .delete()
+      .eq('id', cardId)
+      .eq('user_id', userId);
+    if (error) throw new Error(error.message);
+    return true;
+  }
+
+  const db = loadLocalDB();
+  db.cards = (db.cards || []).filter(c => !(c.id === cardId && c.userId === userId));
+  saveLocalDB(db);
+  return true;
 }
 
 // Upload portrait buffer directly to Supabase Storage (public 'avatars' bucket)
@@ -467,7 +606,11 @@ module.exports = {
   resetUserPassword,
   getCardByUsername,
   getCardByUserId,
+  getCardsByUserId,
+  getCardById,
+  createCardForUser,
   updateCard,
+  deleteCard,
   uploadPhotoToStorage
 };
 

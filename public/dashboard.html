@@ -31,13 +31,43 @@
       <span class="dash-badge">CARD BUILDER</span>
     </div>
 
-    <!-- Center Share URL Banner -->
-    <div class="dash-vanity-pill" id="vanity-share-box">
-      <span class="vanity-dot"></span>
-      <span class="vanity-label">PUBLIC LINK:</span>
-      <a href="#" id="vanity-url-link" target="_blank" class="vanity-url-display">Loading URL...</a>
-      <button id="copy-url-btn" class="btn-copy-sm" type="button">Copy</button>
-      <a href="#" id="open-live-btn" target="_blank" class="btn-open-sm">View ↗</a>
+    <!-- Center Share URL Banner & Multi-Card Switcher -->
+    <div style="display: flex; align-items: center; gap: 8px;">
+      
+      <!-- Multi-Card Conference Switcher -->
+      <div class="card-switcher-wrap" id="card-switcher-wrap" style="display: none;">
+        <button type="button" class="card-switcher-btn" id="card-switcher-btn" title="Switch or create conference cards">
+          <span class="switcher-dot"></span>
+          <span class="switcher-card-title" id="switcher-current-title">My Card</span>
+          <span class="switcher-arrow">▼</span>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div class="card-switcher-dropdown" id="card-switcher-dropdown" style="display: none;">
+          <div class="card-switcher-dropdown-header">
+            <span>YOUR DIGITAL CARDS</span>
+            <span class="card-count-badge" id="card-count-badge">1</span>
+          </div>
+          <div class="card-switcher-list" id="card-switcher-list">
+            <!-- Dynamically populated cards -->
+          </div>
+          <div class="card-switcher-footer">
+            <button type="button" class="btn-create-another-card" id="open-new-card-modal-btn">
+              <span>➕ New Conference Card</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center Share URL Banner -->
+      <div class="dash-vanity-pill" id="vanity-share-box">
+        <span class="vanity-dot"></span>
+        <span class="vanity-label">PUBLIC LINK:</span>
+        <a href="#" id="vanity-url-link" target="_blank" class="vanity-url-display">Loading URL...</a>
+        <button id="copy-url-btn" class="btn-copy-sm" type="button">Copy</button>
+        <a href="#" id="open-live-btn" target="_blank" class="btn-open-sm">View ↗</a>
+      </div>
+
     </div>
 
     <!-- Right Controls: Theme Toggle, Sample Profile Randomizer & User Auth -->
@@ -698,6 +728,57 @@
         </div>
       </form>
 
+    </div>
+  </div>
+
+  <!-- Modal: Create Another Conference Card -->
+  <div class="dash-modal-overlay" id="new-card-modal" style="display: none;">
+    <div class="dash-modal-content" style="max-width: 480px;">
+      <button class="dash-modal-close" id="new-card-modal-close" aria-label="Close modal">&times;</button>
+      
+      <div class="modal-header">
+        <div style="display: inline-block; padding: 3px 10px; background: rgba(224, 90, 71, 0.12); border-radius: 99px; color: #E05A47; font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 8px;">
+          CONFERENCE & EVENT PASS
+        </div>
+        <h3 class="modal-title">Create Another Digital Card</h3>
+        <p class="modal-sub">Attending another conference or event? Create a tailored 3D digital card with its own vanity link, theme, and event badge.</p>
+      </div>
+
+      <div id="new-card-alert" class="modal-alert" style="display: none;"></div>
+
+      <form id="new-card-form" class="modal-form">
+        <div class="form-group">
+          <label for="new-card-event" class="form-label">Event / Conference Name</label>
+          <input type="text" id="new-card-event" class="form-input" placeholder="e.g. FIGMA CONFIG 2026, ETHTOKYO, AFROTECH" required>
+          <span class="form-hint">Displayed on the edition mark of your card (e.g. PASS 02 // CONFIG 2026)</span>
+        </div>
+
+        <div class="form-group">
+          <label for="new-card-username" class="form-label">Choose Your Custom Card Link</label>
+          <div class="username-input-wrap">
+            <span class="input-prefix">/c/</span>
+            <input type="text" id="new-card-username" class="form-input username-field" placeholder="yourname-event" pattern="[a-zA-Z0-9_-]{3,20}" required>
+          </div>
+          <span class="form-hint">Your public share link: <strong>virtualcard.com/c/<span id="new-card-username-preview">yourname-event</span></strong></span>
+        </div>
+
+        <div class="form-group">
+          <label for="new-card-role" class="form-label">Role or Title for This Event (Optional)</label>
+          <input type="text" id="new-card-role" class="form-input" placeholder="e.g. Keynote Speaker / Lead Designer">
+        </div>
+
+        <div class="form-group" style="margin-top: 8px;">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--dash-text);">
+            <input type="checkbox" id="new-card-copy-details" checked style="width: 16px; height: 16px; accent-color: var(--accent-primary, #E05A47);">
+            <span>Copy contact details, bio & photo from my current card</span>
+          </label>
+          <span class="form-hint" style="margin-left: 24px;">Pre-fills your photo, email, phone, and links so you don't have to start from scratch.</span>
+        </div>
+
+        <button type="submit" class="btn-modal-submit" id="new-card-submit-btn">
+          <span>Create & Launch Card 🚀</span>
+        </button>
+      </form>
     </div>
   </div>
 

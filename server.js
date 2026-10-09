@@ -163,23 +163,123 @@ apiRouter.post('/auth/reset-password', async (req, res) => {
   }
 });
 
-// Get Current User & Card Details
+// Get Current User & Card Details (returns all user cards)
 apiRouter.get('/me', requireAuth, async (req, res) => {
   try {
-    const card = await db.getCardByUserId(req.user.id);
+    const cards = await db.getCardsByUserId(req.user.id);
+    const activeCard = cards.length > 0 ? cards[0] : null;
     res.json({
       user: { id: req.user.id, email: req.user.email, username: req.user.username },
-      card
+      cards,
+      card: activeCard
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Update Card Details & Photo Upload
+// Get All Cards Belonging to Authenticated User
+apiRouter.get('/cards', requireAuth, async (req, res) => {
+  try {
+    const cards = await db.getCardsByUserId(req.user.id);
+    res.json({ cards });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Create Another Card for Another Event or Conference
+apiRouter.post('/cards', requireAuth, async (req, res) => {
+  try {
+    const {
+      username,
+      editionMark,
+      roleTitle,
+      fullName,
+      positioningStatement,
+      capabilities,
+      brandSubmark,
+      photoUrl,
+      email,
+      phone,
+      whatsapp,
+      linkedinUrl,
+      portfolioUrl,
+      theme,
+      copyFromCardId
+    } = req.body;
+
+    let initialData = {};
+
+    if (copyFromCardId) {
+      const sourceCard = await db.getCardById(copyFromCardId);
+      if (sourceCard && sourceCard.userId === req.user.id) {
+        initialData = {
+          fullName: sourceCard.fullName,
+          roleTitle: sourceCard.roleTitle,
+          positioningStatement: sourceCard.positioningStatement,
+          capabilities: sourceCard.capabilities,
+          photoUrl: sourceCard.photoUrl,
+          email: sourceCard.email,
+          phone: sourceCard.phone,
+          whatsapp: sourceCard.whatsapp,
+          linkedinUrl: sourceCard.linkedinUrl,
+          portfolioUrl: sourceCard.portfolioUrl,
+          theme: sourceCard.theme
+        };
+      }
+    }
+
+    if (fullName) initialData.fullName = fullName;
+    if (roleTitle) initialData.roleTitle = roleTitle;
+    if (positioningStatement) initialData.positioningStatement = positioningStatement;
+    if (capabilities) initialData.capabilities = capabilities;
+    if (editionMark) initialData.editionMark = editionMark;
+    if (brandSubmark) initialData.brandSubmark = brandSubmark;
+    if (photoUrl) initialData.photoUrl = photoUrl;
+    if (email) initialData.email = email;
+    if (phone) initialData.phone = phone;
+    if (whatsapp) initialData.whatsapp = whatsapp;
+    if (linkedinUrl) initialData.linkedinUrl = linkedinUrl;
+    if (portfolioUrl) initialData.portfolioUrl = portfolioUrl;
+    if (theme) initialData.theme = theme;
+
+    initialData.username = username;
+
+    const newCard = await db.createCardForUser(req.user.id, initialData);
+    const allCards = await db.getCardsByUserId(req.user.id);
+
+    res.json({
+      message: 'New conference card created successfully! 🎉',
+      card: newCard,
+      cards: allCards
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Delete a Specific Conference Card (requires user to maintain at least 1 card)
+apiRouter.delete('/cards/:cardId', requireAuth, async (req, res) => {
+  try {
+    const cardId = req.params.cardId;
+    await db.deleteCard(cardId, req.user.id);
+    const remainingCards = await db.getCardsByUserId(req.user.id);
+    res.json({
+      message: 'Card deleted successfully.',
+      cards: remainingCards,
+      activeCard: remainingCards[0] || null
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Update Card Details & Photo Upload (supports specific cardId)
 apiRouter.post('/card', requireAuth, upload.single('photo'), async (req, res) => {
   try {
     const {
+      cardId,
       fullName,
       roleTitle,
       positioningStatement,
@@ -235,7 +335,7 @@ apiRouter.post('/card', requireAuth, upload.single('photo'), async (req, res) =>
       updates.photoUrl = req.body.photoUrl;
     }
 
-    const updatedCard = await db.updateCard(req.user.id, updates);
+    const updatedCard = await db.updateCard(req.user.id, updates, cardId || null);
     res.json({ message: 'Card updated successfully!', card: updatedCard });
   } catch (err) {
     res.status(500).json({ error: err.message });
