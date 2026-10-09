@@ -593,6 +593,135 @@ async function resetUserPassword(email, username, newPassword) {
   return user;
 }
 
+// Generate a 6-digit email verification OTP for password reset
+async function createPasswordResetCode(email) {
+  const cleanEmail = (email || '').trim().toLowerCase();
+  if (!cleanEmail) throw new Error('Email address is required.');
+
+  const user = await findUserByEmail(cleanEmail);
+  if (!user) {
+    throw new Error('No account found with this email address.');
+  }
+
+  // 6-digit numeric OTP code
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const resetId = 'reset_' + crypto.randomUUID();
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 mins
+
+  if (supabase) {
+    // Invalidate existing unused codes for this email
+    await supabase.from('password_resets').update({ used: true }).eq('email', cleanEmail).eq('used', false);
+
+    const { error } = await supabase.from('password_resets').insert({
+      id: resetId,
+      email: cleanEmail,
+      code,
+      expires_at: expiresAt,
+      used: false
+    });
+    if (error) console.warn('Supabase password_resets insert notice:', error.message);
+  }
+
+  // Local fallback
+  const localDb = loadLocalDB();
+  if (!localDb.passwordResets) localDb.passwordResets = [];
+  localDb.passwordResets.forEach(r => {
+    if (r.email === cleanEmail) r.used = true;
+  });
+  localDb.passwordResets.push({
+    id: resetId,
+    email: cleanEmail,
+    code,
+    expiresAt,
+    used: false
+  });
+  saveLocalDB(localDb);
+
+  return { code, user, expiresAt };
+}
+
+// Verify email OTP and update password
+async function verifyAndResetPassword(email, code, newPassword) {
+  const cleanEmail = (email || '').trim().toLowerCase();
+  const cleanCode = (code || '').trim();
+
+  if (!cleanEmail || !cleanCode || !newPassword) {
+    throw new Error('Email, verification code, and new password are required.');
+  }
+  if (newPassword.length < 6) {
+    throw new Error('New password must be at least 6 characters.');
+  }
+
+  const user = await findUserByEmail(cleanEmail);
+  if (!user) {
+    throw new Error('No account found with this email address.');
+  }
+
+  let isValid = false;
+  const now = new Date();
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('password_resets')
+      .select('*')
+      .eq('email', cleanEmail)
+      .eq('code', cleanCode)
+      .eq('used', false)
+      .gt('expires_at', now.toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (!error && data && data.length > 0) {
+      isValid = true;
+      // Mark code as used
+      await supabase.from('password_resets').update({ used: true }).eq('id', data[0].id);
+    }
+  }
+
+  if (!isValid) {
+    // Check local fallback
+    const localDb = loadLocalDB();
+    const resets = localDb.passwordResets || [];
+    const record = resets.find(r => 
+      r.email === cleanEmail && 
+      r.code === cleanCode && 
+      !r.used && 
+      new Date(r.expiresAt) > now
+    );
+    if (record) {
+      isValid = true;
+      record.used = true;
+      saveLocalDB(localDb);
+    }
+  }
+
+  if (!isValid) {
+    throw new Error('Invalid or expired verification code. Please request a new code.');
+  }
+
+  const newHash = hashPassword(newPassword);
+
+  if (supabase) {
+    const { error } = await supabase
+      .from('users')
+      .update({ password_hash: newHash })
+      .eq('id', user.id);
+    if (error) {
+      throw new Error('Database error updating password: ' + error.message);
+    }
+  }
+
+  // Local fallback
+  const localDb = loadLocalDB();
+  const userIndex = localDb.users.findIndex(u => u.id === user.id);
+  if (userIndex !== -1) {
+    localDb.users[userIndex].passwordHash = newHash;
+    saveLocalDB(localDb);
+  }
+
+  return user;
+}
+
 // Change password for authenticated user
 async function changeUserPassword(userId, currentPassword, newPassword) {
   if (!userId || !currentPassword || !newPassword) {
@@ -646,6 +775,8 @@ module.exports = {
   findUserById,
   createUser,
   resetUserPassword,
+  createPasswordResetCode,
+  verifyAndResetPassword,
   changeUserPassword,
   getCardByUsername,
   getCardByUserId,

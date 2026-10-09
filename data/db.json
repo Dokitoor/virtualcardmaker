@@ -200,5 +200,14 @@
       "userId": "usr_1791462967002_5f64",
       "createdAt": "2026-10-08T12:36:07.013Z"
     }
-  }
+  },
+  "passwordResets": [
+    {
+      "id": "reset_d6718295-5bc2-48ea-aa75-c0381683d952",
+      "email": "oluseyi@example.com",
+      "code": "845317",
+      "expiresAt": "2026-10-09T17:01:19.165Z",
+      "used": false
+    }
+  ]
 }

@@ -6,6 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const QRCode = require('qrcode');
 const db = require('./db');
+const emailService = require('./emailService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -96,6 +97,14 @@ apiRouter.post('/auth/register', async (req, res) => {
     const { user, card } = await db.createUser(email, cleanUsername, password);
     const token = db.createSession(user.id);
 
+    // Send Welcome Email Notification (fire & forget, does not block response)
+    const appUrl = `${req.protocol}://${req.get('host')}`;
+    emailService.sendWelcomeEmail({
+      email: user.email,
+      username: user.username,
+      appUrl
+    }).catch(err => console.warn('Welcome email notice:', err.message));
+
     res.json({
       message: 'Account created successfully!',
       token,
@@ -144,13 +153,56 @@ apiRouter.post('/auth/logout', requireAuth, (req, res) => {
   res.json({ message: 'Logged out successfully.' });
 });
 
-// Reset Password (Verify registered email and username)
+// Step 1: Request Password Reset Code (Sends email verification OTP)
+apiRouter.post('/auth/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Please enter your registered email address.' });
+    }
+
+    const { code, user } = await db.createPasswordResetCode(email);
+
+    // Send Password Reset OTP email
+    await emailService.sendPasswordResetOtpEmail({
+      email: user.email,
+      username: user.username,
+      code
+    });
+
+    res.json({
+      message: `A 6-digit verification code has been sent to ${user.email}. Please check your inbox.`,
+      email: user.email
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message || 'Failed to process password reset request.' });
+  }
+});
+
+// Step 2: Verify Email Code and Set New Password
 apiRouter.post('/auth/reset-password', async (req, res) => {
   try {
-    const { email, username, newPassword } = req.body;
-    const user = await db.resetUserPassword(email, username, newPassword);
+    const { email, code, newPassword, username } = req.body;
+
+    let user;
+    if (code) {
+      // Standard email verification code flow
+      user = await db.verifyAndResetPassword(email, code, newPassword);
+    } else {
+      // Fallback for legacy
+      user = await db.resetUserPassword(email, username, newPassword);
+    }
+
     const token = db.createSession(user.id);
     const card = await db.getCardByUserId(user.id);
+
+    // Send confirmation email
+    const appUrl = `${req.protocol}://${req.get('host')}`;
+    emailService.sendPasswordChangedEmail({
+      email: user.email,
+      username: user.username,
+      appUrl
+    }).catch(err => console.warn('Password changed email notice:', err.message));
 
     res.json({
       message: 'Password reset successfully! You are now logged in.',

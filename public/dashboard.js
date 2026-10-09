@@ -1399,26 +1399,86 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const step10ShowResetBtn = document.getElementById('step10-show-reset-btn');
     const step10ResetBackBtn = document.getElementById('step10-reset-back-btn');
+    const step10SendCodeBtn = document.getElementById('step10-send-code-btn');
+    const step10ResendCodeBtn = document.getElementById('step10-resend-code-btn');
+    const step10ResetStep1 = document.getElementById('step10-reset-step1');
+    const step10ResetStep2 = document.getElementById('step10-reset-step2');
+
+    async function handleStep10SendCode() {
+      const resetEmailEl = document.getElementById('step10-reset-email');
+      const email = (resetEmailEl ? resetEmailEl.value : '').trim();
+      const step10Alert = document.getElementById('step10-auth-alert');
+
+      function showStep10Alert(msg, isErr = true) {
+        if (!step10Alert) return;
+        step10Alert.textContent = msg;
+        step10Alert.className = 'modal-alert ' + (isErr ? 'alert-error' : 'alert-success');
+        step10Alert.style.display = 'block';
+      }
+
+      if (!email) {
+        showStep10Alert('Please enter your registered email address.');
+        return;
+      }
+
+      try {
+        if (step10SendCodeBtn) {
+          step10SendCodeBtn.disabled = true;
+          step10SendCodeBtn.innerHTML = '<span>Sending Code... ⏳</span>';
+        }
+        if (step10ResendCodeBtn) step10ResendCodeBtn.disabled = true;
+
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        let data;
+        try {
+          data = await res.json();
+        } catch {
+          throw new Error(`Server returned an unexpected response (${res.status}). Please try again.`);
+        }
+
+        if (!res.ok) throw new Error(data.error || 'Failed to send verification code.');
+
+        showStep10Alert(`✓ Verification code sent to ${email}! Enter it below.`, false);
+        if (step10ResetStep1) step10ResetStep1.style.display = 'none';
+        if (step10ResetStep2) step10ResetStep2.style.display = 'block';
+        const codeEl = document.getElementById('step10-reset-code');
+        if (codeEl) codeEl.focus();
+      } catch (err) {
+        showStep10Alert(err.message);
+      } finally {
+        if (step10SendCodeBtn) {
+          step10SendCodeBtn.disabled = false;
+          step10SendCodeBtn.innerHTML = '<span>Send Verification Code ✉️</span>';
+        }
+        if (step10ResendCodeBtn) step10ResendCodeBtn.disabled = false;
+      }
+    }
+
+    if (step10SendCodeBtn) step10SendCodeBtn.addEventListener('click', handleStep10SendCode);
+    if (step10ResendCodeBtn) step10ResendCodeBtn.addEventListener('click', handleStep10SendCode);
+
     if (step10ShowResetBtn) {
       step10ShowResetBtn.addEventListener('click', () => {
         const step10ResetBox = document.getElementById('step10-reset-box');
         step10LoginBox.style.display = 'none';
         step10RegisterBox.style.display = 'none';
         if (step10ResetBox) step10ResetBox.style.display = 'block';
+        if (step10ResetStep1) step10ResetStep1.style.display = 'block';
+        if (step10ResetStep2) step10ResetStep2.style.display = 'none';
 
         const logIdEl = document.getElementById('step10-login-identifier');
         const resetEmailEl = document.getElementById('step10-reset-email');
-        const resetUserEl = document.getElementById('step10-reset-username');
-        if (logIdEl && resetEmailEl && !resetEmailEl.value) {
-          if (logIdEl.value.includes('@')) {
-            resetEmailEl.value = logIdEl.value.trim();
-          } else if (resetUserEl && !resetUserEl.value) {
-            resetUserEl.value = logIdEl.value.trim();
-          }
+        if (logIdEl && resetEmailEl && !resetEmailEl.value && logIdEl.value.includes('@')) {
+          resetEmailEl.value = logIdEl.value.trim();
         }
         if (step10MainTitle) step10MainTitle.textContent = 'Reset your password';
-        if (step10MainSub) step10MainSub.textContent = 'Enter your registered email and username handle to set a new password.';
-        if (saveCardBtn) saveCardBtn.innerHTML = '<span>Reset Password & Publish Live 🚀</span>';
+        if (step10MainSub) step10MainSub.textContent = 'Enter your registered email to receive a 6-digit verification code.';
+        if (saveCardBtn) saveCardBtn.innerHTML = '<span>Verify Code & Publish Live 🚀</span>';
         const step10Alert = document.getElementById('step10-auth-alert');
         if (step10Alert) step10Alert.style.display = 'none';
       });
@@ -1477,17 +1537,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (isResetMode) {
         const resetEmailEl = document.getElementById('step10-reset-email');
-        const resetUserEl = document.getElementById('step10-reset-username');
+        const resetCodeEl = document.getElementById('step10-reset-code');
         const resetPassEl = document.getElementById('step10-reset-password');
         const resetConfEl = document.getElementById('step10-reset-confirm');
 
         const email = (resetEmailEl ? resetEmailEl.value : '').trim();
-        const username = (resetUserEl ? resetUserEl.value : '').trim().toLowerCase();
+        const code = (resetCodeEl ? resetCodeEl.value : '').trim();
         const newPassword = (resetPassEl ? resetPassEl.value : '').trim();
         const confirmPassword = (resetConfEl ? resetConfEl.value : '').trim();
 
-        if (!email || !username || !newPassword) {
-          showStep10Alert('Registered email, username handle, and new password are required.');
+        if (!email) {
+          showStep10Alert('Registered email address is required.');
+          return;
+        }
+
+        if (!code || code.length !== 6) {
+          showStep10Alert('Please click "Send Verification Code" and enter the 6-digit code sent to your email.');
           return;
         }
 
@@ -1504,12 +1569,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
           if (saveCardBtn) {
             saveCardBtn.disabled = true;
-            saveCardBtn.innerHTML = '<span>Resetting Password & Publishing... ⏳</span>';
+            saveCardBtn.innerHTML = '<span>Verifying Code & Publishing... ⏳</span>';
           }
           const res = await fetch('/api/auth/reset-password', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, username, newPassword })
+            body: JSON.stringify({ email, code, newPassword })
           });
           let data;
           try {
@@ -1531,7 +1596,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           showStep10Alert(err.message);
           if (saveCardBtn) {
             saveCardBtn.disabled = false;
-            saveCardBtn.innerHTML = '<span>Reset Password & Publish Live 🚀</span>';
+            saveCardBtn.innerHTML = '<span>Verify Code & Publish Live 🚀</span>';
           }
         }
         return;

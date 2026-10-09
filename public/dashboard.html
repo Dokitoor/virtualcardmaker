@@ -481,32 +481,44 @@
               </div>
             </div>
 
-            <!-- Reset Password Box -->
+            <!-- Reset Password Box (2-Step Email Verification) -->
             <div class="step-single-field" id="step10-reset-box" style="display: none;">
-              <div class="form-group">
-                <label for="step10-reset-email" class="form-label">Registered Email Address</label>
-                <input type="email" id="step10-reset-email" class="form-input" placeholder="you@example.com">
-              </div>
-
-              <div class="form-group">
-                <label for="step10-reset-username" class="form-label">Your Card Username Handle (/c/)</label>
-                <div class="username-input-wrap">
-                  <span class="input-prefix">/c/</span>
-                  <input type="text" id="step10-reset-username" class="form-input username-field" placeholder="yourname">
+              <!-- Step 10 Reset Step 1: Request Code -->
+              <div id="step10-reset-step1">
+                <div class="form-group">
+                  <label for="step10-reset-email" class="form-label">Registered Email Address</label>
+                  <input type="email" id="step10-reset-email" class="form-input" placeholder="you@example.com">
+                  <span class="form-hint">Enter your email and we'll send a 6-digit verification code to reset your password.</span>
                 </div>
+                <button type="button" id="step10-send-code-btn" class="btn-wizard-next" style="width: 100%; margin-top: 10px; justify-content: center;">
+                  <span>Send Verification Code ✉️</span>
+                </button>
               </div>
 
-              <div class="form-group">
-                <label for="step10-reset-password" class="form-label">New Password</label>
-                <input type="password" id="step10-reset-password" class="form-input" placeholder="Minimum 6 characters" minlength="6">
+              <!-- Step 10 Reset Step 2: Code & New Password -->
+              <div id="step10-reset-step2" style="display: none;">
+                <div class="form-group">
+                  <label for="step10-reset-code" class="form-label">6-Digit Verification Code</label>
+                  <input type="text" id="step10-reset-code" class="form-input" placeholder="e.g. 849201" pattern="[0-9]{6}" maxlength="6" style="letter-spacing: 0.25em; font-size: 18px; font-weight: 700; text-align: center;">
+                  <span class="form-hint">Check your email inbox for the 6-digit code. Valid for 15 minutes.</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="step10-reset-password" class="form-label">New Password</label>
+                  <input type="password" id="step10-reset-password" class="form-input" placeholder="Minimum 6 characters" minlength="6">
+                </div>
+
+                <div class="form-group">
+                  <label for="step10-reset-confirm" class="form-label">Confirm New Password</label>
+                  <input type="password" id="step10-reset-confirm" class="form-input" placeholder="Re-type new password" minlength="6">
+                </div>
+
+                <p style="text-align: center; margin: 4px 0 0 0; font-size: 12.5px; color: var(--dash-text-muted);">
+                  Didn't receive code? <button type="button" id="step10-resend-code-btn" style="background:none;border:none;color:var(--dash-text);font-weight:700;text-decoration:underline;cursor:pointer;">Resend Code</button>
+                </p>
               </div>
 
-              <div class="form-group">
-                <label for="step10-reset-confirm" class="form-label">Confirm New Password</label>
-                <input type="password" id="step10-reset-confirm" class="form-input" placeholder="Re-type new password" minlength="6">
-              </div>
-
-              <div style="text-align: center; margin-top: 6px; font-size: 13px; color: var(--dash-text-muted);">
+              <div style="text-align: center; margin-top: 10px; font-size: 13px; color: var(--dash-text-muted);">
                 Remembered your password? <button type="button" id="step10-reset-back-btn" style="background:none;border:none;color:var(--dash-text);font-weight:700;text-decoration:underline;cursor:pointer;">Sign In instead</button>
               </div>
             </div>
