@@ -163,6 +163,18 @@ apiRouter.post('/auth/reset-password', async (req, res) => {
   }
 });
 
+// Change Password for Authenticated User (Dashboard Settings)
+apiRouter.post('/auth/change-password', requireAuth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    await db.changeUserPassword(req.user.id, currentPassword, newPassword);
+    res.json({ message: 'Password updated successfully!' });
+  } catch (err) {
+    res.status(400).json({ error: err.message || 'Failed to update password.' });
+  }
+});
+
+
 // Get Current User & Card Details (returns all user cards)
 apiRouter.get('/me', requireAuth, async (req, res) => {
   try {

@@ -593,6 +593,48 @@ async function resetUserPassword(email, username, newPassword) {
   return user;
 }
 
+// Change password for authenticated user
+async function changeUserPassword(userId, currentPassword, newPassword) {
+  if (!userId || !currentPassword || !newPassword) {
+    throw new Error('Current password and new password are required.');
+  }
+  if (newPassword.length < 6) {
+    throw new Error('New password must be at least 6 characters.');
+  }
+
+  const user = await findUserById(userId);
+  if (!user) {
+    throw new Error('User not found.');
+  }
+
+  if (user.passwordHash !== hashPassword(currentPassword)) {
+    throw new Error('Current password is incorrect.');
+  }
+
+  const newHash = hashPassword(newPassword);
+
+  if (supabase) {
+    const { error } = await supabase
+      .from('users')
+      .update({ password_hash: newHash })
+      .eq('id', userId);
+
+    if (error) {
+      throw new Error('Database error updating password: ' + error.message);
+    }
+  }
+
+  // Local fallback
+  const localDb = loadLocalDB();
+  const userIndex = localDb.users.findIndex(u => u.id === userId);
+  if (userIndex !== -1) {
+    localDb.users[userIndex].passwordHash = newHash;
+    saveLocalDB(localDb);
+  }
+
+  return true;
+}
+
 module.exports = {
   hashPassword,
   createSession,
@@ -604,6 +646,7 @@ module.exports = {
   findUserById,
   createUser,
   resetUserPassword,
+  changeUserPassword,
   getCardByUsername,
   getCardByUserId,
   getCardsByUserId,
@@ -613,4 +656,5 @@ module.exports = {
   deleteCard,
   uploadPhotoToStorage
 };
+
 

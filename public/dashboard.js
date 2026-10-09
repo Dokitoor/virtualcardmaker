@@ -31,16 +31,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   const avatarPreviewImg = document.getElementById('avatar-preview-img');
   const themeOptionsGrid = document.getElementById('theme-options-grid');
 
-  // Modal Elements
-  const authModal = document.getElementById('auth-modal');
-  const authModalClose = document.getElementById('auth-modal-close');
-  const modalTabRegister = document.getElementById('modal-tab-register');
-  const modalTabLogin = document.getElementById('modal-tab-login');
-  const modalRegisterForm = document.getElementById('modal-register-form');
-  const modalLoginForm = document.getElementById('modal-login-form');
-  const modalAuthAlert = document.getElementById('modal-auth-alert');
-  const modalRegUsername = document.getElementById('modal-reg-username');
-  const modalUsernamePreview = document.getElementById('modal-username-preview');
+  // View Switcher & Settings Elements
+  const tabBtnCards = document.getElementById('tab-btn-cards');
+  const tabBtnBuilder = document.getElementById('tab-btn-builder');
+  const tabBtnSettings = document.getElementById('tab-btn-settings');
+  const builderBackToCardsBtn = document.getElementById('builder-back-to-cards-btn');
+  const homeNewCardBtn = document.getElementById('home-new-card-btn');
+  const btnQuickCreateCard = document.getElementById('btn-quick-create-card');
+  const emptyStateCreateBtn = document.getElementById('empty-state-create-btn');
+  const builderActiveCardName = document.getElementById('builder-active-card-name');
+  const settingsPasswordForm = document.getElementById('settings-password-form');
+  const settingsPassAlert = document.getElementById('settings-pass-alert');
+  const settingsSavePassBtn = document.getElementById('settings-save-pass-btn');
+  const settingsThemeBtn = document.getElementById('settings-theme-toggle-btn');
+  const settingsLogoutBtn = document.getElementById('settings-logout-btn');
 
   // Input Fields
   const editFullName = document.getElementById('edit-fullName');
@@ -359,18 +363,25 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (currentCardId) localStorage.setItem('active_card_id', currentCardId);
 
           isLoggedIn = true;
+          switchDashboardView('cards');
         } else {
           localStorage.removeItem('card_token');
           token = null;
+          switchDashboardView('builder');
         }
       } catch {
         token = null;
+        switchDashboardView('builder');
       }
+    } else {
+      switchDashboardView('builder');
     }
     syncAuthStateUI();
     renderCardSwitcherUI();
+    renderDashboardCardsGrid();
     emitLiveUpdate();
   }
+
 
   // Update UI for Auth State
   function syncAuthStateUI() {
@@ -938,249 +949,357 @@ document.addEventListener('DOMContentLoaded', async () => {
       isLoggedIn = false;
       currentUser = null;
       currentCard = null;
+      userCards = [];
       token = null;
       syncAuthStateUI();
-      showToast('Logged out.');
+      renderDashboardCardsGrid();
+      switchDashboardView('builder');
+      goToStep(1);
+      showToast('Logged out successfully.');
     } else {
-      openAuthModal();
+      switchDashboardView('builder');
+      goToStep(10);
     }
   });
 
-  function openAuthModal(defaultTab = 'register') {
-    if (!authModal) return;
-    hideModalAlert();
+  // --------------------------------------------------------------------------
+  // DASHBOARD VIEW SWITCHER & MULTI-VIEW NAVIGATION
+  // --------------------------------------------------------------------------
+  let activeDashboardView = 'cards';
 
-    if (editFullName.value && !modalRegUsername.value) {
-      const suggested = editFullName.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (suggested) {
-        modalRegUsername.value = suggested;
-        modalUsernamePreview.textContent = suggested;
-      }
+  function switchDashboardView(view) {
+    activeDashboardView = view;
+    const viewCards = document.getElementById('view-cards-section');
+    const viewBuilder = document.getElementById('view-builder-section');
+    const viewSettings = document.getElementById('view-settings-section');
+
+    if (viewCards) viewCards.style.display = view === 'cards' ? 'block' : 'none';
+    if (viewBuilder) viewBuilder.style.display = view === 'builder' ? 'block' : 'none';
+    if (viewSettings) viewSettings.style.display = view === 'settings' ? 'block' : 'none';
+
+    if (tabBtnCards) {
+      tabBtnCards.classList.toggle('active', view === 'cards');
+      tabBtnCards.setAttribute('aria-selected', view === 'cards');
+    }
+    if (tabBtnBuilder) {
+      tabBtnBuilder.classList.toggle('active', view === 'builder');
+      tabBtnBuilder.setAttribute('aria-selected', view === 'builder');
+    }
+    if (tabBtnSettings) {
+      tabBtnSettings.classList.toggle('active', view === 'settings');
+      tabBtnSettings.setAttribute('aria-selected', view === 'settings');
     }
 
-    switchModalTab(defaultTab);
-    authModal.style.display = 'flex';
-  }
-
-  function closeAuthModal() {
-    if (authModal) authModal.style.display = 'none';
-  }
-
-  function switchModalTab(tab) {
-    hideModalAlert();
-    if (tab === 'login') {
-      modalTabLogin.classList.add('active');
-      modalTabRegister.classList.remove('active');
-      modalLoginForm.style.display = 'flex';
-      modalRegisterForm.style.display = 'none';
-      const modalResetForm = document.getElementById('modal-reset-form');
-      if (modalResetForm) modalResetForm.style.display = 'none';
-    } else if (tab === 'reset') {
-      modalTabLogin.classList.remove('active');
-      modalTabRegister.classList.remove('active');
-      modalLoginForm.style.display = 'none';
-      modalRegisterForm.style.display = 'none';
-      const modalResetForm = document.getElementById('modal-reset-form');
-      if (modalResetForm) modalResetForm.style.display = 'flex';
-    } else {
-      modalTabRegister.classList.add('active');
-      modalTabLogin.classList.remove('active');
-      modalRegisterForm.style.display = 'flex';
-      modalLoginForm.style.display = 'none';
-      const modalResetForm = document.getElementById('modal-reset-form');
-      if (modalResetForm) modalResetForm.style.display = 'none';
+    if (view === 'cards') {
+      renderDashboardCardsGrid();
+    } else if (view === 'builder') {
+      if (builderActiveCardName && currentCard) {
+        builderActiveCardName.textContent = currentCard.editionMark || currentCard.fullName || `/c/${currentCard.username}`;
+      }
+      emitLiveUpdate();
+      setTimeout(emitLiveUpdate, 200);
+    } else if (view === 'settings') {
+      syncSettingsUI();
     }
   }
 
-  if (authModalClose) authModalClose.onclick = closeAuthModal;
-  if (modalTabRegister) modalTabRegister.onclick = () => switchModalTab('register');
-  if (modalTabLogin) modalTabLogin.onclick = () => switchModalTab('login');
+  function showPublishedSuccessBanner(handle) {
+    const alertBanner = document.getElementById('dash-published-alert');
+    const alertTitle = document.getElementById('published-alert-title');
+    const alertSub = document.getElementById('published-alert-subtitle');
+    const bannerCopyBtn = document.getElementById('banner-copy-btn');
+    const bannerViewBtn = document.getElementById('banner-view-btn');
 
-  const modalShowResetBtn = document.getElementById('modal-show-reset-btn');
-  const modalResetBackBtn = document.getElementById('modal-reset-back-btn');
-  if (modalShowResetBtn) {
-    modalShowResetBtn.addEventListener('click', () => {
-      const loginId = document.getElementById('modal-login-identifier');
-      const resetEmail = document.getElementById('modal-reset-email');
-      const resetUser = document.getElementById('modal-reset-username');
-      if (loginId && resetEmail && !resetEmail.value) {
-        if (loginId.value.includes('@')) {
-          resetEmail.value = loginId.value.trim();
-        } else if (resetUser && !resetUser.value) {
-          resetUser.value = loginId.value.trim();
-        }
-      }
-      switchModalTab('reset');
-    });
-  }
-  if (modalResetBackBtn) {
-    modalResetBackBtn.addEventListener('click', () => switchModalTab('login'));
-  }
+    if (!alertBanner || !handle) return;
+    const fullUrl = `${window.location.origin}/c/${handle}`;
+    alertBanner.style.display = 'flex';
+    if (alertTitle) alertTitle.textContent = `🎉 Your Card (/c/${handle}) is Live!`;
+    if (alertSub) alertSub.textContent = `Anyone can now view your 3D digital card or save your contact info with one tap.`;
 
-  if (modalRegUsername) {
-    modalRegUsername.addEventListener('input', () => {
-      const val = modalRegUsername.value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
-      modalUsernamePreview.textContent = val || 'yourname';
-    });
-  }
-
-  if (modalRegisterForm) {
-    modalRegisterForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      hideModalAlert();
-
-      const email = document.getElementById('modal-reg-email').value;
-      const username = modalRegUsername.value.trim().toLowerCase();
-      const password = document.getElementById('modal-reg-password').value;
-
-      try {
-        const res = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, username, password })
-        });
-        let data;
+    if (bannerCopyBtn) {
+      bannerCopyBtn.onclick = async () => {
         try {
-          data = await res.json();
+          await navigator.clipboard.writeText(fullUrl);
+          showToast(`Copied: ${fullUrl}`);
+          bannerCopyBtn.innerHTML = '<span>✓ Copied!</span>';
+          setTimeout(() => {
+            bannerCopyBtn.innerHTML = '<span>📋 Copy Share Link</span>';
+          }, 2000);
         } catch {
-          throw new Error(`Server returned an unexpected response (${res.status}). Please try again.`);
+          showToast(`Share Link: ${fullUrl}`);
         }
-        if (!res.ok) {
-          if (data.error && data.error.toLowerCase().includes('already registered')) {
-            throw new Error('This email is already registered! Please switch to Sign In.');
-          }
-          if (data.error && data.error.toLowerCase().includes('already taken')) {
-            throw new Error('This username is already taken. Please choose another username.');
-          }
-          throw new Error(data.error || 'Registration failed');
-        }
+      };
+    }
 
-        token = data.token;
-        localStorage.setItem('card_token', token);
-        localStorage.setItem('card_user', JSON.stringify(data.user));
-        currentUser = data.user;
-        isLoggedIn = true;
-
-        showModalAlert('Account created! Publishing your card...', false);
-
-        await savePublishedCard();
-
-        closeAuthModal();
-        syncAuthStateUI();
-        showToast(`🎉 Card published live! Your link is /c/${currentUser.username}`);
-      } catch (err) {
-        showModalAlert(err.message);
-      }
-    });
+    if (bannerViewBtn) {
+      bannerViewBtn.href = fullUrl;
+    }
   }
 
-  if (modalLoginForm) {
-    modalLoginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      hideModalAlert();
+  function renderDashboardCardsGrid() {
+    const gridEl = document.getElementById('dash-cards-grid');
+    const emptyEl = document.getElementById('dash-cards-empty');
+    const statCardCount = document.getElementById('stat-card-count');
+    const cardsBadgeCount = document.getElementById('cards-badge-count');
+    const navCardsCount = document.getElementById('nav-cards-count');
+    const statPrimaryHandle = document.getElementById('stat-primary-handle');
+    const dashGreetingName = document.getElementById('dash-greeting-name');
 
-      const identifier = document.getElementById('modal-login-identifier').value;
-      const password = document.getElementById('modal-login-password').value;
+    const totalCards = userCards ? userCards.length : 0;
+    if (statCardCount) statCardCount.textContent = totalCards;
+    if (cardsBadgeCount) cardsBadgeCount.textContent = totalCards;
+    if (navCardsCount) navCardsCount.textContent = totalCards;
 
-      try {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: identifier, password })
+    const displayName = (currentUser && currentUser.username) || (currentCard && currentCard.fullName) || 'there';
+    if (dashGreetingName) dashGreetingName.textContent = displayName;
+
+    const primaryHandle = (currentUser && currentUser.username) || (currentCard && currentCard.username) || '';
+    if (statPrimaryHandle) statPrimaryHandle.textContent = primaryHandle ? `/c/${primaryHandle}` : '—';
+
+    if (!gridEl) return;
+
+    if (totalCards === 0) {
+      gridEl.innerHTML = '';
+      if (emptyEl) emptyEl.style.display = 'block';
+      return;
+    }
+
+    if (emptyEl) emptyEl.style.display = 'none';
+    gridEl.innerHTML = '';
+
+    userCards.forEach(card => {
+      const tile = document.createElement('div');
+      tile.className = 'dash-card-tile';
+
+      const themeName = (card.theme || 'terracotta').toLowerCase();
+      const editionText = card.editionMark || 'DIGITAL PASS';
+      const userFullName = card.fullName || card.username || 'Conference Pass';
+      const userRole = card.roleTitle || 'Attendee';
+      const userBio = card.positioningStatement || 'Connecting and Networking';
+      const fullLink = `${window.location.origin}/c/${card.username}`;
+
+      const avatarMarkup = card.photoUrl
+        ? `<img src="${escapeHtml(card.photoUrl)}" alt="${escapeHtml(userFullName)}" class="tile-avatar-img">`
+        : `<span>${escapeHtml(userFullName.substring(0, 2).toUpperCase())}</span>`;
+
+      tile.innerHTML = `
+        <div class="dash-card-tile-top">
+          <div class="tile-badges-wrap">
+            <span class="tile-edition-badge">${escapeHtml(editionText)}</span>
+            <span class="tile-theme-pill theme-pill-${escapeHtml(themeName)}">${escapeHtml(themeName)}</span>
+          </div>
+          <span style="display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; color:#10B981;">
+            <span style="width:6px; height:6px; border-radius:50%; background:#10B981;"></span> LIVE
+          </span>
+        </div>
+
+        <div class="dash-card-tile-body">
+          <div class="tile-profile-header">
+            <div class="tile-avatar-box">
+              ${avatarMarkup}
+            </div>
+            <div class="tile-info-block">
+              <h3 class="tile-user-name">${escapeHtml(userFullName)}</h3>
+              <p class="tile-user-role">${escapeHtml(userRole)}</p>
+            </div>
+          </div>
+
+          <p class="tile-user-bio">${escapeHtml(userBio)}</p>
+
+          <div class="tile-link-bar">
+            <a href="${fullLink}" target="_blank" class="tile-link-url">/c/${escapeHtml(card.username)}</a>
+            <button type="button" class="btn-mini-copy" data-link="${fullLink}">Copy</button>
+          </div>
+        </div>
+
+        <div class="dash-card-tile-actions">
+          <button type="button" class="btn-tile-action btn-tile-copy" data-link="${fullLink}">
+            <span>📋 Copy Link</span>
+          </button>
+          <a href="${fullLink}" target="_blank" class="btn-tile-action btn-tile-view">
+            <span>View ↗</span>
+          </a>
+          <button type="button" class="btn-tile-action btn-tile-edit" data-card-id="${escapeHtml(card.id)}">
+            <span>Edit Card ✏️</span>
+          </button>
+          ${userCards.length > 1 ? `
+            <button type="button" class="btn-tile-action btn-tile-delete" data-card-id="${escapeHtml(card.id)}" title="Delete card">
+              <span>🗑️</span>
+            </button>
+          ` : ''}
+        </div>
+      `;
+
+      // Wire Copy Buttons
+      const copyBtns = tile.querySelectorAll('[data-link]');
+      copyBtns.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const link = btn.getAttribute('data-link');
+          try {
+            await navigator.clipboard.writeText(link);
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<span>✓ Copied!</span>';
+            btn.style.color = '#10B981';
+            showToast(`Copied to clipboard: ${link}`);
+            setTimeout(() => {
+              btn.innerHTML = orig;
+              btn.style.color = '';
+            }, 1800);
+          } catch {
+            showToast(`Card link: ${link}`);
+          }
         });
-        let data;
-        try {
-          data = await res.json();
-        } catch {
-          throw new Error(`Server returned an unexpected response (${res.status}). Please try again.`);
-        }
-        if (!res.ok) throw new Error(data.error || 'Invalid email/username or password.');
+      });
 
-        token = data.token;
-        localStorage.setItem('card_token', token);
-        localStorage.setItem('card_user', JSON.stringify(data.user));
-        currentUser = data.user;
-        isLoggedIn = true;
-
-        showModalAlert('Logged in! Updating your card...', false);
-
-        await savePublishedCard();
-
-        closeAuthModal();
-        syncAuthStateUI();
-        showToast(`Welcome back, ${currentUser.username}! Card updated.`);
-      } catch (err) {
-        showModalAlert(err.message);
+      // Wire Edit Button
+      const editBtn = tile.querySelector('.btn-tile-edit');
+      if (editBtn) {
+        editBtn.addEventListener('click', () => {
+          selectActiveCard(card);
+          if (builderActiveCardName) {
+            builderActiveCardName.textContent = card.editionMark || card.fullName || `/c/${card.username}`;
+          }
+          switchDashboardView('builder');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          showToast(`Now editing: ${card.editionMark || card.username} ✏️`);
+        });
       }
+
+      // Wire Delete Button
+      const delBtn = tile.querySelector('.btn-tile-delete');
+      if (delBtn) {
+        delBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          if (!confirm(`Are you sure you want to delete your "${card.editionMark || card.username}" card? This cannot be undone.`)) {
+            return;
+          }
+          try {
+            const res = await fetch(`/api/cards/${card.id}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to delete card.');
+            userCards = data.cards || userCards.filter(c => c.id !== card.id);
+            if (currentCard && currentCard.id === card.id) {
+              currentCard = userCards[0] || null;
+              currentCardId = currentCard ? currentCard.id : null;
+              if (currentCard) populateForm(currentCard);
+            }
+            renderDashboardCardsGrid();
+            renderCardSwitcherUI();
+            showToast('Card deleted successfully.');
+          } catch (err) {
+            showToast('❌ ' + err.message);
+          }
+        });
+      }
+
+      gridEl.appendChild(tile);
     });
   }
 
-  const modalResetForm = document.getElementById('modal-reset-form');
-  if (modalResetForm) {
-    modalResetForm.addEventListener('submit', async (e) => {
+  function syncSettingsUI() {
+    const setMail = document.getElementById('settings-display-email');
+    const setUser = document.getElementById('settings-display-username');
+    const setCount = document.getElementById('settings-display-cards-count');
+    if (setMail && currentUser) setMail.textContent = currentUser.email;
+    if (setUser && currentUser) setUser.textContent = `/c/${currentUser.username}`;
+    if (setCount) setCount.textContent = `${userCards.length} ${userCards.length === 1 ? 'Card' : 'Cards'}`;
+  }
+
+  // View Navigation Listeners
+  if (tabBtnCards) tabBtnCards.addEventListener('click', () => switchDashboardView('cards'));
+  if (tabBtnBuilder) tabBtnBuilder.addEventListener('click', () => switchDashboardView('builder'));
+  if (tabBtnSettings) tabBtnSettings.addEventListener('click', () => switchDashboardView('settings'));
+  if (builderBackToCardsBtn) builderBackToCardsBtn.addEventListener('click', () => switchDashboardView('cards'));
+  if (homeNewCardBtn) homeNewCardBtn.addEventListener('click', () => openNewCardModal());
+  if (btnQuickCreateCard) btnQuickCreateCard.addEventListener('click', () => openNewCardModal());
+  if (emptyStateCreateBtn) emptyStateCreateBtn.addEventListener('click', () => switchDashboardView('builder'));
+
+  function openNewCardModal() {
+    if (!isLoggedIn) {
+      switchDashboardView('builder');
+      goToStep(10);
+      showToast('Please sign in or create an account first.');
+      return;
+    }
+    if (newCardModal) {
+      if (newCardAlert) newCardAlert.style.display = 'none';
+      if (newCardForm) newCardForm.reset();
+      if (newCardUsernamePreview) newCardUsernamePreview.textContent = 'yourname-event';
+      newCardModal.style.display = 'flex';
+    }
+  }
+
+  // Settings Password Change
+  if (settingsPasswordForm) {
+    settingsPasswordForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      hideModalAlert();
+      const currentPassword = document.getElementById('settings-current-pass').value.trim();
+      const newPassword = document.getElementById('settings-new-pass').value.trim();
+      const confirmPassword = document.getElementById('settings-confirm-pass').value.trim();
 
-      const email = document.getElementById('modal-reset-email').value.trim();
-      const username = document.getElementById('modal-reset-username').value.trim().toLowerCase();
-      const newPassword = document.getElementById('modal-reset-password').value.trim();
-      const confirmPassword = document.getElementById('modal-reset-confirm').value.trim();
-
-      if (!email || !username || !newPassword) {
-        showModalAlert('Email, card username handle, and new password are required.');
-        return;
+      function showPassAlert(msg, isErr = true) {
+        if (!settingsPassAlert) return;
+        settingsPassAlert.textContent = msg;
+        settingsPassAlert.className = 'modal-alert ' + (isErr ? 'alert-error' : 'alert-success');
+        settingsPassAlert.style.display = 'block';
       }
 
       if (newPassword.length < 6) {
-        showModalAlert('Password must be at least 6 characters.');
+        showPassAlert('New password must be at least 6 characters.');
         return;
       }
-
       if (newPassword !== confirmPassword) {
-        showModalAlert('New passwords do not match. Please re-enter.');
+        showPassAlert('New passwords do not match. Please verify.');
         return;
       }
 
-      const submitBtn = document.getElementById('modal-reset-submit-btn');
       try {
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.innerHTML = '<span>Resetting Password... ⏳</span>';
+        if (settingsSavePassBtn) {
+          settingsSavePassBtn.disabled = true;
+          settingsSavePassBtn.innerHTML = '<span>Updating Password... ⏳</span>';
         }
-        const res = await fetch('/api/auth/reset-password', {
+        const res = await fetch('/api/auth/change-password', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, username, newPassword })
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ currentPassword, newPassword })
         });
-        let data;
-        try {
-          data = await res.json();
-        } catch {
-          throw new Error(`Server returned an unexpected response (${res.status}). Please try again.`);
-        }
-        if (!res.ok) throw new Error(data.error || 'Password reset failed.');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Password update failed.');
 
-        token = data.token;
-        localStorage.setItem('card_token', token);
-        localStorage.setItem('card_user', JSON.stringify(data.user));
-        currentUser = data.user;
-        isLoggedIn = true;
-
-        showModalAlert('Password reset! Updating your card...', false);
-        await savePublishedCard();
-        closeAuthModal();
-        syncAuthStateUI();
-        showToast(`🎉 Password reset! Welcome back, ${currentUser.username}.`);
+        settingsPasswordForm.reset();
+        showPassAlert('✓ Password updated successfully!', false);
+        showToast('Password changed successfully! 🔑');
       } catch (err) {
-        showModalAlert(err.message);
+        showPassAlert(err.message, true);
       } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = '<span>Reset Password & Sign In 🔑</span>';
+        if (settingsSavePassBtn) {
+          settingsSavePassBtn.disabled = false;
+          settingsSavePassBtn.innerHTML = '<span>Update Password 🔑</span>';
         }
       }
     });
   }
+
+  if (settingsThemeBtn) {
+    settingsThemeBtn.addEventListener('click', () => {
+      const currentTheme = document.body.getAttribute('data-dashboard-theme') || 'light';
+      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+  }
+
+  if (settingsLogoutBtn) {
+    settingsLogoutBtn.addEventListener('click', () => {
+      if (logoutBtn) logoutBtn.click();
+    });
+  }
+
 
   async function savePublishedCard() {
     const formData = new FormData();
@@ -1407,9 +1526,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           isLoggedIn = true;
 
           await savePublishedCard();
-          syncAuthStateUI();
-          showToast(`🎉 Password reset! Card published live at /c/${currentUser.username}`);
-          window.location.href = `/c/${currentUser.username}`;
+          onCardPublishedSuccess(`🎉 Password reset! Card published live.`);
         } catch (err) {
           showStep10Alert(err.message);
           if (saveCardBtn) {
@@ -1453,9 +1570,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           isLoggedIn = true;
 
           await savePublishedCard();
-          syncAuthStateUI();
-          showToast(`🎉 Welcome back, ${currentUser.username}! Card published live.`);
-          window.location.href = `/c/${currentUser.username}`;
+          onCardPublishedSuccess(`🎉 Welcome back, ${currentUser.username}! Card published live.`);
         } catch (err) {
           showStep10Alert(err.message);
           if (saveCardBtn) {
@@ -1513,9 +1628,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           isLoggedIn = true;
 
           await savePublishedCard();
-          syncAuthStateUI();
-          showToast(`🎉 Account created! Card published live at /c/${currentUser.username}`);
-          window.location.href = `/c/${currentUser.username}`;
+          onCardPublishedSuccess(`🎉 Account created! Card published live at /c/${currentUser.username}`);
         } catch (err) {
           showStep10Alert(err.message);
           if (saveCardBtn) {
@@ -1534,11 +1647,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         saveCardBtn.innerHTML = '<span>Publishing... ⏳</span>';
       }
       await savePublishedCard();
-      showToast('🎉 Card published successfully!');
-      const targetHandle = (currentCard && currentCard.username) || (currentUser && currentUser.username) || '';
-      if (liveCardIframe && targetHandle) {
-        liveCardIframe.src = `/c/${targetHandle}?t=` + Date.now();
-      }
+      onCardPublishedSuccess('🎉 Card published successfully! Moved to your dashboard.');
     } catch (err) {
       showToast('❌ Submission Error: ' + err.message);
     } finally {
@@ -1548,6 +1657,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
   });
+
+  function onCardPublishedSuccess(msg) {
+    syncAuthStateUI();
+    renderDashboardCardsGrid();
+    renderCardSwitcherUI();
+    const targetHandle = (currentCard && currentCard.username) || (currentUser && currentUser.username) || '';
+    if (liveCardIframe && targetHandle) {
+      liveCardIframe.src = `/c/${targetHandle}?t=` + Date.now();
+    }
+    switchDashboardView('cards');
+    showPublishedSuccessBanner(targetHandle);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showToast(msg || `🎉 Card published live! Moved to your dashboard.`);
+  }
+
 
   // --------------------------------------------------------------------------
   // MULTI-CARD SWITCHER & NEW CONFERENCE CARD CREATION LOGIC
@@ -1707,6 +1831,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         newCardModal.style.display = 'none';
         userCards = data.cards || [data.card, ...userCards];
         selectActiveCard(data.card);
+        renderDashboardCardsGrid();
+        switchDashboardView('cards');
+        showPublishedSuccessBanner(data.card.username);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         showToast(`🎉 New card created for ${eventName}! Public link: /c/${data.card.username}`);
       } catch (err) {
         showNewCardAlert(err.message);

@@ -29,7 +29,7 @@
   <!-- Top Dashboard Navigation Header -->
   <header class="dashboard-top-nav">
     <div class="dash-brand-wrap">
-      <a href="/" class="dash-auth-logo">
+      <a href="/" class="dash-auth-logo" title="Back to Meetme Home">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <circle cx="7.2" cy="5.2" r="2.2"/>
           <circle cx="16.8" cy="5.2" r="2.2"/>
@@ -37,60 +37,34 @@
         </svg>
         <span class="dash-logo-text">Meetme</span>
       </a>
-      <span class="dash-badge">CARD BUILDER</span>
+      <span class="dash-badge">DASHBOARD</span>
     </div>
 
-    <!-- Center Share URL Banner & Multi-Card Switcher -->
-    <div style="display: flex; align-items: center; gap: 8px;">
-      
-      <!-- Multi-Card Conference Switcher -->
-      <div class="card-switcher-wrap" id="card-switcher-wrap" style="display: none;">
-        <button type="button" class="card-switcher-btn" id="card-switcher-btn" title="Switch or create conference cards">
-          <span class="switcher-dot"></span>
-          <span class="switcher-card-title" id="switcher-current-title">My Card</span>
-          <span class="switcher-arrow">▼</span>
-        </button>
-
-        <!-- Dropdown Menu -->
-        <div class="card-switcher-dropdown" id="card-switcher-dropdown" style="display: none;">
-          <div class="card-switcher-dropdown-header">
-            <span>YOUR DIGITAL CARDS</span>
-            <span class="card-count-badge" id="card-count-badge">1</span>
-          </div>
-          <div class="card-switcher-list" id="card-switcher-list">
-            <!-- Dynamically populated cards -->
-          </div>
-          <div class="card-switcher-footer">
-            <button type="button" class="btn-create-another-card" id="open-new-card-modal-btn">
-              <span>➕ New Conference Card</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Center Share URL Banner -->
-      <div class="dash-vanity-pill" id="vanity-share-box">
-        <span class="vanity-dot"></span>
-        <span class="vanity-label">PUBLIC LINK:</span>
-        <a href="#" id="vanity-url-link" target="_blank" class="vanity-url-display">Loading URL...</a>
-        <button id="copy-url-btn" class="btn-copy-sm" type="button">Copy</button>
-        <a href="#" id="open-live-btn" target="_blank" class="btn-open-sm">View ↗</a>
-      </div>
-
-    </div>
-
-    <!-- Right Controls: Theme Toggle, Sample Profile Randomizer & User Auth -->
-    <div class="dash-controls-wrap">
-      <button id="randomize-profile-btn" class="theme-toggle-btn randomize-btn" type="button" title="Fill out with a sample Nigerian profile across diverse roles">
-        <span>🎲 Sample Profile</span>
+    <!-- Center Navigation Tabs (My Cards / Card Builder / Settings) -->
+    <nav class="dash-view-tabs" role="tablist" aria-label="Dashboard views">
+      <button type="button" class="dash-nav-tab active" id="tab-btn-cards" role="tab" aria-selected="true" title="View all your digital cards">
+        <span class="tab-icon">🎴</span>
+        <span class="tab-label">My Cards</span>
+        <span class="dash-nav-count-badge" id="nav-cards-count">1</span>
       </button>
+      <button type="button" class="dash-nav-tab" id="tab-btn-builder" role="tab" aria-selected="false" title="Customize or create cards in 3D builder">
+        <span class="tab-icon">✏️</span>
+        <span class="tab-label">Card Builder</span>
+      </button>
+      <button type="button" class="dash-nav-tab" id="tab-btn-settings" role="tab" aria-selected="false" title="Account & security settings">
+        <span class="tab-icon">⚙️</span>
+        <span class="tab-label">Settings</span>
+      </button>
+    </nav>
 
+    <!-- Right Controls: Theme Toggle, User Auth & Logout -->
+    <div class="dash-controls-wrap">
       <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" title="Toggle Light/Dark Mode">
         <span id="theme-icon">🌙</span>
         <span id="theme-text">Dark Mode</span>
       </button>
 
-      <div class="user-info-pill">
+      <div class="user-info-pill" id="user-info-pill">
         <span class="user-dot"></span>
         <span id="user-display-email">Loading...</span>
       </div>
@@ -98,8 +72,127 @@
     </div>
   </header>
 
-  <!-- Dashboard Workspace Layout -->
-  <main class="dashboard-workspace">
+  <!-- Main View Container -->
+  <main id="dashboard-main-area">
+
+    <!-- VIEW 1: MY CARDS (DASHBOARD OVERVIEW) -->
+    <section id="view-cards-section" class="dash-view-section">
+      <div class="dash-container">
+
+        <!-- Active / Just-Published Celebratory Banner -->
+        <div class="dash-published-alert" id="dash-published-alert" style="display: none;">
+          <div class="dash-published-left">
+            <span class="dash-published-icon">🎉</span>
+            <div>
+              <div class="dash-published-title" id="published-alert-title">Your Card is Published Live!</div>
+              <div class="dash-published-subtitle" id="published-alert-subtitle">Your 3D digital card is live. Share your link or preview below.</div>
+            </div>
+          </div>
+          <div class="dash-published-actions">
+            <button type="button" class="btn-banner-action btn-banner-copy" id="banner-copy-btn">
+              <span>📋 Copy Share Link</span>
+            </button>
+            <a href="#" target="_blank" class="btn-banner-action btn-banner-view" id="banner-view-btn">
+              <span>View Live ↗</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Dashboard Hero Header -->
+        <div class="dash-home-header">
+          <div class="dash-home-greeting-wrap">
+            <h1 class="dash-home-title">Welcome, <span id="dash-greeting-name">there</span> 👋</h1>
+            <p class="dash-home-sub">Manage your digital passes, copy quick vanity share links, and launch tailored cards for upcoming conferences.</p>
+          </div>
+          <div>
+            <button type="button" class="btn-primary-create-card" id="home-new-card-btn">
+              <span>➕ Create New Conference Card</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats Overview Bar -->
+        <div class="dash-stats-bar">
+          <div class="dash-stat-box">
+            <span class="stat-box-label">Cards Created</span>
+            <span class="stat-box-value" id="stat-card-count">1</span>
+            <span class="stat-box-hint">Active networking passes</span>
+          </div>
+
+          <div class="dash-stat-box">
+            <span class="stat-box-label">Primary Card Link</span>
+            <span class="stat-box-value" id="stat-primary-handle" style="font-size: 19px; word-break: break-all;">/c/...</span>
+            <span class="stat-box-hint">Your public identity URL</span>
+          </div>
+
+          <div class="dash-stat-box">
+            <span class="stat-box-label">Interactions</span>
+            <span class="stat-box-value" style="color: #10B981; font-size: 20px;">🟢 Live & Interactive</span>
+            <span class="stat-box-hint">VCF contact download & 3D tilt active</span>
+          </div>
+        </div>
+
+        <!-- Cards Section Bar -->
+        <div class="dash-section-bar">
+          <h2 class="dash-section-title">
+            <span>Your Digital Cards</span>
+            <span class="dash-section-count" id="cards-badge-count">1</span>
+          </h2>
+          <button type="button" class="btn-create-another-card" id="btn-quick-create-card" style="width: auto; padding: 6px 14px;">
+            <span>➕ New Card</span>
+          </button>
+        </div>
+
+        <!-- Cards Grid Container -->
+        <div class="dash-cards-grid" id="dash-cards-grid">
+          <!-- Dynamically populated card tiles -->
+        </div>
+
+        <!-- Empty State (Fallback if 0 cards) -->
+        <div class="dash-empty-state" id="dash-cards-empty" style="display: none;">
+          <div class="dash-empty-icon">🎴</div>
+          <h3 class="dash-empty-title">No Digital Cards Created Yet</h3>
+          <p class="dash-empty-sub">Create your first 3D digital networking card in minutes using our step-by-step wizard.</p>
+          <button type="button" class="btn-primary-create-card" id="empty-state-create-btn">
+            <span>Create Your First Card 🚀</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIEW 2: CARD BUILDER (10-STEP WIZARD + LIVE 3D PREVIEW) -->
+    <section id="view-builder-section" class="dash-view-section" style="display: none;">
+      
+      <!-- Builder Top Sub-Bar -->
+      <div class="builder-top-bar">
+        <button type="button" class="btn-back-to-cards" id="builder-back-to-cards-btn">
+          <span>← Back to My Cards</span>
+        </button>
+
+        <div class="builder-active-card-pill">
+          Editing: <strong id="builder-active-card-name">My Card</strong>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <!-- Center Share URL Banner -->
+          <div class="dash-vanity-pill" id="vanity-share-box">
+            <span class="vanity-dot"></span>
+            <span class="vanity-label">PUBLIC LINK:</span>
+            <a href="#" id="vanity-url-link" target="_blank" class="vanity-url-display">Loading URL...</a>
+            <button id="copy-url-btn" class="btn-copy-sm" type="button">Copy</button>
+            <a href="#" id="open-live-btn" target="_blank" class="btn-open-sm">View ↗</a>
+          </div>
+
+          <button id="randomize-profile-btn" class="theme-toggle-btn randomize-btn" type="button" title="Fill out with a sample Nigerian profile across diverse roles">
+            <span>🎲 Sample Profile</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dashboard Workspace Layout -->
+      <div class="dashboard-workspace">
+
     
     <!-- LEFT PANEL: MINIMAL INTERACTIVE FORM STAGE -->
     <section class="editor-panel">
@@ -631,114 +724,117 @@
         <iframe id="live-card-iframe" src="about:blank" title="Live Card Preview" class="card-iframe-container" style="display: none;"></iframe>
       </div>
     </section>
+  </div> <!-- closes .dashboard-workspace -->
+</section> <!-- closes #view-builder-section -->
 
-  </main>
+<!-- VIEW 3: SETTINGS VIEW -->
+<section id="view-settings-section" class="dash-view-section" style="display: none;">
+  <div class="dash-container">
+    
+    <div class="dash-home-header" style="margin-bottom: 24px;">
+      <div>
+        <h1 class="dash-home-title">Account & Settings</h1>
+        <p class="dash-home-sub">Manage your security credentials, profile identity, and platform preferences.</p>
+      </div>
+    </div>
 
-  <!-- Toast Notification -->
-  <div class="toast-notification" id="toast-notification" role="status" aria-live="polite">
-    <span class="toast-icon">✓</span>
-    <span class="toast-message" id="toast-message">Changes saved!</span>
-  </div>
-
-  <!-- Auth Modal -->
-  <div class="dash-modal-overlay" id="auth-modal" style="display: none;">
-    <div class="dash-modal-content">
-      <button class="dash-modal-close" id="auth-modal-close" aria-label="Close modal">&times;</button>
+    <div class="dash-settings-grid">
       
-      <div class="modal-header">
-        <h3 class="modal-title">Publish Your 3D Digital Card</h3>
-        <p class="modal-sub">Create a free account or sign in to publish your card and claim your custom share link.</p>
+      <!-- Card 1: Account Profile -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <h3 class="settings-card-title">👤 Account Information</h3>
+          <p class="settings-card-sub">Your registered Meetme profile details.</p>
+        </div>
+        
+        <div class="settings-info-row">
+          <span class="settings-info-label">Email Address</span>
+          <span class="settings-info-val" id="settings-display-email">user@example.com</span>
+        </div>
+        
+        <div class="settings-info-row">
+          <span class="settings-info-label">Primary Username</span>
+          <span class="settings-info-val" id="settings-display-username">/c/...</span>
+        </div>
+
+        <div class="settings-info-row">
+          <span class="settings-info-label">Active Cards</span>
+          <span class="settings-info-val" id="settings-display-cards-count">1 Card</span>
+        </div>
+
+        <div class="settings-info-row">
+          <span class="settings-info-label">Account Plan</span>
+          <span class="settings-info-val" style="color: #10B981;">✓ Pro MVP (Unlimited Cards)</span>
+        </div>
       </div>
 
-      <div class="modal-tabs">
-        <button class="modal-tab-btn active" id="modal-tab-register" type="button">Create Free Account</button>
-        <button class="modal-tab-btn" id="modal-tab-login" type="button">Sign In</button>
+      <!-- Card 2: Security & Password -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <h3 class="settings-card-title">🔒 Change Password</h3>
+          <p class="settings-card-sub">Update your account password safely.</p>
+        </div>
+
+        <div id="settings-pass-alert" class="modal-alert" style="display: none; margin-bottom: 14px;"></div>
+
+        <form id="settings-password-form" class="settings-form">
+          <div class="form-group">
+            <label for="settings-current-pass" class="form-label">Current Password</label>
+            <input type="password" id="settings-current-pass" class="form-input" placeholder="••••••••" required>
+          </div>
+
+          <div class="form-group">
+            <label for="settings-new-pass" class="form-label">New Password</label>
+            <input type="password" id="settings-new-pass" class="form-input" placeholder="Minimum 6 characters" minlength="6" required>
+          </div>
+
+          <div class="form-group">
+            <label for="settings-confirm-pass" class="form-label">Confirm New Password</label>
+            <input type="password" id="settings-confirm-pass" class="form-input" placeholder="Re-type new password" minlength="6" required>
+          </div>
+
+          <button type="submit" class="btn-settings-save" id="settings-save-pass-btn">
+            <span>Update Password 🔑</span>
+          </button>
+        </form>
       </div>
 
-      <div id="modal-auth-alert" class="modal-alert" style="display: none;"></div>
-
-      <!-- Register Form -->
-      <form id="modal-register-form" class="modal-form">
-        <div class="form-group">
-          <label for="modal-reg-email" class="form-label">Email Address</label>
-          <input type="email" id="modal-reg-email" class="form-input" placeholder="you@example.com" required>
+      <!-- Card 3: Display & Session -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <h3 class="settings-card-title">⚙️ Preferences & Session</h3>
+          <p class="settings-card-sub">Theme mode and account sign out.</p>
         </div>
 
-        <div class="form-group">
-          <label for="modal-reg-username" class="form-label">Choose Your Custom Vanity URL</label>
-          <div class="username-input-wrap">
-            <span class="input-prefix">/c/</span>
-            <input type="text" id="modal-reg-username" class="form-input username-field" placeholder="yourname" pattern="[a-zA-Z0-9_-]{3,20}" required>
-          </div>
-          <span class="form-hint">Your public share link: <strong>virtualcard.com/c/<span id="modal-username-preview">yourname</span></strong></span>
+        <div class="settings-info-row">
+          <span class="settings-info-label">Interface Theme</span>
+          <button type="button" id="settings-theme-toggle-btn" class="theme-toggle-btn" style="padding: 6px 12px;">
+            <span id="settings-theme-icon">🌙</span>
+            <span id="settings-theme-text">Toggle Theme</span>
+          </button>
         </div>
 
-        <div class="form-group">
-          <label for="modal-reg-password" class="form-label">Password</label>
-          <input type="password" id="modal-reg-password" class="form-input" placeholder="Minimum 6 characters" minlength="6" required>
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--dash-border, rgba(50, 28, 4, 0.08));">
+          <h4 style="font-size: 14px; font-weight: 700; color: var(--dash-text); margin-bottom: 6px;">Sign Out</h4>
+          <p style="font-size: 12.5px; color: var(--dash-text-muted); margin-bottom: 12px;">Sign out of this session on this browser.</p>
+          <button type="button" id="settings-logout-btn" class="btn-tile-action btn-tile-delete" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #EF4444; color: #EF4444; font-weight: 700; cursor: pointer;">
+            <span>Sign Out of Account 🚪</span>
+          </button>
         </div>
-
-        <button type="submit" class="btn-modal-submit" id="modal-reg-submit-btn">
-          <span>Create Account & Publish Card 🚀</span>
-        </button>
-      </form>
-
-      <!-- Login Form -->
-      <form id="modal-login-form" class="modal-form" style="display: none;">
-        <div class="form-group">
-          <label for="modal-login-identifier" class="form-label">Email Address or Username</label>
-          <input type="text" id="modal-login-identifier" class="form-input" placeholder="e.g. dokitoor or email@example.com" required>
-        </div>
-
-        <div class="form-group">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <label for="modal-login-password" class="form-label" style="margin-bottom: 0;">Password</label>
-            <button type="button" id="modal-show-reset-btn" style="background:none;border:none;color:var(--dash-text-muted);font-size:12px;cursor:pointer;text-decoration:underline;">Forgot Password?</button>
-          </div>
-          <input type="password" id="modal-login-password" class="form-input" placeholder="••••••••" required>
-        </div>
-
-        <button type="submit" class="btn-modal-submit" id="modal-login-submit-btn">
-          <span>Sign In & Publish Card 🔑</span>
-        </button>
-      </form>
-
-      <!-- Reset Password Form -->
-      <form id="modal-reset-form" class="modal-form" style="display: none;">
-        <div class="form-group">
-          <label for="modal-reset-email" class="form-label">Registered Email Address</label>
-          <input type="email" id="modal-reset-email" class="form-input" placeholder="you@example.com" required>
-        </div>
-
-        <div class="form-group">
-          <label for="modal-reset-username" class="form-label">Your Card Username Handle (/c/)</label>
-          <div class="username-input-wrap">
-            <span class="input-prefix">/c/</span>
-            <input type="text" id="modal-reset-username" class="form-input username-field" placeholder="yourhandle" required>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="modal-reset-password" class="form-label">New Password</label>
-          <input type="password" id="modal-reset-password" class="form-input" placeholder="Minimum 6 characters" minlength="6" required>
-        </div>
-
-        <div class="form-group">
-          <label for="modal-reset-confirm" class="form-label">Confirm New Password</label>
-          <input type="password" id="modal-reset-confirm" class="form-input" placeholder="Re-type new password" minlength="6" required>
-        </div>
-
-        <button type="submit" class="btn-modal-submit" id="modal-reset-submit-btn">
-          <span>Reset Password & Sign In 🔑</span>
-        </button>
-
-        <div style="text-align: center; margin-top: 12px; font-size: 13px; color: var(--dash-text-muted);">
-          Remembered your password? <button type="button" id="modal-reset-back-btn" style="background:none;border:none;color:var(--dash-text);font-weight:700;text-decoration:underline;cursor:pointer;">Sign In instead</button>
-        </div>
-      </form>
+      </div>
 
     </div>
   </div>
+</section>
+
+</main> <!-- closes #dashboard-main-area -->
+
+<!-- Toast Notification -->
+<div class="toast-notification" id="toast-notification" role="status" aria-live="polite">
+  <span class="toast-icon">✓</span>
+  <span class="toast-message" id="toast-message">Changes saved!</span>
+</div>
+
 
   <!-- Modal: Create Another Conference Card -->
   <div class="dash-modal-overlay" id="new-card-modal" style="display: none;">
