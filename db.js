@@ -7,9 +7,9 @@ const { createClient } = require('@supabase/supabase-js');
 const DB_PATH = path.join(__dirname, 'data', 'db.json');
 const JWT_SECRET = process.env.JWT_SECRET || 'meetme_secret_salt_card_platform_2026';
 
-// Initialize Supabase Client if environment variables exist
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+// Initialize Supabase Client (uses environment variables, with project fallback for serverless)
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ypgowtcunpxwrkcvmhom.supabase.co';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwZ293dGN1bnB4d3JrY3ZtaG9tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NjM3NTAsImV4cCI6MjEwNzAzOTc1MH0.OFxaoH53wXlqP7iDdBIBcxrDVIXIcnAAqxnqgKa7zZs';
 let supabase = null;
 
 if (SUPABASE_URL && SUPABASE_ANON_KEY) {

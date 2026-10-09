@@ -145,8 +145,13 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
           });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'Login failed');
+          let data;
+          try {
+            data = await res.json();
+          } catch {
+            throw new Error(`Server returned an unexpected response (${res.status}). Please try again.`);
+          }
+          if (!res.ok) throw new Error(data.error || 'Invalid email/username or password.');
 
           localStorage.setItem('card_token', data.token);
           localStorage.setItem('card_user', JSON.stringify(data.user));
@@ -173,8 +178,21 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, username, password })
           });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'Registration failed');
+          let data;
+          try {
+            data = await res.json();
+          } catch {
+            throw new Error(`Server returned an unexpected response (${res.status}). Please try again.`);
+          }
+          if (!res.ok) {
+            if (data.error && data.error.toLowerCase().includes('already registered')) {
+              throw new Error('This email is already registered! Please switch to the Sign In tab.');
+            }
+            if (data.error && data.error.toLowerCase().includes('already taken')) {
+              throw new Error('This username is already taken. Please choose another username.');
+            }
+            throw new Error(data.error || 'Registration failed');
+          }
 
           localStorage.setItem('card_token', data.token);
           localStorage.setItem('card_user', JSON.stringify(data.user));

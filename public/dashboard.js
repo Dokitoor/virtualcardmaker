@@ -976,8 +976,21 @@ document.addEventListener('DOMContentLoaded', async () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, username, password })
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Registration failed');
+        let data;
+        try {
+          data = await res.json();
+        } catch {
+          throw new Error(`Server returned an unexpected response (${res.status}). Please try again.`);
+        }
+        if (!res.ok) {
+          if (data.error && data.error.toLowerCase().includes('already registered')) {
+            throw new Error('This email is already registered! Please switch to Sign In.');
+          }
+          if (data.error && data.error.toLowerCase().includes('already taken')) {
+            throw new Error('This username is already taken. Please choose another username.');
+          }
+          throw new Error(data.error || 'Registration failed');
+        }
 
         token = data.token;
         localStorage.setItem('card_token', token);
@@ -1012,8 +1025,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: identifier, password })
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Login failed');
+        let data;
+        try {
+          data = await res.json();
+        } catch {
+          throw new Error(`Server returned an unexpected response (${res.status}). Please try again.`);
+        }
+        if (!res.ok) throw new Error(data.error || 'Invalid email/username or password.');
 
         token = data.token;
         localStorage.setItem('card_token', token);
@@ -1060,7 +1078,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       headers: { 'Authorization': `Bearer ${token}` },
       body: formData
     });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error(`Server returned an unexpected response (${res.status}). Please try again.`);
+    }
     if (!res.ok) throw new Error(data.error || 'Failed to save card');
     currentCard = data.card;
     localStorage.removeItem('card_draft');
@@ -1083,9 +1106,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     step10ShowLoginBtn.addEventListener('click', () => {
       step10RegisterBox.style.display = 'none';
       step10LoginBox.style.display = 'block';
+      const regEmailEl = document.getElementById('step10-reg-email');
+      const logIdEl = document.getElementById('step10-login-identifier');
+      if (regEmailEl && logIdEl && !logIdEl.value) {
+        logIdEl.value = regEmailEl.value;
+      }
       if (step10MainTitle) step10MainTitle.textContent = 'Sign in to publish your card';
       if (step10MainSub) step10MainSub.textContent = 'Sign in with your Meetme account to publish your card changes.';
       if (saveCardBtn) saveCardBtn.innerHTML = '<span>Sign In & Publish Live 🚀</span>';
+      const step10Alert = document.getElementById('step10-auth-alert');
+      if (step10Alert) step10Alert.style.display = 'none';
     });
 
     step10ShowRegisterBtn.addEventListener('click', () => {
@@ -1094,6 +1124,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (step10MainTitle) step10MainTitle.textContent = 'Create your account to publish';
       if (step10MainSub) step10MainSub.textContent = 'Your card is ready! Create your free account to publish your card and claim your custom share link.';
       if (saveCardBtn) saveCardBtn.innerHTML = '<span>Create Account & Publish Live 🚀</span>';
+      const step10Alert = document.getElementById('step10-auth-alert');
+      if (step10Alert) step10Alert.style.display = 'none';
     });
   }
 
@@ -1152,8 +1184,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: identifier, password })
           });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'Login failed');
+          let data;
+          try {
+            data = await res.json();
+          } catch {
+            throw new Error(`Server returned an unexpected response (${res.status}). Please try again.`);
+          }
+          if (!res.ok) throw new Error(data.error || 'Invalid email/username or password.');
 
           token = data.token;
           localStorage.setItem('card_token', token);
@@ -1199,8 +1236,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, username, password })
           });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'Account creation failed');
+          let data;
+          try {
+            data = await res.json();
+          } catch {
+            throw new Error(`Server returned an unexpected response (${res.status}). Please try again.`);
+          }
+          if (!res.ok) {
+            if (data.error && data.error.toLowerCase().includes('already registered')) {
+              throw new Error('This email is already registered! Click "Sign In Instead" below to log into your account.');
+            }
+            if (data.error && data.error.toLowerCase().includes('already taken')) {
+              throw new Error('This username is already taken. Please choose another username.');
+            }
+            throw new Error(data.error || 'Account creation failed');
+          }
 
           token = data.token;
           localStorage.setItem('card_token', token);
