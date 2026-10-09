@@ -17,6 +17,76 @@
   <link rel="shortcut icon" href="/favicon.ico">
 
   <link rel="stylesheet" href="/styles.css">
+  <style>
+    /* Meetme Warm Brown Brand Styling for Auth */
+    .auth-logo svg {
+      color: #F6E4CF !important;
+    }
+    .auth-subtitle {
+      color: #6E5A4A !important;
+    }
+    .form-input, .username-field {
+      background-color: #FAF5EE !important;
+      border-color: rgba(50, 28, 4, 0.18) !important;
+      color: #321C04 !important;
+    }
+    .form-input:focus, .username-input-wrap:focus-within {
+      border-color: #8C5B32 !important;
+      background-color: #FFFFFF !important;
+      box-shadow: 0 0 0 3px rgba(140, 91, 50, 0.16) !important;
+      outline: none !important;
+    }
+    /* Neutralize browser default blue autofill across Chrome, Edge & Safari */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px #FAF5EE inset !important;
+      -webkit-text-fill-color: #321C04 !important;
+      caret-color: #321C04 !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+    .brand-link-btn {
+      background: none;
+      border: none;
+      color: #8C5B32 !important;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+      transition: color 0.15s ease;
+    }
+    .brand-link-btn:hover {
+      color: #321C04 !important;
+    }
+    .btn-auth-submit {
+      background-color: #321C04 !important;
+      color: #FFFFFF !important;
+      border-radius: 99px !important;
+    }
+    .btn-auth-submit:hover {
+      background-color: #1F1003 !important;
+    }
+    .auth-tab-btn.active {
+      background-color: #321C04 !important;
+      color: #FFFFFF !important;
+    }
+    .auth-tab-btn {
+      color: #6E5A4A !important;
+    }
+    .auth-footer-note {
+      color: #8C7B70 !important;
+    }
+    .auth-footer-note code {
+      background-color: #F6E4CF !important;
+      color: #321C04 !important;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+  </style>
 </head>
 <body class="auth-body">
 
@@ -29,14 +99,14 @@
     
     <div class="auth-header" style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px;">
       <a href="/" class="auth-logo" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none;padding:10px 20px;background-color:#321C04;color:#FFFFFF;border-radius:100px;box-shadow:0 4px 16px rgba(50,28,4,0.18);transition:transform 0.2s ease;">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:#2563EB;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:#F6E4CF;">
           <circle cx="7.2" cy="5.2" r="2.2"/>
           <circle cx="16.8" cy="5.2" r="2.2"/>
           <path d="M4.5 19.5V13.8C4.5 11.5 6.3 9.8 8.5 9.8C9.6 9.8 10.6 10.2 11.3 11L12 11.8L12.7 11C13.4 10.2 14.4 9.8 15.5 9.8C17.7 9.8 19.5 11.5 19.5 13.8V19.5H16.2V14.2C16.2 13.5 15.6 12.8 14.8 12.8C14.2 12.8 13.6 13.2 13.3 13.8L12 15.8L10.7 13.8C10.4 13.2 9.8 12.8 9.2 12.8C8.4 12.8 7.8 13.5 7.8 14.2V19.5H4.5Z"/>
         </svg>
         <span style="font-family:'Public Sans',sans-serif;font-weight:700;font-size:18px;letter-spacing:-0.02em;color:#FFFFFF;">Meetme</span>
       </a>
-      <p class="auth-subtitle" style="font-family:'Public Sans',sans-serif;font-size:14px;color:#475569;margin-top:4px;">Create and manage your Meetme digital card</p>
+      <p class="auth-subtitle" style="font-family:'Public Sans',sans-serif;font-size:14px;color:#6E5A4A;margin-top:4px;">Create and manage your Meetme digital card</p>
     </div>
 
     <!-- Auth Tabs -->
@@ -58,7 +128,7 @@
       <div class="form-group">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
           <label for="login-password" class="form-label" style="margin-bottom: 0;">Password</label>
-          <button type="button" id="link-forgot-pass" style="background:none;border:none;color:#4F46E5;font-size:12px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;">Forgot Password?</button>
+          <button type="button" id="link-forgot-pass" class="brand-link-btn">Forgot Password?</button>
         </div>
         <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
       </div>
@@ -109,13 +179,13 @@
           <span>Verify Code & Reset Password 🔑</span>
         </button>
 
-        <p style="text-align: center; margin: 4px 0 0 0; font-size: 13px; color: #6B7280;">
-          Didn't receive code? <button type="button" id="btn-resend-code" style="background:none;border:none;color:#4F46E5;font-weight:600;cursor:pointer;text-decoration:underline;padding:0;">Resend Code</button>
+        <p style="text-align: center; margin: 4px 0 0 0; font-size: 13px; color: #8C7B70;">
+          Didn't receive code? <button type="button" id="btn-resend-code" class="brand-link-btn" style="font-size: 13px;">Resend Code</button>
         </p>
       </div>
 
       <p class="auth-footer-note" style="text-align: center; margin-top: 14px;">
-        Remember your password? <button type="button" id="link-back-login" style="background:none;border:none;color:#4F46E5;font-weight:600;cursor:pointer;text-decoration:underline;padding:0;">Sign In Instead</button>
+        Remember your password? <button type="button" id="link-back-login" class="brand-link-btn" style="font-size: 13px;">Sign In Instead</button>
       </p>
     </form>
 
