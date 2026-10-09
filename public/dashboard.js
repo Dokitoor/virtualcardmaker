@@ -1753,21 +1753,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  function openNewCardModal() {
+    if (!newCardModal) return;
+    if (cardSwitcherDropdown) cardSwitcherDropdown.style.display = 'none';
+    if (newCardAlert) {
+      newCardAlert.style.display = 'none';
+      newCardAlert.textContent = '';
+    }
+    if (newCardForm) newCardForm.reset();
+    if (newCardUsernamePreview) newCardUsernamePreview.textContent = 'yourname-event';
+    newCardModal.classList.remove('hidden');
+    newCardModal.style.setProperty('display', 'flex', 'important');
+  }
+
+  function closeNewCardModal() {
+    if (!newCardModal) return;
+    newCardModal.classList.add('hidden');
+    newCardModal.style.setProperty('display', 'none', 'important');
+    if (newCardAlert) {
+      newCardAlert.style.display = 'none';
+      newCardAlert.textContent = '';
+    }
+  }
+
   if (openNewCardModalBtn && newCardModal) {
-    openNewCardModalBtn.addEventListener('click', () => {
-      if (cardSwitcherDropdown) cardSwitcherDropdown.style.display = 'none';
-      if (newCardAlert) newCardAlert.style.display = 'none';
-      if (newCardForm) newCardForm.reset();
-      if (newCardUsernamePreview) newCardUsernamePreview.textContent = 'yourname-event';
-      newCardModal.style.display = 'flex';
-    });
+    openNewCardModalBtn.addEventListener('click', openNewCardModal);
   }
 
   if (newCardModalClose && newCardModal) {
-    newCardModalClose.addEventListener('click', () => {
-      newCardModal.style.display = 'none';
+    newCardModalClose.addEventListener('click', closeNewCardModal);
+  }
+
+  if (newCardModal) {
+    newCardModal.addEventListener('click', (e) => {
+      if (e.target === newCardModal) {
+        closeNewCardModal();
+      }
     });
   }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && newCardModal && !newCardModal.classList.contains('hidden')) {
+      closeNewCardModal();
+    }
+  });
 
   if (newCardUsername && newCardUsernamePreview) {
     newCardUsername.addEventListener('input', (e) => {
@@ -1828,14 +1857,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!res.ok) throw new Error(data.error || 'Failed to create conference card.');
 
-        newCardModal.style.display = 'none';
-        userCards = data.cards || [data.card, ...userCards];
-        selectActiveCard(data.card);
-        renderDashboardCardsGrid();
-        switchDashboardView('cards');
-        showPublishedSuccessBanner(data.card.username);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        showToast(`🎉 New card created for ${eventName}! Public link: /c/${data.card.username}`);
+        // Close modal immediately upon successful creation
+        closeNewCardModal();
+
+        try {
+          userCards = data.cards || [data.card, ...userCards];
+          selectActiveCard(data.card);
+          renderDashboardCardsGrid();
+          switchDashboardView('cards');
+          showPublishedSuccessBanner(data.card.username);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          showToast(`🎉 New card created for ${eventName}! Public link: /c/${data.card.username}`);
+        } catch (uiErr) {
+          console.warn('UI update notice:', uiErr);
+          showToast(`🎉 New card created! Public link: /c/${data.card.username}`);
+        }
       } catch (err) {
         showNewCardAlert(err.message);
       } finally {
