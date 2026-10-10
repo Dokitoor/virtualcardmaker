@@ -30,45 +30,32 @@
   <header class="dashboard-top-nav">
     <div class="dash-brand-wrap">
       <a href="/" class="dash-auth-logo" title="Back to Meetme Home">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
           <circle cx="7.2" cy="5.2" r="2.2"/>
           <circle cx="16.8" cy="5.2" r="2.2"/>
           <path d="M4.5 19.5V13.8C4.5 11.5 6.3 9.8 8.5 9.8C9.6 9.8 10.6 10.2 11.3 11L12 11.8L12.7 11C13.4 10.2 14.4 9.8 15.5 9.8C17.7 9.8 19.5 11.5 19.5 13.8V19.5H16.2V14.2C16.2 13.5 15.6 12.8 14.8 12.8C14.2 12.8 13.6 13.2 13.3 13.8L12 15.8L10.7 13.8C10.4 13.2 9.8 12.8 9.2 12.8C8.4 12.8 7.8 13.5 7.8 14.2V19.5H4.5Z"/>
         </svg>
         <span class="dash-logo-text">Meetme</span>
       </a>
-      <span class="dash-badge">DASHBOARD</span>
     </div>
 
-    <!-- Center Navigation Tabs (My Cards / Card Builder / Settings) -->
-    <nav class="dash-view-tabs" role="tablist" aria-label="Dashboard views">
-      <button type="button" class="dash-nav-tab active" id="tab-btn-cards" role="tab" aria-selected="true" title="View all your digital cards">
-        <span class="tab-icon">🎴</span>
-        <span class="tab-label">My Cards</span>
-        <span class="dash-nav-count-badge" id="nav-cards-count">1</span>
-      </button>
-      <button type="button" class="dash-nav-tab" id="tab-btn-builder" role="tab" aria-selected="false" title="Customize or create cards in 3D builder">
-        <span class="tab-icon">✏️</span>
-        <span class="tab-label">Card Builder</span>
-      </button>
-      <button type="button" class="dash-nav-tab" id="tab-btn-settings" role="tab" aria-selected="false" title="Account & security settings">
-        <span class="tab-icon">⚙️</span>
-        <span class="tab-label">Settings</span>
-      </button>
-    </nav>
-
-    <!-- Right Controls: Theme Toggle, User Auth & Logout -->
+    <!-- Right Controls: Settings Shortcut & Profile Avatar (and Logout if guest) -->
     <div class="dash-controls-wrap">
-      <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" title="Toggle Light/Dark Mode">
-        <span id="theme-icon">🌙</span>
-        <span id="theme-text">Dark Mode</span>
+      <!-- Settings Icon Button (opens Settings view) -->
+      <button type="button" class="nav-settings-btn" id="nav-settings-btn" title="Settings" aria-label="Settings" style="display: none;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3.2"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
       </button>
 
-      <div class="user-info-pill" id="user-info-pill">
-        <span class="user-dot"></span>
-        <span id="user-display-email">Loading...</span>
-      </div>
-      <button id="logout-btn" class="btn-subtle-logout">Logout</button>
+      <!-- Profile Avatar Button (Logged In - opens Settings) -->
+      <button type="button" class="user-avatar-btn" id="user-avatar-btn" title="Account Profile" aria-label="Account Profile" style="display: none;">
+        <img id="header-avatar-img" src="/assets/dummy-avatar.svg" alt="Profile" class="header-avatar-img">
+      </button>
+
+      <!-- Sign In / Register (Logged Out only) -->
+      <button id="logout-btn" class="btn-subtle-logout">Sign In / Register</button>
     </div>
   </header>
 
@@ -82,7 +69,9 @@
         <!-- Active / Just-Published Celebratory Banner -->
         <div class="dash-published-alert" id="dash-published-alert" style="display: none;">
           <div class="dash-published-left">
-            <span class="dash-published-icon">🎉</span>
+            <span class="dash-published-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </span>
             <div>
               <div class="dash-published-title" id="published-alert-title">Your Card is Published Live!</div>
               <div class="dash-published-subtitle" id="published-alert-subtitle">Your 3D digital card is live. Share your link or preview below.</div>
@@ -90,10 +79,12 @@
           </div>
           <div class="dash-published-actions">
             <button type="button" class="btn-banner-action btn-banner-copy" id="banner-copy-btn">
-              <span>📋 Copy Share Link</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy Share Link</span>
             </button>
-            <a href="#" target="_blank" class="btn-banner-action btn-banner-view" id="banner-view-btn">
-              <span>View Live ↗</span>
+            <a href="#" target="_blank" class="btn-banner-action btn-banner-view" id="banner-view-btn" style="display:inline-flex; align-items:center; gap:5px;">
+              <span>View Live</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </a>
           </div>
         </div>
@@ -101,13 +92,8 @@
         <!-- Dashboard Hero Header -->
         <div class="dash-home-header">
           <div class="dash-home-greeting-wrap">
-            <h1 class="dash-home-title">Welcome, <span id="dash-greeting-name">there</span> 👋</h1>
+            <h1 class="dash-home-title">Welcome, <span id="dash-greeting-name">there</span></h1>
             <p class="dash-home-sub">Manage your digital passes, copy quick vanity share links, and launch tailored cards for upcoming conferences.</p>
-          </div>
-          <div>
-            <button type="button" class="btn-primary-create-card" id="home-new-card-btn">
-              <span>➕ Create New Conference Card</span>
-            </button>
           </div>
         </div>
 
@@ -127,7 +113,10 @@
 
           <div class="dash-stat-box">
             <span class="stat-box-label">Interactions</span>
-            <span class="stat-box-value" style="color: #10B981; font-size: 20px;">🟢 Live & Interactive</span>
+            <span class="stat-box-value" style="color: #10B981; font-size: 19px; display:inline-flex; align-items:center; gap:6px;">
+              <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10B981; box-shadow:0 0 8px #10B981;"></span>
+              Live & Interactive
+            </span>
             <span class="stat-box-hint">VCF contact download & 3D tilt active</span>
           </div>
         </div>
@@ -138,8 +127,9 @@
             <span>Your Digital Cards</span>
             <span class="dash-section-count" id="cards-badge-count">1</span>
           </h2>
-          <button type="button" class="btn-create-another-card" id="btn-quick-create-card" style="width: auto; padding: 6px 14px;">
-            <span>➕ New Card</span>
+          <button type="button" class="btn-create-another-card" id="btn-quick-create-card" style="width: auto; padding: 6px 14px; display:inline-flex; align-items:center; gap:6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>New Card</span>
           </button>
         </div>
 
@@ -150,11 +140,14 @@
 
         <!-- Empty State (Fallback if 0 cards) -->
         <div class="dash-empty-state" id="dash-cards-empty" style="display: none;">
-          <div class="dash-empty-icon">🎴</div>
+          <div class="dash-empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.6;"><rect x="2" y="4" width="20" height="16" rx="3.5"></rect><line x1="2" y1="9.5" x2="22" y2="9.5"></line><rect x="5.5" y="13.5" width="4.5" height="3" rx="0.8" fill="currentColor" opacity="0.3"></rect></svg>
+          </div>
           <h3 class="dash-empty-title">No Digital Cards Created Yet</h3>
           <p class="dash-empty-sub">Create your first 3D digital networking card in minutes using our step-by-step wizard.</p>
           <button type="button" class="btn-primary-create-card" id="empty-state-create-btn">
-            <span>Create Your First Card 🚀</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:5px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Create Your First Card</span>
           </button>
         </div>
 
@@ -166,32 +159,18 @@
       
       <!-- Builder Top Sub-Bar -->
       <div class="builder-top-bar">
-        <button type="button" class="btn-back-to-cards" id="builder-back-to-cards-btn">
-          <span>← Back to My Cards</span>
+        <button type="button" class="btn-back-to-cards" id="builder-back-to-cards-btn" style="display: none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <span>Back to My Cards</span>
         </button>
 
         <div class="builder-active-card-pill">
-          Editing: <strong id="builder-active-card-name">My Card</strong>
-        </div>
-
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <!-- Center Share URL Banner -->
-          <div class="dash-vanity-pill" id="vanity-share-box">
-            <span class="vanity-dot"></span>
-            <span class="vanity-label">PUBLIC LINK:</span>
-            <a href="#" id="vanity-url-link" target="_blank" class="vanity-url-display">Loading URL...</a>
-            <button id="copy-url-btn" class="btn-copy-sm" type="button">Copy</button>
-            <a href="#" id="open-live-btn" target="_blank" class="btn-open-sm">View ↗</a>
-          </div>
-
-          <button id="randomize-profile-btn" class="theme-toggle-btn randomize-btn" type="button" title="Fill out with a sample Nigerian profile across diverse roles">
-            <span>🎲 Sample Profile</span>
-          </button>
+          <span id="builder-status-prefix">Editing:</span> <strong id="builder-active-card-name">My Card</strong>
         </div>
       </div>
 
       <!-- Dashboard Workspace Layout -->
-      <div class="dashboard-workspace">
+      <div class="dashboard-workspace" id="dashboard-workspace">
 
     
     <!-- LEFT PANEL: MINIMAL INTERACTIVE FORM STAGE -->
@@ -725,8 +704,9 @@
               </div>
 
               <footer class="back-footer-actions">
-                <button type="button" class="flip-trigger-btn" id="flip-to-front-btn" style="background-color: var(--accent-primary, #321C04);">
-                  <span>← Back to Front Face</span>
+                <button type="button" class="flip-trigger-btn" id="flip-to-front-btn" style="background-color: var(--accent-primary, #321C04); display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                  <span>Back to Front Face</span>
                 </button>
               </footer>
             </article>
@@ -743,10 +723,16 @@
 <section id="view-settings-section" class="dash-view-section" style="display: none;">
   <div class="dash-container">
     
-    <div class="dash-home-header" style="margin-bottom: 24px;">
+    <div class="dash-home-header" style="margin-bottom: 24px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
       <div>
         <h1 class="dash-home-title">Account & Settings</h1>
         <p class="dash-home-sub">Manage your security credentials, profile identity, and platform preferences.</p>
+      </div>
+      <div>
+        <button type="button" class="btn-back-to-cards" id="settings-back-to-cards-btn" style="display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <span>Back to My Cards</span>
+        </button>
       </div>
     </div>
 
@@ -755,7 +741,10 @@
       <!-- Card 1: Account Profile -->
       <div class="settings-card">
         <div class="settings-card-header">
-          <h3 class="settings-card-title">👤 Account Information</h3>
+          <h3 class="settings-card-title" style="display:flex; align-items:center; gap:8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>Account Information</span>
+          </h3>
           <p class="settings-card-sub">Your registered Meetme profile details.</p>
         </div>
         
@@ -783,7 +772,10 @@
       <!-- Card 2: Security & Password -->
       <div class="settings-card">
         <div class="settings-card-header">
-          <h3 class="settings-card-title">🔒 Change Password</h3>
+          <h3 class="settings-card-title" style="display:flex; align-items:center; gap:8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>Change Password</span>
+          </h3>
           <p class="settings-card-sub">Update your account password safely.</p>
         </div>
 
@@ -806,7 +798,8 @@
           </div>
 
           <button type="submit" class="btn-settings-save" id="settings-save-pass-btn">
-            <span>Update Password 🔑</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:5px;"><path d="M21 2l-2 2m-2-2l2 2"></path><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="m21 2-9.6 9.6"></path><path d="m15.5 7.5 3 3"></path></svg>
+            <span>Update Password</span>
           </button>
         </form>
       </div>
@@ -814,7 +807,10 @@
       <!-- Card 3: Display & Session -->
       <div class="settings-card">
         <div class="settings-card-header">
-          <h3 class="settings-card-title">⚙️ Preferences & Session</h3>
+          <h3 class="settings-card-title" style="display:flex; align-items:center; gap:8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <span>Preferences & Session</span>
+          </h3>
           <p class="settings-card-sub">Theme mode and account sign out.</p>
         </div>
 
@@ -829,8 +825,9 @@
         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--dash-border, rgba(50, 28, 4, 0.08));">
           <h4 style="font-size: 14px; font-weight: 700; color: var(--dash-text); margin-bottom: 6px;">Sign Out</h4>
           <p style="font-size: 12.5px; color: var(--dash-text-muted); margin-bottom: 12px;">Sign out of this session on this browser.</p>
-          <button type="button" id="settings-logout-btn" class="btn-tile-action btn-tile-delete" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #EF4444; color: #EF4444; font-weight: 700; cursor: pointer;">
-            <span>Sign Out of Account 🚪</span>
+          <button type="button" id="settings-logout-btn" class="btn-tile-action btn-tile-delete" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #EF4444; color: #EF4444; font-weight: 700; cursor: pointer; display:inline-flex; align-items:center; gap:6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            <span>Sign Out of Account</span>
           </button>
         </div>
       </div>
@@ -898,6 +895,9 @@
       </form>
     </div>
   </div>
+
+  <!-- Fixed Mobile Native App Bottom Navigation Bar (Huge Icons Only) -->
+  
 
   <script src="/dashboard.js"></script>
 </body>

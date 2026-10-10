@@ -553,6 +553,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   // iPhone Share Sheet Modal
   function openIphoneShareModal() {
     if (!iphoneShareModal) return;
+    const shareAvatarImg = document.getElementById('share-avatar-img');
+    const shareSheetName = document.getElementById('share-sheet-name');
+    if (cardData) {
+      if (shareAvatarImg) {
+        shareAvatarImg.src = cardData.photoUrl || '/assets/dummy-avatar.svg';
+        shareAvatarImg.alt = cardData.fullName || 'Avatar';
+      }
+      if (shareSheetName) {
+        shareSheetName.textContent = cardData.fullName || 'Digital Business Card';
+      }
+    }
     iphoneShareModal.classList.add('is-open');
     playSubtleClick();
   }

@@ -31,10 +31,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const avatarPreviewImg = document.getElementById('avatar-preview-img');
   const themeOptionsGrid = document.getElementById('theme-options-grid');
 
-  // View Switcher & Settings Elements
+  // View Switcher, Avatar & Settings Elements
   const tabBtnCards = document.getElementById('tab-btn-cards');
-  const tabBtnBuilder = document.getElementById('tab-btn-builder');
   const tabBtnSettings = document.getElementById('tab-btn-settings');
+  const navSettingsBtn = document.getElementById('nav-settings-btn');
+  const userAvatarBtn = document.getElementById('user-avatar-btn');
+  const headerAvatarImg = document.getElementById('header-avatar-img');
   const builderBackToCardsBtn = document.getElementById('builder-back-to-cards-btn');
   const homeNewCardBtn = document.getElementById('home-new-card-btn');
   const btnQuickCreateCard = document.getElementById('btn-quick-create-card');
@@ -117,12 +119,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   function applyTheme(theme) {
     document.body.setAttribute('data-dashboard-theme', theme);
     localStorage.setItem('dashboard_theme', theme);
-    if (theme === 'dark') {
-      themeIcon.textContent = '☀️';
-      themeText.textContent = 'Light Mode';
-    } else {
-      themeIcon.textContent = '🌙';
-      themeText.textContent = 'Dark Mode';
+    if (themeIcon) {
+      if (theme === 'dark') {
+        themeIcon.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+      } else {
+        themeIcon.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+      }
+    }
+    const settingsThemeIcon = document.getElementById('settings-theme-icon');
+    const settingsThemeText = document.getElementById('settings-theme-text');
+    if (settingsThemeIcon && settingsThemeText) {
+      if (theme === 'dark') {
+        settingsThemeIcon.innerHTML = '☀️';
+        settingsThemeText.textContent = 'Switch to Light Mode';
+      } else {
+        settingsThemeIcon.innerHTML = '🌙';
+        settingsThemeText.textContent = 'Switch to Dark Mode';
+      }
     }
   }
 
@@ -385,35 +398,66 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Update UI for Auth State
   function syncAuthStateUI() {
+    const dashViewTabs = document.getElementById('dash-view-tabs');
+    const mobBottomNav = document.getElementById('mobile-bottom-nav');
+    const builderBackBtn = document.getElementById('builder-back-to-cards-btn');
+    const userInfoPill = document.getElementById('user-info-pill');
+    const builderStatusPrefix = document.getElementById('builder-status-prefix');
+
     if (isLoggedIn && currentUser) {
-      userDisplayEmail.textContent = currentUser.email;
-      logoutBtn.textContent = 'Logout';
+      document.body.classList.add('is-logged-in');
+      // Navigation tabs removed - settings is directly beside profile
+      if (builderBackBtn) builderBackBtn.style.display = (userCards && userCards.length > 0) ? 'inline-flex' : 'none';
+      if (userInfoPill) userInfoPill.style.display = 'none';
+      if (logoutBtn) logoutBtn.style.display = 'none'; // Kept in Settings view instead of top header
+      if (navSettingsBtn) navSettingsBtn.style.display = 'inline-flex';
+      if (userAvatarBtn) {
+        userAvatarBtn.style.display = 'inline-flex';
+        const photo = (currentCard && currentCard.photoUrl) || (userCards && userCards[0] && userCards[0].photoUrl) || '/assets/dummy-avatar.svg';
+        if (headerAvatarImg) headerAvatarImg.src = photo;
+      }
+
+      if (builderStatusPrefix) builderStatusPrefix.textContent = 'Editing:';
+      if (builderActiveCardName && currentCard) {
+        builderActiveCardName.textContent = currentCard.editionMark || currentCard.fullName || `/c/${currentCard.username}`;
+      }
 
       const activeHandle = (currentCard && currentCard.username) || currentUser.username;
-      previewUsernameTag.textContent = activeHandle;
+      if (previewUsernameTag) previewUsernameTag.textContent = activeHandle;
 
-      const fullVanityUrl = `${window.location.origin}/c/${activeHandle}`;
-      vanityUrlLink.href = fullVanityUrl;
-      vanityUrlLink.textContent = fullVanityUrl;
-      openLiveBtn.href = fullVanityUrl;
+      if (vanityUrlLink) {
+        const fullVanityUrl = `${window.location.origin}/c/${activeHandle}`;
+        vanityUrlLink.href = fullVanityUrl;
+        vanityUrlLink.textContent = fullVanityUrl;
+      }
+      if (openLiveBtn) {
+        openLiveBtn.href = `${window.location.origin}/c/${activeHandle}`;
+      }
 
-      saveCardBtn.innerHTML = '<span>Save & Publish Changes 🚀</span>';
-      liveCardIframe.src = `/c/${activeHandle}`;
+      if (saveCardBtn) saveCardBtn.innerHTML = '<span>Save & Publish Changes 🚀</span>';
+      if (liveCardIframe) liveCardIframe.src = `/c/${activeHandle}`;
       populateForm(currentCard);
     } else {
-      userDisplayEmail.textContent = '⚡ DRAFT MODE (Unpublished)';
-      logoutBtn.textContent = 'Sign In / Register';
-      previewUsernameTag.textContent = 'yourname';
+      // Unauthenticated: Direct to card builder with no empty dashboard/settings clutter
+      document.body.classList.remove('is-logged-in');
+
+      if (builderBackBtn) builderBackBtn.style.display = 'none';
+      if (userInfoPill) userInfoPill.style.display = 'none';
+      if (navSettingsBtn) navSettingsBtn.style.display = 'none';
+      if (userAvatarBtn) userAvatarBtn.style.display = 'none';
+      if (logoutBtn) {
+        logoutBtn.style.display = 'inline-flex';
+        logoutBtn.textContent = 'Sign In / Register';
+      }
+
+      if (builderStatusPrefix) builderStatusPrefix.textContent = 'Creating:';
+      if (builderActiveCardName) builderActiveCardName.textContent = 'New 3D Card';
+
+      if (previewUsernameTag) previewUsernameTag.textContent = 'yourname';
       renderCardSwitcherUI();
 
-      const draftVanityUrl = `${window.location.origin}/c/yourname`;
-      vanityUrlLink.href = '#';
-      vanityUrlLink.textContent = `${draftVanityUrl} (Claim link below)`;
-      openLiveBtn.href = '#';
-      openLiveBtn.onclick = (e) => { e.preventDefault(); openAuthModal(); };
-
-      saveCardBtn.innerHTML = '<span>Publish & Claim Custom Link 🚀</span>';
-      liveCardIframe.src = `/c/demo`;
+      if (saveCardBtn) saveCardBtn.innerHTML = '<span>Publish & Claim Custom Link 🚀</span>';
+      if (liveCardIframe) liveCardIframe.src = `/c/demo`;
 
       const savedDraft = localStorage.getItem('card_draft');
       if (savedDraft) {
@@ -922,19 +966,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     emitLiveUpdate();
   }
 
-  copyUrlBtn.addEventListener('click', async () => {
-    const url = vanityUrlLink.href;
-    if (!isLoggedIn) {
-      openAuthModal();
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(url);
-      showToast('Custom card URL copied to clipboard!');
-    } catch {
-      showToast('Card URL: ' + url);
-    }
-  });
+  if (copyUrlBtn && vanityUrlLink) {
+    copyUrlBtn.addEventListener('click', async () => {
+      const url = vanityUrlLink.href;
+      if (!isLoggedIn) {
+        openAuthModal();
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast('Custom card URL copied to clipboard!');
+      } catch {
+        showToast('Card URL: ' + url);
+      }
+    });
+  }
 
   logoutBtn.addEventListener('click', async () => {
     if (isLoggedIn) {
@@ -968,6 +1014,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   let activeDashboardView = 'cards';
 
   function switchDashboardView(view) {
+    if (!isLoggedIn && (view === 'cards' || view === 'settings')) {
+      view = 'builder';
+    }
     activeDashboardView = view;
     const viewCards = document.getElementById('view-cards-section');
     const viewBuilder = document.getElementById('view-builder-section');
@@ -977,24 +1026,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (viewBuilder) viewBuilder.style.display = view === 'builder' ? 'block' : 'none';
     if (viewSettings) viewSettings.style.display = view === 'settings' ? 'block' : 'none';
 
-    if (tabBtnCards) {
-      tabBtnCards.classList.toggle('active', view === 'cards');
-      tabBtnCards.setAttribute('aria-selected', view === 'cards');
-    }
-    if (tabBtnBuilder) {
-      tabBtnBuilder.classList.toggle('active', view === 'builder');
-      tabBtnBuilder.setAttribute('aria-selected', view === 'builder');
-    }
-    if (tabBtnSettings) {
-      tabBtnSettings.classList.toggle('active', view === 'settings');
-      tabBtnSettings.setAttribute('aria-selected', view === 'settings');
+    if (navSettingsBtn) {
+      navSettingsBtn.classList.toggle('active', view === 'settings');
+      navSettingsBtn.setAttribute('aria-selected', view === 'settings');
     }
 
     if (view === 'cards') {
       renderDashboardCardsGrid();
     } else if (view === 'builder') {
-      if (builderActiveCardName && currentCard) {
-        builderActiveCardName.textContent = currentCard.editionMark || currentCard.fullName || `/c/${currentCard.username}`;
+      const builderBackBtn = document.getElementById('builder-back-to-cards-btn');
+      if (builderBackBtn) {
+        builderBackBtn.style.display = (isLoggedIn && userCards && userCards.length > 0) ? 'inline-flex' : 'none';
+      }
+      const builderActiveCardName = document.getElementById('builder-active-card-name');
+      const builderStatusPrefix = document.getElementById('builder-status-prefix');
+      if (builderStatusPrefix) {
+        builderStatusPrefix.textContent = isLoggedIn ? 'Editing:' : 'Creating:';
+      }
+      if (builderActiveCardName) {
+        if (isLoggedIn && currentCard) {
+          builderActiveCardName.textContent = currentCard.editionMark || currentCard.fullName || `/c/${currentCard.username}`;
+        } else {
+          builderActiveCardName.textContent = 'New 3D Card';
+        }
       }
       emitLiveUpdate();
       setTimeout(emitLiveUpdate, 200);
@@ -1013,7 +1067,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!alertBanner || !handle) return;
     const fullUrl = `${window.location.origin}/c/${handle}`;
     alertBanner.style.display = 'flex';
-    if (alertTitle) alertTitle.textContent = `🎉 Your Card (/c/${handle}) is Live!`;
+    if (alertTitle) alertTitle.textContent = `Your Card (/c/${handle}) is Live!`;
     if (alertSub) alertSub.textContent = `Anyone can now view your 3D digital card or save your contact info with one tap.`;
 
     if (bannerCopyBtn) {
@@ -1023,7 +1077,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           showToast(`Copied: ${fullUrl}`);
           bannerCopyBtn.innerHTML = '<span>✓ Copied!</span>';
           setTimeout(() => {
-            bannerCopyBtn.innerHTML = '<span>📋 Copy Share Link</span>';
+            bannerCopyBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span>Copy Share Link</span>';
           }, 2000);
         } catch {
           showToast(`Share Link: ${fullUrl}`);
@@ -1042,6 +1096,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const statCardCount = document.getElementById('stat-card-count');
     const cardsBadgeCount = document.getElementById('cards-badge-count');
     const navCardsCount = document.getElementById('nav-cards-count');
+    const mobCardsCount = document.getElementById('mob-cards-count');
     const statPrimaryHandle = document.getElementById('stat-primary-handle');
     const dashGreetingName = document.getElementById('dash-greeting-name');
 
@@ -1049,6 +1104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (statCardCount) statCardCount.textContent = totalCards;
     if (cardsBadgeCount) cardsBadgeCount.textContent = totalCards;
     if (navCardsCount) navCardsCount.textContent = totalCards;
+    if (mobCardsCount) mobCardsCount.textContent = totalCards;
 
     const displayName = (currentUser && currentUser.username) || (currentCard && currentCard.fullName) || 'there';
     if (dashGreetingName) dashGreetingName.textContent = displayName;
@@ -1113,18 +1169,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         <div class="dash-card-tile-actions">
-          <button type="button" class="btn-tile-action btn-tile-copy" data-link="${fullLink}">
-            <span>📋 Copy Link</span>
+          <button type="button" class="btn-tile-action btn-tile-copy" data-link="${fullLink}" style="display:inline-flex; align-items:center; justify-content:center; gap:5px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span>Copy Link</span>
           </button>
-          <a href="${fullLink}" target="_blank" class="btn-tile-action btn-tile-view">
-            <span>View ↗</span>
+          <a href="${fullLink}" target="_blank" class="btn-tile-action btn-tile-view" style="display:inline-flex; align-items:center; justify-content:center; gap:4px;">
+            <span>View</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
           </a>
-          <button type="button" class="btn-tile-action btn-tile-edit" data-card-id="${escapeHtml(card.id)}">
-            <span>Edit Card ✏️</span>
+          <button type="button" class="btn-tile-action btn-tile-edit" data-card-id="${escapeHtml(card.id)}" style="display:inline-flex; align-items:center; justify-content:center; gap:5px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            <span>Edit Card</span>
           </button>
           ${userCards.length > 1 ? `
-            <button type="button" class="btn-tile-action btn-tile-delete" data-card-id="${escapeHtml(card.id)}" title="Delete card">
-              <span>🗑️</span>
+            <button type="button" class="btn-tile-action btn-tile-delete" data-card-id="${escapeHtml(card.id)}" title="Delete card" aria-label="Delete card" style="display:inline-flex; align-items:center; justify-content:center;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             </button>
           ` : ''}
         </div>
@@ -1210,10 +1269,67 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // View Navigation Listeners
-  if (tabBtnCards) tabBtnCards.addEventListener('click', () => switchDashboardView('cards'));
-  if (tabBtnBuilder) tabBtnBuilder.addEventListener('click', () => switchDashboardView('builder'));
-  if (tabBtnSettings) tabBtnSettings.addEventListener('click', () => switchDashboardView('settings'));
-  if (builderBackToCardsBtn) builderBackToCardsBtn.addEventListener('click', () => switchDashboardView('cards'));
+  if (tabBtnCards) {
+    tabBtnCards.addEventListener('click', () => {
+      if (!isLoggedIn) {
+        switchDashboardView('builder');
+        goToStep(10);
+        showToast('Please sign in or create an account first.');
+        return;
+      }
+      switchDashboardView('cards');
+    });
+  }
+
+  if (navSettingsBtn) {
+    navSettingsBtn.addEventListener('click', () => {
+      if (!isLoggedIn) {
+        switchDashboardView('builder');
+        goToStep(10);
+        showToast('Please sign in or create an account first.');
+        return;
+      }
+      switchDashboardView('settings');
+    });
+  }
+
+  if (userAvatarBtn) {
+    userAvatarBtn.addEventListener('click', () => {
+      if (!isLoggedIn) {
+        switchDashboardView('builder');
+        goToStep(10);
+        showToast('Please sign in or create an account first.');
+        return;
+      }
+      switchDashboardView('settings');
+    });
+  }
+
+  if (builderBackToCardsBtn) {
+    builderBackToCardsBtn.addEventListener('click', () => {
+      if (isLoggedIn && userCards && userCards.length > 0) {
+        switchDashboardView('cards');
+      }
+    });
+  }
+
+  const settingsBackToCardsBtn = document.getElementById('settings-back-to-cards-btn');
+  if (settingsBackToCardsBtn) {
+    settingsBackToCardsBtn.addEventListener('click', () => {
+      switchDashboardView('cards');
+    });
+  }
+
+  const dashAuthLogo = document.querySelector('.dash-auth-logo');
+  if (dashAuthLogo) {
+    dashAuthLogo.addEventListener('click', (e) => {
+      if (isLoggedIn) {
+        e.preventDefault();
+        switchDashboardView('cards');
+      }
+    });
+  }
+
   if (homeNewCardBtn) homeNewCardBtn.addEventListener('click', () => openNewCardModal());
   if (btnQuickCreateCard) btnQuickCreateCard.addEventListener('click', () => openNewCardModal());
   if (emptyStateCreateBtn) emptyStateCreateBtn.addEventListener('click', () => switchDashboardView('builder'));
